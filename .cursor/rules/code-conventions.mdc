@@ -1,0 +1,54 @@
+---
+description: Code conventions for ConciergeTravel.fr (TypeScript strict, naming, layering, imports, comments)
+globs: "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Code conventions — ConciergeTravel.fr
+
+## Layering
+- Pure domain logic lives in `packages/domain/`. No `next/`, `@supabase/*`, `fetch`, `Date.now()` allowed there.
+- Vendor calls live in `packages/integrations/`. Each vendor has a dedicated package or sub-folder.
+- Apps (`apps/web`, `apps/admin`) compose domain + integrations. They never re-implement domain rules.
+
+## TypeScript strict
+- No `any`, no `as Foo`, no `!` non-null assertion. Narrow with type guards or Zod.
+- Branded types for IDs and slugs.
+- Discriminated unions for state and `Result<T, Error>` for fallible operations.
+- Exhaustive switch with a `never`-returning helper.
+
+## Naming
+- Files: kebab-case (`hotel-detail.tsx`, `cancellation-policy.ts`). React components export PascalCase.
+- Symbols: PascalCase types/components, camelCase values, SCREAMING_SNAKE for env-only constants.
+- Test files alongside source: `<name>.test.ts(x)`.
+
+## Imports
+- Use path aliases (`@cct/domain`, `@cct/integrations`, `@cct/seo`, …) instead of deep relative paths.
+- Group: built-ins → external → workspace → relative. Prettier organises automatically; do not fight it.
+- Never import server-only secrets in client components. ESLint enforces.
+
+## Comments
+- Only when intent is non-obvious. Do not narrate the code.
+- ADR-level decisions reference the ADR number in a comment, e.g. `// see docs/adr/0003-payload-cms.md`.
+
+## React / Next.js
+- Server Components by default. `'use client'` only for genuine interactivity.
+- Server Actions: validate input with Zod at the boundary; return discriminated `Result` unions.
+- Avoid `useEffect` for data fetching — use Server Components or actions.
+
+## Validation
+- Vendor responses parsed by Zod schemas in `packages/integrations/<vendor>/types.ts`. Cast results never bypass parse.
+
+## Errors
+- Domain returns typed errors. Throwing reserved for programmer assertions.
+- HTTP route handlers and server actions translate domain errors to user-facing responses without leaking stack traces.
+
+## Tests
+- New business rule → unit test in `packages/domain/`.
+- New integration function → MSW-mocked test in the integration package.
+- New user journey impacting booking, search, account, or comparator → Playwright E2E case.
+
+## Security
+- Read secrets only from validated env via `@cct/config/env`.
+- No `dangerouslySetInnerHTML` outside of trusted JSON-LD scripts.
+- Do not log PII (email, phone, full address).

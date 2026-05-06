@@ -1,0 +1,65 @@
+---
+description: Conventional Commits for ConciergeTravel.fr — scopes, types, examples
+alwaysApply: false
+---
+
+# Commit conventions — ConciergeTravel.fr
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/) with project-specific scopes.
+
+## Format
+
+```
+<type>(<scope>): <short summary>
+
+<optional body>
+
+<optional footer(s)>
+```
+
+## Types
+- `feat`: new feature
+- `fix`: bug fix
+- `chore`: tooling, scaffolding, dependency bumps
+- `refactor`: refactor without behavior change
+- `perf`: performance improvement
+- `docs`: documentation only
+- `test`: tests only
+- `style`: formatting, no logic
+- `revert`: revert previous commit
+
+## Scopes (project-specific)
+- `repo` — root tooling, CI, monorepo plumbing
+- `web` — `apps/web`
+- `admin` — `apps/admin`
+- `db` — `packages/db`
+- `domain` — `packages/domain`
+- `integrations` — generic integrations changes
+- `amadeus`, `little`, `makcorps`, `apify`, `gplaces`, `brevo`, `algolia`, `redis`, `sentry` — specific integration
+- `seo`, `geo`, `aeo`, `jsonld`, `sitemap`, `robots`, `llms`
+- `booking`, `search`, `loyalty`, `pricing`, `editorial`, `account`, `auth`, `email`
+- `ui` — shared UI
+- `docs` — documentation
+- `skills` — `.cursor/skills/`
+
+## Examples
+
+```
+feat(booking): persist cancellation policy verbatim in bookings table
+
+fix(amadeus): refresh OAuth token on 401 with mutex to avoid stampede
+
+docs(seo): document anti-cannibalisation 301 matrix
+
+chore(repo): bump turbo to 2.5.0 and pnpm to 10.33.2
+
+feat(skills): bootstrap 29 cursor skills covering CDC v3.0 §14
+
+refactor(domain): extract Booking state machine into dedicated module
+```
+
+## Rules
+- Subject in imperative mood ("add", "fix", not "added", "fixes").
+- ≤ 72 chars subject line; body wraps at 100 chars.
+- Reference ADRs in body when relevant: `Refs: docs/adr/0003-payload-cms.md`.
+- Breaking changes flagged with `!` and `BREAKING CHANGE:` footer.
