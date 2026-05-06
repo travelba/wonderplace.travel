@@ -1,0 +1,41 @@
+/**
+ * Design tokens — the entire visual identity is driven by these CSS custom
+ * properties. Restyling the product = override this file in apps/web/src/styles.
+ *
+ * Palette inspired by CDC §10.1 (sober editorial luxe, neutral base + gold accent).
+ */
+:root {
+  /* Colors */
+  --color-bg: #fafaf8;
+  --color-fg: #1a1a1a;
+  --color-muted: #6b6b6b;
+  --color-border: #e5e5e0;
+  --color-accent-gold: #c9a96e;
+  --color-accent-fg: #1a1a1a;
+  --color-sage: #8f9d83;
+  --color-success: #2f7a3d;
+  --color-warning: #b07d2e;
+  --color-danger: #a83232;
+
+  /* Typography (overridden by next/font in apps/web) */
+  --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', 'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* Spacing scale (4px base) is on Tailwind; tokens here are extras */
+  --space-section: 6rem;
+  --space-section-mobile: 3.5rem;
+
+  /* Layout */
+  --max-prose: 68ch;
+  --max-editorial: 74rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Dark palette deferred — the brief mandates a sober neutral base and the
+     final design will be reworked. Keeping a light theme as default. */
+}

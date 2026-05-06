@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": false,
+    "useDefineForClassFields": true,
+
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+
+    "jsx": "preserve",
+
+    "paths": {
+      "@cct/db": ["./packages/db/src/index.ts"],
+      "@cct/db/*": ["./packages/db/src/*"],
+      "@cct/domain": ["./packages/domain/src/index.ts"],
+      "@cct/domain/*": ["./packages/domain/src/*"],
+      "@cct/integrations": ["./packages/integrations/src/index.ts"],
+      "@cct/integrations/*": ["./packages/integrations/src/*"],
+      "@cct/ui": ["./packages/ui/src/index.ts"],
+      "@cct/ui/*": ["./packages/ui/src/*"],
+      "@cct/seo": ["./packages/seo/src/index.ts"],
+      "@cct/seo/*": ["./packages/seo/src/*"],
+      "@cct/emails": ["./packages/emails/src/index.ts"],
+      "@cct/emails/*": ["./packages/emails/src/*"],
+      "@cct/observability": ["./packages/observability/src/index.ts"],
+      "@cct/observability/*": ["./packages/observability/src/*"],
+      "@cct/config": ["./packages/config/src/index.ts"],
+      "@cct/config/*": ["./packages/config/src/*"]
+    }
+  },
+  "exclude": ["node_modules", ".next", "dist", "build", "coverage", ".turbo"]
+}

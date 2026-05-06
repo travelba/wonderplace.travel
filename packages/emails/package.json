@@ -1,0 +1,28 @@
+{
+  "name": "@cct/emails",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./templates/*": "./src/templates/*"
+  },
+  "scripts": {
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "dev": "email dev --port 3002 --dir ./src/templates",
+    "export": "email export --dir ./src/templates --outDir ./dist"
+  },
+  "dependencies": {
+    "@react-email/components": "^0.0.32",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@cct/config": "workspace:*",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "react-email": "^3.0.4",
+    "typescript": "catalog:"
+  }
+}

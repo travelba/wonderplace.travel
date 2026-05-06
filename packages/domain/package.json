@@ -1,0 +1,31 @@
+{
+  "name": "@cct/domain",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./hotels": "./src/hotels/index.ts",
+    "./booking": "./src/booking/index.ts",
+    "./loyalty": "./src/loyalty/index.ts",
+    "./pricing": "./src/pricing/index.ts",
+    "./editorial": "./src/editorial/index.ts",
+    "./shared": "./src/shared/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cct/config": "workspace:*",
+    "@types/node": "^22.10.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

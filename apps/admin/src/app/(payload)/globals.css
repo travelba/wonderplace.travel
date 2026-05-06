@@ -1,0 +1,8 @@
+/**
+ * Payload admin global stylesheet (light layer on top of Payload's defaults).
+ * Brand customization to come in Phase 8.
+ */
+:root {
+  --theme-elevation-50: #fafaf8;
+  --theme-elevation-1000: #1a1a1a;
+}

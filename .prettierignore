@@ -1,0 +1,13 @@
+node_modules
+.next
+.turbo
+.vercel
+dist
+build
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+*.lock
+*.tsbuildinfo
+apps/admin/payload-types.ts

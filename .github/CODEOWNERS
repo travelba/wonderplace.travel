@@ -1,0 +1,9 @@
+# Default owners for everything in the repo.
+# Will be updated when team members are onboarded.
+*       @cct-cto
+
+/.cursor/skills/                    @cct-cto
+/.cursor/rules/                     @cct-cto
+/docs/adr/                          @cct-cto
+/packages/db/migrations/            @cct-cto
+/.github/                           @cct-cto

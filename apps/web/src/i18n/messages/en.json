@@ -1,0 +1,37 @@
+{
+  "common": {
+    "siteName": "ConciergeTravel",
+    "tagline": "5-star hotels and Palaces in France — editorial selection and premium booking",
+    "search": "Search",
+    "book": "Book",
+    "bookingRequest": "Request booking",
+    "loading": "Loading…",
+    "loginCTA": "Sign in",
+    "signupCTA": "Create an account"
+  },
+  "navigation": {
+    "hotels": "Hotels",
+    "selection": "Selections",
+    "guides": "Guides",
+    "loyalty": "Loyalty program",
+    "method": "Our method",
+    "agency": "The agency"
+  },
+  "homepage": {
+    "title": "The concierge for France's finest hotels",
+    "subtitle": "IATA-accredited agency and ASPST member. GDS net rates, secure Amadeus payment, loyalty perks from the first night.",
+    "comingSoon": "ConciergeTravel.fr — bootstrapping",
+    "trust": {
+      "iata": "IATA-accredited agency",
+      "aspst": "ASPST member",
+      "amadeus": "Secure Amadeus payment"
+    }
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The requested page does not exist or has been moved.",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "Our team has been notified. Please try again shortly.",
+    "tryAgain": "Try again"
+  }
+}

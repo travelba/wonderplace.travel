@@ -1,0 +1,31 @@
+{
+  "name": "@cct/seo",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./jsonld": "./src/jsonld/index.ts",
+    "./jsonld/builders": "./src/jsonld/builders/index.ts",
+    "./metadata": "./src/metadata.ts",
+    "./llms": "./src/llms/index.ts",
+    "./sitemaps": "./src/sitemaps/index.ts",
+    "./agent-skills": "./src/agent-skills.ts"
+  },
+  "scripts": {
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "schema-dts": "^1.1.5",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cct/config": "workspace:*",
+    "@cct/domain": "workspace:*",
+    "@types/node": "^22.10.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

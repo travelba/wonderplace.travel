@@ -1,0 +1,38 @@
+{
+  "name": "@cct/integrations",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./amadeus": "./src/amadeus/index.ts",
+    "./little-hotelier": "./src/little-hotelier/index.ts",
+    "./makcorps": "./src/makcorps/index.ts",
+    "./apify": "./src/apify/index.ts",
+    "./google-places": "./src/google-places/index.ts",
+    "./brevo": "./src/brevo/index.ts",
+    "./algolia-admin": "./src/algolia-admin/index.ts",
+    "./redis": "./src/redis/index.ts",
+    "./http": "./src/http/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "catalog:",
+    "@upstash/redis": "catalog:",
+    "algoliasearch": "^5.20.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cct/config": "workspace:*",
+    "@cct/domain": "workspace:*",
+    "@types/node": "^22.10.0",
+    "msw": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

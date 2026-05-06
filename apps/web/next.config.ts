@@ -1,0 +1,76 @@
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  poweredByHeader: false,
+  experimental: {
+    typedRoutes: true,
+    optimizePackageImports: ['lucide-react', '@cct/ui'],
+  },
+  transpilePackages: ['@cct/ui', '@cct/seo', '@cct/domain', '@cct/emails'],
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: '**.supabase.co' },
+    ],
+    deviceSizes: [320, 420, 640, 768, 1024, 1280, 1536, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
+          },
+          // RFC 8288: announce agent skills (cf. geo-llm-optimization skill)
+          {
+            key: 'Link',
+            value: '</.well-known/agent-skills.json>; rel="agent-skills"',
+          },
+        ],
+      },
+      {
+        // Tunnel + account: noindex
+        source: '/:locale(fr|en)/(reservation|compte|auth)/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
+  },
+  async redirects() {
+    // Anti-cannibalisation 301 redirects (cf. CDC arborescence + ADR seo).
+    // Final list managed via Payload `Redirects` collection in Phase 8.
+    return [
+      {
+        source: '/:locale(fr|en)/selection/lune-de-miel',
+        destination: '/:locale/selection/romantiques-et-lune-de-miel',
+        permanent: true,
+      },
+      {
+        source: '/:locale(fr|en)/selection/ski',
+        destination: '/:locale/selection/montagne',
+        permanent: true,
+      },
+      {
+        source: '/:locale(fr|en)/selection/plage-privee',
+        destination: '/:locale/selection/bord-de-mer-et-plage',
+        permanent: true,
+      },
+    ];
+  },
+};
+
+export default withNextIntl(nextConfig);
