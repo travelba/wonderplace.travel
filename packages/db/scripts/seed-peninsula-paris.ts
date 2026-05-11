@@ -67,6 +67,12 @@ interface LocalisedFaq {
   readonly answer_fr: string;
   readonly question_en: string;
   readonly answer_en: string;
+  /**
+   * Intent-based bucket consumed by `readFaqByCategory()` in the
+   * web app. Omitting it lands the question in the `before` bucket
+   * (legacy behaviour). See `apps/web/src/server/hotels/get-hotel-by-slug.ts`.
+   */
+  readonly category?: 'before' | 'during' | 'after' | 'agency';
 }
 
 interface CloudinaryImage {
@@ -164,6 +170,7 @@ const AMENITIES: readonly LocalisedAmenity[] = [
 
 const FAQ: readonly LocalisedFaq[] = [
   {
+    category: 'before',
     question_fr: "Quelle est l'adresse du Peninsula Paris ?",
     answer_fr:
       'The Peninsula Paris est situé au 19 avenue Kléber, 75116 Paris, dans le 16ᵉ arrondissement, à 5 minutes à pied de l’Arc de Triomphe et des Champs-Élysées.',
@@ -172,46 +179,34 @@ const FAQ: readonly LocalisedFaq[] = [
       'The Peninsula Paris is located at 19 Avenue Kléber, 75116 Paris, in the 16th arrondissement, a 5-minute walk from the Arc de Triomphe and the Champs-Élysées.',
   },
   {
-    question_fr: 'Quels sont les restaurants du Peninsula Paris ?',
+    category: 'before',
+    question_fr: "Quel est le prix moyen d'une nuit au Peninsula Paris ?",
     answer_fr:
-      "L'hôtel compte 7 lieux de restauration : L'Oiseau Blanc (rooftop, 2★ Michelin, chef David Bizet), LiLi (cantonais gastronomique), Le Lobby (français et international), Le Bar Kléber, La Terrasse Kléber, Le Rooftop \"L'Heure Dorée\" et le Lounge Kléber Cigar.",
-    question_en: 'What restaurants are available at The Peninsula Paris?',
+      'Les chambres Deluxe démarrent autour de 1 600 € la nuit, les chambres Premier autour de 2 200 €, et la Suite Tour Eiffel autour de 8 000 €. Le tarif définitif dépend de la saison, de la durée du séjour et des options incluses (petit-déjeuner, transfert). ConciergeTravel transmet un devis personnalisé sous 24 h après votre demande.',
+    question_en: 'What is the average price for a night at The Peninsula Paris?',
     answer_en:
-      'The hotel has 7 dining venues: L\'Oiseau Blanc (rooftop, 2 Michelin stars, chef David Bizet), LiLi (fine Cantonese cuisine), Le Lobby (French and international), Le Bar Kléber, La Terrasse Kléber, the "Golden Hour" Rooftop and the Kléber Cigar Lounge.',
+      'Deluxe rooms start around €1,600 per night, Premier rooms around €2,200, and the Eiffel Tower Suite around €8,000. The final rate depends on season, length of stay and included options (breakfast, transfer). ConciergeTravel sends a personalised quote within 24 hours of your request.',
   },
   {
-    question_fr: 'Le Peninsula Paris dispose-t-il d’un spa et d’une piscine ?',
+    category: 'before',
+    question_fr: "Comment se rendre à l'hôtel depuis l'aéroport Charles-de-Gaulle ?",
     answer_fr:
-      "Oui. Le Spa Peninsula est le plus grand parmi les palaces parisiens (1 800 m², 6 salles de soins). L'hôtel propose aussi une piscine intérieure et une salle de sport ouverte 24h/24.",
-    question_en: 'Does The Peninsula Paris have a spa and a pool?',
+      "L'aéroport Paris-Charles-de-Gaulle est à 25 km, soit environ 30 minutes en voiture. Le service de voiturier de l'hôtel propose un transfert privé en Rolls-Royce Phantom EWB (à réserver avant l'arrivée). En transports en commun : RER B jusqu'à Charles-de-Gaulle–Étoile puis métro ligne 6 jusqu'à Kléber (environ 55 minutes au total).",
+    question_en: 'How can I reach the hotel from Charles-de-Gaulle airport?',
     answer_en:
-      'Yes. The Peninsula Spa is the largest among Parisian palaces (1,800 m², 6 treatment rooms). The hotel also offers an indoor pool and a 24/7 fitness centre.',
+      "Paris-Charles-de-Gaulle airport is 25 km away, about 30 minutes by car. The hotel's chauffeur service offers private transfers in a Rolls-Royce Phantom EWB (book before arrival). By public transport: RER B to Charles-de-Gaulle–Étoile then metro line 6 to Kléber (around 55 minutes total).",
   },
   {
-    question_fr: 'Combien de chambres et suites compte le Peninsula Paris ?',
+    category: 'before',
+    question_fr: 'Les animaux sont-ils acceptés au Peninsula Paris ?',
     answer_fr:
-      "L'hôtel dispose de 200 chambres et suites, dont 87 suites, réparties sur 6 étages. Le bâtiment date de 1908 et a été entièrement rénové entre 2010 et 2014.",
-    question_en: 'How many rooms and suites does The Peninsula Paris have?',
+      "Oui, les chiens de petite et moyenne taille sont les bienvenus. Merci de contacter la conciergerie de l'hôtel pour préciser votre demande lors de la réservation.",
+    question_en: 'Are pets allowed at The Peninsula Paris?',
     answer_en:
-      'The hotel has 200 rooms and suites — including 87 suites — across 6 floors. The building dates from 1908 and was fully renovated between 2010 and 2014.',
+      'Yes, small and medium-sized dogs are welcome. Please contact the hotel concierge to confirm specific requirements when booking.',
   },
   {
-    question_fr: 'Le Peninsula Paris est-il un palace ?',
-    answer_fr:
-      'Oui, The Peninsula Paris a reçu la distinction officielle de Palace par Atout France en juillet 2016. Il fait partie des 13 palaces parisiens.',
-    question_en: 'Is The Peninsula Paris an officially recognised palace?',
-    answer_en:
-      'Yes. The Peninsula Paris received the official Palace distinction from Atout France in July 2016. It is one of 13 Parisian palaces.',
-  },
-  {
-    question_fr: 'Quels sont les horaires de check-in et check-out ?',
-    answer_fr:
-      'Grâce au programme Peninsula Time, l’arrivée est possible dès 6h du matin et le départ jusqu’à 22h, sans frais supplémentaires, sous réserve de disponibilité.',
-    question_en: 'What are the check-in and check-out hours?',
-    answer_en:
-      'Through the Peninsula Time programme, check-in is available from 6 am and check-out until 10 pm, free of charge, subject to availability.',
-  },
-  {
+    category: 'before',
     question_fr: 'Quels services de transport propose le Peninsula Paris ?',
     answer_fr:
       "L'hôtel met à disposition de ses clients deux Rolls-Royce Phantom EWB et deux Mini Cooper Clubman estampillées Peninsula. L’aéroport Roissy-Charles-de-Gaulle est à 25 km (~30 min).",
@@ -220,12 +215,58 @@ const FAQ: readonly LocalisedFaq[] = [
       'Guests have access to two Rolls-Royce Phantom EWB and two Peninsula-branded Mini Cooper Clubman. Charles-de-Gaulle airport is 25 km away (~30 min by car).',
   },
   {
-    question_fr: 'Les animaux sont-ils acceptés au Peninsula Paris ?',
+    category: 'during',
+    question_fr: 'Quels sont les horaires de check-in et check-out ?',
     answer_fr:
-      "Oui, les chiens de petite et moyenne taille sont les bienvenus. Merci de contacter la conciergerie de l'hôtel pour préciser votre demande lors de la réservation.",
-    question_en: 'Are pets allowed at The Peninsula Paris?',
+      'Grâce au programme Peninsula Time, l’arrivée est possible dès 6h du matin et le départ jusqu’à 22h, sans frais supplémentaires, sous réserve de disponibilité.',
+    question_en: 'What are the check-in and check-out hours?',
     answer_en:
-      'Yes, small and medium-sized dogs are welcome. Please contact the hotel concierge to confirm specific requirements when booking.',
+      'Through the Peninsula Time programme, check-in is available from 6 am and check-out until 10 pm, free of charge, subject to availability.',
+  },
+  {
+    category: 'during',
+    question_fr: 'Quels sont les restaurants du Peninsula Paris ?',
+    answer_fr:
+      "L'hôtel compte 7 lieux de restauration : L'Oiseau Blanc (rooftop, 2★ Michelin, chef David Bizet), LiLi (cantonais gastronomique), Le Lobby (français et international), Le Bar Kléber, La Terrasse Kléber, Le Rooftop \"L'Heure Dorée\" et le Lounge Kléber Cigar.",
+    question_en: 'What restaurants are available at The Peninsula Paris?',
+    answer_en:
+      'The hotel has 7 dining venues: L\'Oiseau Blanc (rooftop, 2 Michelin stars, chef David Bizet), LiLi (fine Cantonese cuisine), Le Lobby (French and international), Le Bar Kléber, La Terrasse Kléber, the "Golden Hour" Rooftop and the Kléber Cigar Lounge.',
+  },
+  {
+    category: 'during',
+    question_fr: 'Le Peninsula Paris dispose-t-il d’un spa et d’une piscine ?',
+    answer_fr:
+      "Oui. Le Spa Peninsula est le plus grand parmi les palaces parisiens (1 800 m², 6 salles de soins). L'hôtel propose aussi une piscine intérieure et une salle de sport ouverte 24h/24.",
+    question_en: 'Does The Peninsula Paris have a spa and a pool?',
+    answer_en:
+      'Yes. The Peninsula Spa is the largest among Parisian palaces (1,800 m², 6 treatment rooms). The hotel also offers an indoor pool and a 24/7 fitness centre.',
+  },
+  {
+    category: 'after',
+    question_fr: 'Comment annuler ou modifier ma réservation ?',
+    answer_fr:
+      "Toute demande d'annulation ou de modification doit être adressée par e-mail à reservations@conciergetravel.fr. L'annulation est gratuite jusqu'à 24 h avant l'arrivée ; une retenue d'une nuit s'applique au-delà, ainsi qu'en cas de non-présentation (no-show).",
+    question_en: 'How can I cancel or modify my reservation?',
+    answer_en:
+      'Any cancellation or modification request should be sent by email to reservations@conciergetravel.fr. Cancellation is free of charge up to 24 hours before arrival; one night will be charged thereafter, as well as in case of no-show.',
+  },
+  {
+    category: 'agency',
+    question_fr: 'Combien de chambres et suites compte le Peninsula Paris ?',
+    answer_fr:
+      "L'hôtel dispose de 200 chambres et suites, dont 87 suites, réparties sur 6 étages. Le bâtiment date de 1908 et a été entièrement rénové entre 2010 et 2014.",
+    question_en: 'How many rooms and suites does The Peninsula Paris have?',
+    answer_en:
+      'The hotel has 200 rooms and suites — including 87 suites — across 6 floors. The building dates from 1908 and was fully renovated between 2010 and 2014.',
+  },
+  {
+    category: 'agency',
+    question_fr: 'Le Peninsula Paris est-il un palace ?',
+    answer_fr:
+      'Oui, The Peninsula Paris a reçu la distinction officielle de Palace par Atout France en juillet 2016. Il fait partie des 13 palaces parisiens.',
+    question_en: 'Is The Peninsula Paris an officially recognised palace?',
+    answer_en:
+      'Yes. The Peninsula Paris received the official Palace distinction from Atout France in July 2016. It is one of 13 Parisian palaces.',
   },
 ];
 

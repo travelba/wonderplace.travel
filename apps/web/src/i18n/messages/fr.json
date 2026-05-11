@@ -392,6 +392,12 @@
       "tocTitle": "Sommaire",
       "tocLabel": "Sommaire de la présentation"
     },
+    "faq": {
+      "categoryBefore": "Avant votre séjour",
+      "categoryDuring": "Pendant votre séjour",
+      "categoryAfter": "Après votre séjour",
+      "categoryAgency": "À propos de l'établissement"
+    },
     "displayOnly": {
       "headline": "Réservation par concierge ConciergeTravel",
       "explainer": "{name} n'est pas disponible à la réservation en ligne. Indiquez vos dates, nous vous transmettons une proposition personnalisée par e-mail.",

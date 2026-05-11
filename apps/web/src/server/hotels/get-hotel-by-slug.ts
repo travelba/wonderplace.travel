@@ -213,11 +213,33 @@ export function readInventoryCounts(row: HotelDetailRow): HotelInventoryCounts {
 }
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
+/**
+ * FAQ buckets for intent-based grouping on the public hotel page
+ * (CDC §2.11). Mapping rationale:
+ *
+ *   - `before` — pre-stay logistics: address, transport from airport,
+ *     pet policy, room categories, pricing range, dress code, etc.
+ *     This is the bucket most travel searchers care about pre-click.
+ *   - `during` — in-stay services: spa hours, breakfast service,
+ *     pool, restaurant reservations, concierge desk hours.
+ *   - `after` — post-stay: cancellation, modification, loyalty
+ *     redemption, invoice / VAT, lost & found.
+ *   - `agency` — property-level facts that are stable regardless of
+ *     the booking lifecycle: palace distinction, history, official
+ *     awards, ownership.
+ *
+ * Untagged entries fall into `before` (the historical bucket).
+ */
+export const FAQ_CATEGORIES = ['before', 'during', 'after', 'agency'] as const;
+export type FaqCategory = (typeof FAQ_CATEGORIES)[number];
+const FaqCategorySchema = z.enum(FAQ_CATEGORIES);
+
 export const FaqItemSchema = z.object({
   question_fr: z.string().min(1).optional(),
   question_en: z.string().min(1).optional(),
   answer_fr: z.string().min(1).optional(),
   answer_en: z.string().min(1).optional(),
+  category: FaqCategorySchema.optional(),
 });
 export type FaqItem = z.infer<typeof FaqItemSchema>;
 
@@ -226,6 +248,12 @@ const FaqContentSchema = z.array(FaqItemSchema);
 export interface LocalisedFaq {
   readonly question: string;
   readonly answer: string;
+  readonly category: FaqCategory;
+}
+
+export interface LocalisedFaqGroup {
+  readonly category: FaqCategory;
+  readonly items: readonly LocalisedFaq[];
 }
 
 /** Extracts a list of strings from a jsonb field that may be a string[] or object[]. */
@@ -393,10 +421,45 @@ export function readFaq(row: HotelDetailRow, locale: SupportedLocale): readonly 
     const a =
       locale === 'fr' ? (item.answer_fr ?? item.answer_en) : (item.answer_en ?? item.answer_fr);
     if (q !== undefined && a !== undefined) {
-      out.push({ question: q, answer: a });
+      out.push({ question: q, answer: a, category: item.category ?? 'before' });
     }
   }
   return out;
+}
+
+/**
+ * Groups the FAQ entries by intent bucket (CDC §2.11). The order of
+ * the returned groups follows `FAQ_CATEGORIES` (`before`, `during`,
+ * `after`, `agency`) — a deliberate pre-stay-first ranking that
+ * mirrors the average traveller's mental model. Buckets with zero
+ * items are omitted.
+ *
+ * We preserve the in-bucket order from the source (Payload editorial
+ * sort, which is array-position) — alphabetising would scramble
+ * questions designed to flow narratively ("Is breakfast included?"
+ * before "What time is breakfast served?").
+ */
+export function readFaqByCategory(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): readonly LocalisedFaqGroup[] {
+  const flat = readFaq(row, locale);
+  if (flat.length === 0) return [];
+  const buckets = new Map<FaqCategory, LocalisedFaq[]>();
+  for (const cat of FAQ_CATEGORIES) {
+    buckets.set(cat, []);
+  }
+  for (const item of flat) {
+    buckets.get(item.category)?.push(item);
+  }
+  const groups: LocalisedFaqGroup[] = [];
+  for (const cat of FAQ_CATEGORIES) {
+    const items = buckets.get(cat);
+    if (items !== undefined && items.length > 0) {
+      groups.push({ category: cat, items });
+    }
+  }
+  return groups;
 }
 
 // ---------------------------------------------------------------------------

@@ -392,6 +392,12 @@
       "tocTitle": "Contents",
       "tocLabel": "Story table of contents"
     },
+    "faq": {
+      "categoryBefore": "Before your stay",
+      "categoryDuring": "During your stay",
+      "categoryAfter": "After your stay",
+      "categoryAgency": "About the property"
+    },
     "displayOnly": {
       "headline": "ConciergeTravel concierge booking",
       "explainer": "{name} is not available for online booking. Share your dates and our concierge will email a tailored proposal.",

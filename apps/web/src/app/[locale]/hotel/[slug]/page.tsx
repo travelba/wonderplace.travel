@@ -10,6 +10,7 @@ import { DisplayOnlyBookingCard } from '@/components/hotel/display-only-booking-
 import { HotelAmenities } from '@/components/hotel/hotel-amenities';
 import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
+import { HotelFaq } from '@/components/hotel/hotel-faq';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
@@ -36,6 +37,7 @@ import {
   readAwards,
   hasAnyPolicy,
   readFaq,
+  readFaqByCategory,
   readGallery,
   readHeroImage,
   readHighlights,
@@ -257,6 +259,7 @@ async function renderHotelPage(
   const inventory = readInventoryCounts(row);
   const storySections = readHotelStory(row, locale);
   const faqs = readFaq(row, locale);
+  const faqGroups = readFaqByCategory(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
   const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -828,33 +831,16 @@ async function renderHotelPage(
 
       {hasAnyPolicy(policies) ? <HotelPolicies locale={locale} policies={policies} /> : null}
 
-      <section aria-labelledby="faq-title" className="mb-12">
-        <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">
-          {t('sections.faq')}
-        </h2>
-        {faqs.length > 0 ? (
-          <ul className="divide-border flex flex-col divide-y">
-            {faqs.map((f, i) => (
-              <li key={i} className="py-4">
-                <details className="group">
-                  <summary className="text-fg cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden">
-                    <span
-                      className="mr-2 inline-block transition-transform group-open:rotate-90"
-                      aria-hidden
-                    >
-                      ›
-                    </span>
-                    {f.question}
-                  </summary>
-                  <p className="text-muted mt-2 text-sm">{f.answer}</p>
-                </details>
-              </li>
-            ))}
-          </ul>
-        ) : (
+      {faqGroups.length > 0 ? (
+        <HotelFaq locale={locale} groups={faqGroups} />
+      ) : (
+        <section aria-labelledby="faq-title" className="mb-12">
+          <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">
+            {t('sections.faq')}
+          </h2>
           <p className="text-muted text-sm">{t('noFaq')}</p>
-        )}
-      </section>
+        </section>
+      )}
 
       <HotelReassurance locale={locale} />
 
