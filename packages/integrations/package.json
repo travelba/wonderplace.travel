@@ -12,6 +12,7 @@
     "./google-places": "./src/google-places/index.ts",
     "./brevo": "./src/brevo/index.ts",
     "./algolia-admin": "./src/algolia-admin/index.ts",
+    "./algolia-hotel-catalog": "./src/algolia-admin/hotel-catalog-public.ts",
     "./redis": "./src/redis/index.ts",
     "./http": "./src/http/index.ts"
   },
@@ -22,14 +23,14 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
+    "@cct/config": "workspace:*",
+    "@cct/domain": "workspace:*",
     "@upstash/ratelimit": "catalog:",
     "@upstash/redis": "catalog:",
     "algoliasearch": "^5.20.0",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@cct/config": "workspace:*",
-    "@cct/domain": "workspace:*",
     "@types/node": "^22.10.0",
     "msw": "catalog:",
     "typescript": "catalog:",

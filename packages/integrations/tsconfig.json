@@ -1,9 +1,9 @@
 {
   "extends": "@cct/config/tsconfig/library.json",
   "compilerOptions": {
-    "rootDir": "./src",
     "outDir": "./dist",
     "noEmit": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
 }
