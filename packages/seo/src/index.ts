@@ -1,8 +1,10 @@
 /**
  * @cct/seo — JSON-LD builders, metadata helpers, llms.txt + sitemaps + agent-skills
  * (skills: seo-technical, geo-llm-optimization, structured-data-schema-org).
- *
- * Implementations are filled in across Phase 5 (templates) and Phase 9 (SEO/GEO).
  */
+export * from './aeo';
+export * from './agent-skills';
+export * from './llms';
 export * from './metadata';
+export * from './sitemaps';
 export * as JsonLd from './jsonld';

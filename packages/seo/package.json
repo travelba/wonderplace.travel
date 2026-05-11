@@ -21,10 +21,14 @@
     "schema-dts": "^1.1.5",
     "zod": "catalog:"
   },
+  "peerDependencies": {
+    "next": "catalog:"
+  },
   "devDependencies": {
     "@cct/config": "workspace:*",
     "@cct/domain": "workspace:*",
     "@types/node": "^22.10.0",
+    "next": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
