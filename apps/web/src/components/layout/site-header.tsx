@@ -2,8 +2,8 @@ import { getTranslations } from 'next-intl/server';
 import { Suspense, type ReactElement } from 'react';
 
 import { Link } from '@/i18n/navigation';
-import { getOptionalUser } from '@/server/auth/session';
 
+import { AuthArea } from './auth-area';
 import { LocaleSwitcher } from './locale-switcher';
 import { MobileNav } from './mobile-nav';
 
@@ -17,9 +17,11 @@ import { MobileNav } from './mobile-nav';
  *   │ [Brand]   [Primary nav (md+)]   [Locale]  [Auth]  [☰]   │
  *   └─────────────────────────────────────────────────────────┘
  *
- *  - Server Component: resolves the optional user session once and
- *    passes a `signedIn` bool down to the client islands so the auth
- *    area renders without flicker.
+ *  - Pure Server Component — does NOT read `cookies()` so it stays
+ *    static. The auth area is a client island that resolves the
+ *    Supabase session in the browser via `<AuthArea />`. This is what
+ *    enables pages underneath to opt into ISR instead of
+ *    `force-dynamic` (ADR-0007, Sprint 4.1).
  *  - The skip-link is the first focusable element on every page and
  *    jumps to `#main` (set by the locale layout).
  *  - Desktop nav uses `<nav aria-label>` for a discoverable landmark.
@@ -27,8 +29,6 @@ import { MobileNav } from './mobile-nav';
  */
 export async function SiteHeader(): Promise<ReactElement> {
   const t = await getTranslations('header');
-  const user = await getOptionalUser();
-  const signedIn = user !== null;
 
   return (
     <>
@@ -78,33 +78,9 @@ export async function SiteHeader(): Promise<ReactElement> {
               <LocaleSwitcher />
             </Suspense>
 
-            <div className="hidden items-center gap-1 md:flex">
-              {signedIn ? (
-                <Link
-                  href="/compte"
-                  className="border-border bg-bg text-fg hover:bg-muted/10 focus-visible:ring-ring rounded-md border px-3 py-1.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-2"
-                >
-                  {t('account.myAccount')}
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/compte/connexion"
-                    className="text-fg hover:bg-muted/10 focus-visible:ring-ring rounded-md px-3 py-1.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-2"
-                  >
-                    {t('account.signIn')}
-                  </Link>
-                  <Link
-                    href="/compte/inscription"
-                    className="bg-fg text-bg focus-visible:ring-ring rounded-md px-3 py-1.5 text-sm font-medium hover:opacity-90 focus-visible:outline-none focus-visible:ring-2"
-                  >
-                    {t('account.signUp')}
-                  </Link>
-                </>
-              )}
-            </div>
+            <AuthArea variant="header" />
 
-            <MobileNav signedIn={signedIn} />
+            <MobileNav />
           </div>
         </div>
       </header>

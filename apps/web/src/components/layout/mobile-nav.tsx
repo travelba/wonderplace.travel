@@ -5,10 +5,7 @@ import { useEffect, useId, useRef, useState, type ReactElement } from 'react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 
-interface MobileNavProps {
-  /** Whether to show the "Mon compte" link or the "Connexion" pair. */
-  readonly signedIn: boolean;
-}
+import { AuthArea } from './auth-area';
 
 /**
  * Mobile slide-over menu (skill: accessibility §dialogs +
@@ -22,8 +19,10 @@ interface MobileNavProps {
  *    closes it (route change handled by next-intl).
  *  - `role="dialog"` + `aria-modal="true"` because it's an *overlay*
  *    (vs. the consent banner which is non-modal).
+ *  - Sprint 4.1: auth area is the shared `<AuthArea variant="mobile" />`
+ *    client island so the host header stays static.
  */
-export function MobileNav({ signedIn }: MobileNavProps): ReactElement {
+export function MobileNav(): ReactElement {
   const t = useTranslations('header');
   const [open, setOpen] = useState(false);
   const labelId = useId();
@@ -159,31 +158,7 @@ export function MobileNav({ signedIn }: MobileNavProps): ReactElement {
               </Link>
             </nav>
 
-            <div className="border-border mt-auto flex flex-col gap-2 border-t pt-5">
-              {signedIn ? (
-                <Link
-                  href="/compte"
-                  className="bg-fg text-bg focus-visible:ring-ring rounded-md px-3 py-2 text-center text-sm font-medium hover:opacity-90 focus-visible:outline-none focus-visible:ring-2"
-                >
-                  {t('account.myAccount')}
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/compte/connexion"
-                    className="bg-fg text-bg focus-visible:ring-ring rounded-md px-3 py-2 text-center text-sm font-medium hover:opacity-90 focus-visible:outline-none focus-visible:ring-2"
-                  >
-                    {t('account.signIn')}
-                  </Link>
-                  <Link
-                    href="/compte/inscription"
-                    className="border-border bg-bg text-fg hover:bg-muted/10 focus-visible:ring-ring rounded-md border px-3 py-2 text-center text-sm font-medium focus-visible:outline-none focus-visible:ring-2"
-                  >
-                    {t('account.signUp')}
-                  </Link>
-                </>
-              )}
-            </div>
+            <AuthArea variant="mobile" />
           </div>
         </div>
       ) : null}

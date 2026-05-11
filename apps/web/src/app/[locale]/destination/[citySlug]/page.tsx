@@ -12,13 +12,12 @@ import { getDestinationBySlug, listPublishedCities } from '@/server/destinations
 import { getAmadeusAggregateRatingsBatch } from '@/server/hotels/get-amadeus-sentiments-batch';
 
 /**
- * Mirrors the hotel detail page: the shared layout reads cookies (auth
- * area in the header) so ISR + dynamic-API cohabitation triggers
- * `DYNAMIC_SERVER_USAGE`. Until the layout's auth read is moved to a
- * client island we render destination hubs dynamically — the upstream
- * CDN still caches them.
+ * Rendering mode (Sprint 4.1 refactor): the layout no longer reads
+ * `cookies()`, so destination hubs are now safe to ISR. We pre-render
+ * every published city via `generateStaticParams` and revalidate hourly
+ * (matching the SLA for new editorial publications). See ADR-0007.
  */
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 

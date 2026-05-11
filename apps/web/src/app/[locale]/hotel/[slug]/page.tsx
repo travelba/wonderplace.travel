@@ -27,21 +27,23 @@ import {
 } from '@/server/hotels/get-hotel-by-slug';
 
 /**
- * Rendering mode: the page is dynamic because the shared layout reads
- * `cookies()` (via `getOptionalUser` to drive the auth area in the
- * header), AND because the page itself accepts stay-window
- * `searchParams` that change the booking form + comparator output for
- * every request. Mixing `revalidate` with these dynamic reads triggers
- * `DYNAMIC_SERVER_USAGE` in Next 15.
+ * Rendering mode (Sprint 4.1 refactor):
  *
- * The trade-off vs ISR is intentional: editorial slugs are surfaced
- * by the Supabase data cache + the upstream CDN; the dynamic-tagged
- * pages benefit from React's server-component cache for the duration
- * of the request. The legacy `revalidate = 3600` hint can be
- * reinstated together with a layout refactor (moving the auth read
- * into a client island) — tracked separately.
+ *  - The shared layout no longer reads `cookies()` — the auth area
+ *    became a client island (`<AuthArea />`), so the layout tree is
+ *    static again.
+ *  - The page still accepts stay-window `searchParams` (`checkIn`,
+ *    `checkOut`, `adults`, `children`) that legitimately change the
+ *    booking form + price comparator output for every request, so
+ *    Next.js will treat each unique stay as its own dynamic render
+ *    while the slug + locale combination stays cacheable.
+ *  - We therefore opt into **ISR with `revalidate = 3600`**: cold
+ *    renders are SSR'd, hot renders served from the CDN, and the slug
+ *    catalog is pre-rendered at build time via `generateStaticParams`.
+ *
+ * See ADR-0007 (Sprint 4.1).
  */
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
