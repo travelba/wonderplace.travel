@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { JsonLd } from '@cct/seo';
 
 import { PriceComparator } from '@/components/price-comparator';
+import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
 import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
@@ -318,20 +319,9 @@ async function renderHotelPage(
 
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {faqJsonLd !== null ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-        />
-      ) : null}
+      <JsonLdScript data={hotelJsonLd} />
+      <JsonLdScript data={breadcrumbJsonLd} />
+      {faqJsonLd !== null ? <JsonLdScript data={faqJsonLd} /> : null}
 
       <nav aria-label={t('breadcrumb.hotels')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">

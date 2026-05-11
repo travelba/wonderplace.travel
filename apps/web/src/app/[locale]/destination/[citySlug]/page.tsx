@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
 
+import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
 import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
@@ -185,18 +186,9 @@ export default async function DestinationHubPage({
 
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLdScript data={itemListJsonLd} />
+      <JsonLdScript data={breadcrumbJsonLd} />
+      <JsonLdScript data={faqJsonLd} />
 
       <nav aria-label={t('breadcrumb.hotels')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">

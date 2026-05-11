@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { JsonLd } from '@cct/seo';
 
+import { JsonLdScript } from '@/components/seo/json-ld';
 import { env } from '@/lib/env';
 
 export const revalidate = 3600;
@@ -27,11 +28,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <main className="max-w-editorial container mx-auto flex min-h-[60vh] flex-col items-start justify-center gap-6 px-4 py-16 sm:py-24">
-      <script
-        type="application/ld+json"
-        // JSON-LD payload is built from typed inputs (no user-controlled HTML).
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(agencyJsonLd) }}
-      />
+      <JsonLdScript data={agencyJsonLd} />
       <p className="text-muted text-xs uppercase tracking-[0.18em]">
         {tCommon('siteName')} — France
       </p>
