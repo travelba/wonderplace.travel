@@ -70,7 +70,7 @@ export const DEFAULT_AGENT_SKILLS: AgentSkillsDocument = {
     {
       name: 'get-hotel',
       description:
-        'Récupérer la fiche détaillée d’un hôtel par son slug (description, équipements, FAQ, rating Amadeus, JSON-LD).',
+        'Récupérer la fiche détaillée d’un hôtel par son slug (description, équipements, restaurants, spa, localisation, conditions de séjour, distinctions, FAQ, rating Amadeus, JSON-LD Hotel). URL canonique : /fr/hotel/{slug} ou /en/hotel/{slug}.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -78,8 +78,37 @@ export const DEFAULT_AGENT_SKILLS: AgentSkillsDocument = {
             type: 'string',
             description: 'Slug kebab-case de la fiche (ex. "ritz-paris", "hotel-du-cap-eden-roc").',
           },
+          locale: {
+            type: 'string',
+            description: 'Locale demandée — "fr" (par défaut) ou "en".',
+          },
         },
         required: ['slug'],
+      },
+    },
+    {
+      name: 'get-hotel-room',
+      description:
+        'Récupérer une chambre ou suite spécifique d’un hôtel (description longue, équipements de la chambre, dimensions, capacité, photos, JSON-LD HotelRoom). URL canonique : /fr/hotel/{hotelSlug}/chambres/{roomSlug}.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          hotelSlug: {
+            type: 'string',
+            description:
+              'Slug kebab-case de l’hôtel (ex. "peninsula-paris", "hotel-du-cap-eden-roc").',
+          },
+          roomSlug: {
+            type: 'string',
+            description:
+              'Slug kebab-case de la chambre (ex. "chambre-deluxe", "suite-tour-eiffel").',
+          },
+          locale: {
+            type: 'string',
+            description: 'Locale demandée — "fr" (par défaut) ou "en".',
+          },
+        },
+        required: ['hotelSlug', 'roomSlug'],
       },
     },
     {

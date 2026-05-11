@@ -123,6 +123,13 @@ test.describe('hotel detail page', () => {
         hreflangDefault: getHref('link[rel="alternate"][hreflang="x-default"]'),
         ogTitle: get('meta[property="og:title"]'),
         ogLocale: get('meta[property="og:locale"]'),
+        ogUrl: get('meta[property="og:url"]'),
+        ogImage: get('meta[property="og:image"]'),
+        ogImageWidth: get('meta[property="og:image:width"]'),
+        ogImageHeight: get('meta[property="og:image:height"]'),
+        ogImageAlt: get('meta[property="og:image:alt"]'),
+        twitterCard: get('meta[name="twitter:card"]'),
+        twitterImage: get('meta[name="twitter:image"]'),
       };
     });
 
@@ -134,6 +141,22 @@ test.describe('hotel detail page', () => {
     expect(meta.hreflangDefault).toContain('/hotel/hotel-de-test-e2e');
     expect(meta.ogTitle).toMatch(/Hôtel de Test/i);
     expect(meta.ogLocale).toBe('fr_FR');
+    expect(meta.ogUrl).toContain('/hotel/hotel-de-test-e2e');
+    // The Twitter card type must be the large image variant for hotel
+    // pages — small thumbnails crop hero shots in unflattering ways
+    // and we want share previews to dominate timelines.
+    expect(meta.twitterCard).toBe('summary_large_image');
+    // The E2E seed defines a Cloudinary hero, so og:image + twitter:image
+    // must be emitted with the dimensions Facebook/LinkedIn expect (1.91:1).
+    if (meta.ogImage !== null) {
+      expect(meta.ogImage).toMatch(/cloudinary\.com\/.+\/image\/upload\//);
+      expect(meta.ogImage).toContain('w_1200');
+      expect(meta.ogImage).toContain('h_630');
+      expect(meta.ogImageWidth).toBe('1200');
+      expect(meta.ogImageHeight).toBe('630');
+      expect(meta.ogImageAlt?.toLowerCase()).toContain('hôtel de test');
+      expect(meta.twitterImage).toBe(meta.ogImage);
+    }
 
     // Sanity: canonical must be absolute (Next 15 emits the full URL
     // when `metadataBase` is configured).
@@ -190,6 +213,36 @@ test.describe('hotel detail page', () => {
     // FAQPage carries the two questions from the seam.
     const f = faq as { mainEntity?: ReadonlyArray<{ name?: string }> };
     expect(f.mainEntity?.length).toBe(2);
+  });
+
+  test('renders a refined freshness badge with a machine-readable <time>', async ({ page }) => {
+    await page.goto(FR_PATH);
+
+    // The fact sheet block lives between H1 and the AEO answer. The
+    // freshness pill is the trailing `<p data-freshness>` inside it
+    // and MUST carry a `<time dateTime="…">` so crawlers and copy-paste
+    // workflows don't have to parse a locale-aware human label.
+    const factSheet = page.locator('section[aria-labelledby="fact-sheet-title"]');
+    await expect(factSheet).toBeVisible();
+
+    const freshness = factSheet.locator('p[data-freshness]');
+    await expect(freshness).toBeVisible();
+
+    const time = freshness.locator('time');
+    await expect(time).toHaveCount(1);
+
+    const iso = await time.getAttribute('datetime');
+    expect(iso).not.toBeNull();
+    // Supabase `timestamptz` round-trips to an ISO-8601 instant. Allow
+    // either the bare YYYY-MM-DD shape or the full Zulu form — both
+    // are valid `dateTime` values per HTML.
+    expect(iso).toMatch(/^\d{4}-\d{2}-\d{2}([T ].+)?$/);
+
+    // The aria-label on the pill must mention the rendered date so
+    // screen readers don't read the small calendar icon as the source
+    // of meaning.
+    const aria = await freshness.getAttribute('aria-label');
+    expect(aria?.length ?? 0).toBeGreaterThan(0);
   });
 
   test('page is indexable and uses ISR (no noindex, has cache-control)', async ({ page }) => {

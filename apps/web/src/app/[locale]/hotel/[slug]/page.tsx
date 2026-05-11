@@ -6,9 +6,21 @@ import { JsonLd } from '@cct/seo';
 
 import { buildCloudinarySrc } from '@cct/ui';
 
+import { DisplayOnlyBookingCard } from '@/components/hotel/display-only-booking-card';
+import { HotelAmenities } from '@/components/hotel/hotel-amenities';
+import { HotelAwards } from '@/components/hotel/hotel-awards';
+import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
+import { HotelFaq } from '@/components/hotel/hotel-faq';
+import { HotelFeaturedReviews } from '@/components/hotel/hotel-featured-reviews';
+import { HotelShareButton } from '@/components/hotel/hotel-share-button';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
+import { HotelLocation } from '@/components/hotel/hotel-location';
+import { HotelPolicies } from '@/components/hotel/hotel-policies';
+import { HotelReassurance } from '@/components/hotel/hotel-reassurance';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
+import { HotelSignatureExperiences } from '@/components/hotel/hotel-signature-experiences';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
+import { HotelStory } from '@/components/hotel/hotel-story';
 import { PriceComparator } from '@/components/price-comparator';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
@@ -24,11 +36,22 @@ import {
   getHotelBySlug,
   listPublishedHotelSlugs,
   readAmenities,
+  readAmenitiesByCategory,
+  readAwards,
+  hasAnyPolicy,
   readFaq,
+  readFaqByCategory,
+  readFeaturedReviews,
   readGallery,
   readHeroImage,
   readHighlights,
+  readHotelStory,
+  readInventoryCounts,
+  readLocation,
+  readPolicies,
+  readPostalCode,
   readRestaurants,
+  readSignatureExperiences,
   readSpa,
   type HotelDetail,
   type HotelDetailRow,
@@ -162,6 +185,42 @@ export async function generateMetadata({
   const slugFr = row.slug;
   const slugEn = row.slug_en !== null && row.slug_en !== '' ? row.slug_en : row.slug;
   const canonical = locale === 'fr' ? `/hotel/${slugFr}` : `/en/hotel/${slugEn}`;
+  const origin = siteOrigin();
+  const absoluteUrl = `${origin}${canonical}`;
+
+  // Open Graph / Twitter Card image:
+  //   - Use the hotel hero (Cloudinary) when present, served at the
+  //     OG-recommended 1200×630 (1.91:1).
+  //   - We force `c_fill,g_auto` to keep the focal point centred and
+  //     `f_jpg,q_auto` because some social parsers (notably older
+  //     LinkedIn crawlers) still choke on WebP — JPEG is the safest
+  //     interchange format for share previews.
+  //   - Cap the URL string at the documented Facebook limit (no
+  //     practical risk with our public_id grammar, but we encode
+  //     defensively via `buildCloudinarySrc`).
+  //   - Fall back to undefined when no hero is set; Next.js drops the
+  //     `og:image` tag rather than emitting an empty one.
+  const heroPublicId = readHeroImage(row);
+  const ogImageUrl =
+    heroPublicId !== null
+      ? buildCloudinarySrc({
+          cloudName: env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+          publicId: heroPublicId,
+          transforms: 'f_jpg,q_auto,c_fill,g_auto,w_1200,h_630',
+        })
+      : undefined;
+  const ogImages =
+    ogImageUrl !== undefined
+      ? [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: name,
+            type: 'image/jpeg' as const,
+          },
+        ]
+      : undefined;
 
   return {
     title,
@@ -180,6 +239,16 @@ export async function generateMetadata({
       description: desc,
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       siteName: 'ConciergeTravel',
+      url: absoluteUrl,
+      ...(ogImages !== undefined ? { images: ogImages } : {}),
+    },
+    twitter: {
+      // `summary_large_image` is the only card type Twitter still
+      // honours that gives a true hero treatment in DMs and timelines.
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      ...(ogImageUrl !== undefined ? { images: [ogImageUrl] } : {}),
     },
   };
 }
@@ -231,9 +300,19 @@ async function renderHotelPage(
   const description = pickDescription(row, locale);
   const highlights = readHighlights(row, locale);
   const amenities = readAmenities(row, locale);
+  const amenityGroups = readAmenitiesByCategory(row, locale);
   const restaurants = readRestaurants(row, locale);
   const spa = readSpa(row, locale);
+  const location = readLocation(row, locale);
+  const policies = readPolicies(row, locale);
+  const awards = readAwards(row, locale);
+  const postalCode = readPostalCode(row);
+  const inventory = readInventoryCounts(row);
+  const storySections = readHotelStory(row, locale);
+  const signatureExperiences = readSignatureExperiences(row, locale);
+  const featuredReviews = readFeaturedReviews(row, locale);
   const faqs = readFaq(row, locale);
+  const faqGroups = readFaqByCategory(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
   const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -265,6 +344,18 @@ async function renderHotelPage(
     jsonLdImages.push(buildCloudinarySrc({ cloudName, publicId: img.publicId }));
   }
 
+  // Award strings for JSON-LD: prefer "Name — Issuer, Year" to give Google /
+  // LLMs a self-contained sentence. The regulated *Palace* distinction is
+  // already emitted by `hotelJsonLd` when `isPalace === true`, so we only
+  // forward the editorial entries here. We also drop the duplicate Palace
+  // entry from the seed array (matched on issuer "Atout France") to avoid
+  // emitting it twice.
+  const jsonLdAwards: string[] = awards
+    .filter((a) => a.issuer.toLowerCase() !== 'atout france')
+    .map((a) =>
+      a.year !== null ? `${a.name} — ${a.issuer}, ${a.year}` : `${a.name} — ${a.issuer}`,
+    );
+
   const hotelInput: JsonLd.HotelJsonLdInput = {
     name,
     url: canonicalUrl,
@@ -275,15 +366,74 @@ async function renderHotelPage(
       : {}),
     ...(jsonLdImages.length > 0 ? { images: jsonLdImages } : {}),
     ...(amenities.length > 0 ? { amenityFeatures: amenities } : {}),
+    ...(jsonLdAwards.length > 0 ? { awards: jsonLdAwards } : {}),
+    // Inventory counts (Phase 10.8 / CDC §2.15). `numberOfRooms` is
+    // omitted when null — Google's rich-result test prefers an absent
+    // property to a `null`/0 one.
+    ...(inventory.totalRooms !== null ? { numberOfRooms: inventory.totalRooms } : {}),
+    // Check-in / check-out (Phase 10.8 / CDC §2.15). Both come from the
+    // structured `policies` jsonb already parsed above; we emit only the
+    // values that are present so unfinished editorial entries still
+    // validate cleanly.
+    ...(policies.checkIn !== null ? { checkinTime: policies.checkIn.from } : {}),
+    ...(policies.checkOut !== null ? { checkoutTime: policies.checkOut.until } : {}),
+    // `petsAllowed` is a boolean: explicit `false` is informative for
+    // travellers + Google, so we forward whatever the policy says.
+    ...(policies.pets !== null ? { petsAllowed: policies.pets.allowed } : {}),
+    // Featured editorial reviews (Phase 10.14 / CDC §2.10). The builder
+    // caps at 5 internally; we forward everything we have and let it
+    // decide. Empty array is omitted so the builder doesn't emit
+    // `review: []`.
+    ...(featuredReviews.length > 0
+      ? {
+          featuredReviews: featuredReviews.map((r) => ({
+            source: r.source,
+            quote: r.quote,
+            ...(r.sourceUrl !== null ? { sourceUrl: r.sourceUrl } : {}),
+            ...(r.author !== null ? { author: r.author } : {}),
+            ...(r.rating !== null && r.maxRating !== null
+              ? { rating: r.rating, maxRating: r.maxRating }
+              : {}),
+            ...(r.dateIso !== null ? { date: r.dateIso } : {}),
+          })),
+        }
+      : {}),
+    // Freshness signal (Phase 10.16 / CDC §2.15). `row.updated_at` is
+    // already an ISO-8601 timestamp from Supabase (`timestamptz`); we
+    // forward it as-is so LLM ingestion pipelines and Google can
+    // surface "Last updated: …" hints.
+    ...(row.updated_at !== null && row.updated_at !== '' ? { dateModified: row.updated_at } : {}),
+    // Nearby attractions (Phase 10.16 / CDC §2.7+§2.15). The builder
+    // caps at 10 entries; we forward the top points of interest as
+    // already sorted by `readLocation()` (distance asc). Coordinates
+    // are forwarded when available so Google can render the map
+    // ribbon in the rich result.
+    ...(location.pointsOfInterest.length > 0
+      ? {
+          nearbyAttractions: location.pointsOfInterest.map((p) => ({
+            name: p.name,
+            type: p.type,
+            ...(p.latitude !== null && p.longitude !== null
+              ? { latitude: p.latitude, longitude: p.longitude }
+              : {}),
+          })),
+        }
+      : {}),
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
       : {}),
-    ...(row.address !== null && row.address !== ''
+    // Google Rich Results require a non-empty `postalCode` to validate the
+    // PostalAddress block; we therefore only emit the address when both
+    // `address` and `postalCode` are present. Editorial entries without a
+    // postal code (legacy rows pre-migration 0014) fall back to no address
+    // node — better than emitting an invalid one and being silently
+    // dropped by the indexer.
+    ...(row.address !== null && row.address !== '' && postalCode !== null
       ? {
           address: {
             streetAddress: row.address,
             addressLocality: row.city,
-            postalCode: '',
+            postalCode,
             addressCountry: 'FR',
             addressRegion: row.region,
           },
@@ -397,25 +547,33 @@ async function renderHotelPage(
       </nav>
 
       <header className="mb-10">
-        <div className="text-muted flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em]">
-          {row.is_palace ? (
-            <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-amber-900">
-              {t('hero.palace')}
-            </span>
-          ) : (
-            <span className="border-border bg-bg rounded-md border px-2 py-1">
-              {t('hero.stars', { count: row.stars })}
-            </span>
-          )}
-          <span>{row.city}</span>
-          {row.district !== null && row.district !== '' ? (
-            <>
-              <span aria-hidden>{t('hero.districtSeparator')}</span>
-              <span>{row.district}</span>
-            </>
-          ) : null}
-          <span aria-hidden>{t('hero.districtSeparator')}</span>
-          <span>{row.region}</span>
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+          <div className="text-muted flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em]">
+            {row.is_palace ? (
+              <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-amber-900">
+                {t('hero.palace')}
+              </span>
+            ) : (
+              <span className="border-border bg-bg rounded-md border px-2 py-1">
+                {t('hero.stars', { count: row.stars })}
+              </span>
+            )}
+            <span>{row.city}</span>
+            {row.district !== null && row.district !== '' ? (
+              <>
+                <span aria-hidden>{t('hero.districtSeparator')}</span>
+                <span>{row.district}</span>
+              </>
+            ) : null}
+            <span aria-hidden>{t('hero.districtSeparator')}</span>
+            <span>{row.region}</span>
+          </div>
+
+          <HotelShareButton
+            hotelName={name}
+            shareText={description !== null ? truncate(description, 160) : null}
+            canonicalUrl={canonicalUrl}
+          />
         </div>
 
         <h1 className="text-fg mt-3 font-serif text-3xl sm:text-4xl md:text-5xl">{name}</h1>
@@ -452,7 +610,9 @@ async function renderHotelPage(
           </p>
         ) : null}
 
-        {row.latitude !== null && row.longitude !== null ? (
+        {row.latitude !== null &&
+        row.longitude !== null &&
+        location.pointsOfInterest.length === 0 ? (
           <p className="mt-3 text-sm">
             <a
               href={`https://www.openstreetmap.org/?mlat=${row.latitude}&mlon=${row.longitude}&zoom=15`}
@@ -473,6 +633,26 @@ async function renderHotelPage(
         images={galleryImages}
       />
 
+      <HotelFactSheet
+        locale={locale}
+        hotelName={name}
+        address={row.address}
+        postalCode={postalCode}
+        city={row.city}
+        district={row.district}
+        stars={row.stars as 1 | 2 | 3 | 4 | 5}
+        isPalace={row.is_palace}
+        latitude={row.latitude}
+        longitude={row.longitude}
+        totalRooms={inventory.totalRooms}
+        suites={inventory.suites}
+        checkInFrom={policies.checkIn !== null ? policies.checkIn.from : null}
+        checkOutUntil={policies.checkOut !== null ? policies.checkOut.until : null}
+        petsAllowed={policies.pets !== null ? policies.pets.allowed : null}
+        lastUpdatedLabel={lastUpdated}
+        lastUpdatedIso={row.updated_at !== null && row.updated_at !== '' ? row.updated_at : null}
+      />
+
       <section
         data-aeo
         aria-labelledby="hotel-aeo-title"
@@ -490,9 +670,9 @@ async function renderHotelPage(
         className="border-border bg-bg mb-12 rounded-lg border p-5 sm:p-6"
       >
         <h2 id="booking-title" className="text-fg font-serif text-xl sm:text-2xl">
-          {t('sections.booking')}
+          {bookable ? t('sections.booking') : t('sections.concierge')}
         </h2>
-        <p className="text-muted mt-2 text-sm">{t('booking.intro')}</p>
+        {bookable ? <p className="text-muted mt-2 text-sm">{t('booking.intro')}</p> : null}
 
         {bookable ? (
           <form
@@ -566,20 +746,15 @@ async function renderHotelPage(
             </div>
           </form>
         ) : (
-          <div className="mt-5 flex flex-col gap-3">
-            <p className="text-muted text-sm">{t('booking.noOnline')}</p>
-            <p>
-              <Link
-                href={{
-                  pathname: '/reservation/start',
-                  query: { hotelId: row.id, hotelName: name, checkIn, checkOut, adults, children },
-                }}
-                className="border-border bg-bg text-fg hover:bg-muted/10 inline-flex rounded-md border px-4 py-2 text-sm font-medium"
-              >
-                {t('booking.requestEmail')}
-              </Link>
-            </p>
-          </div>
+          <DisplayOnlyBookingCard
+            locale={locale}
+            hotelId={row.id}
+            hotelName={name}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            adults={adults}
+            children={children}
+          />
         )}
       </section>
 
@@ -600,20 +775,24 @@ async function renderHotelPage(
         />
       </div>
 
-      {description !== null && description.length > 0 ? (
-        <section aria-labelledby="about-title" className="mb-12">
-          <h2 id="about-title" className="text-fg mb-3 font-serif text-2xl">
-            {t('sections.about')}
-          </h2>
-          <div className="prose text-fg/90 max-w-prose text-base">
-            {description.split(/\n\n+/u).map((paragraph, idx) => (
-              <p key={idx} className="mb-3 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <HotelStory
+        locale={locale}
+        sections={storySections}
+        heroParagraphs={
+          description !== null && description.length > 0
+            ? description
+                .split(/\n\n+/u)
+                .map((p) => p.trim())
+                .filter((p) => p.length > 0)
+            : null
+        }
+      />
+
+      <HotelSignatureExperiences
+        locale={locale}
+        cloudName={cloudName}
+        experiences={signatureExperiences}
+      />
 
       <section aria-labelledby="highlights-title" className="mb-12">
         <h2 id="highlights-title" className="text-fg mb-3 font-serif text-2xl">
@@ -634,6 +813,10 @@ async function renderHotelPage(
           <p className="text-muted text-sm">{t('noHighlights')}</p>
         )}
       </section>
+
+      <HotelAwards locale={locale} awards={awards} />
+
+      <HotelFeaturedReviews locale={locale} reviews={featuredReviews} />
 
       {amadeusCategories.length > 0 ? (
         <section
@@ -673,25 +856,7 @@ async function renderHotelPage(
         </section>
       ) : null}
 
-      <section aria-labelledby="amenities-title" className="mb-12">
-        <h2 id="amenities-title" className="text-fg mb-3 font-serif text-2xl">
-          {t('sections.amenities')}
-        </h2>
-        {amenities.length > 0 ? (
-          <ul className="flex flex-wrap gap-2">
-            {amenities.map((a) => (
-              <li
-                key={a}
-                className="border-border bg-bg text-fg rounded-md border px-3 py-1.5 text-sm"
-              >
-                {a}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted text-sm">{t('noAmenities')}</p>
-        )}
-      </section>
+      <HotelAmenities locale={locale} groups={amenityGroups} flat={amenities} />
 
       {restaurants !== null && restaurants.venues.length > 0 ? (
         <HotelRestaurants locale={locale} restaurants={restaurants} />
@@ -699,78 +864,94 @@ async function renderHotelPage(
 
       {spa !== null ? <HotelSpa locale={locale} spa={spa} /> : null}
 
+      <HotelLocation
+        locale={locale}
+        hotelName={name}
+        city={row.city}
+        address={row.address}
+        postalCode={postalCode}
+        latitude={row.latitude}
+        longitude={row.longitude}
+        location={location}
+      />
+
       <section aria-labelledby="rooms-title" className="mb-12">
         <h2 id="rooms-title" className="text-fg mb-4 font-serif text-2xl">
           {t('sections.rooms')}
         </h2>
         {rooms.length > 0 ? (
           <ul className="flex flex-col gap-4">
-            {rooms.map((room) => (
-              <li key={room.id}>
-                <article className="border-border bg-bg rounded-lg border p-4 sm:p-5">
-                  <header className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="text-fg font-serif text-lg">{room.name ?? room.room_code}</h3>
-                    <p className="text-muted text-xs">
-                      {room.max_occupancy !== null
-                        ? t('rooms.occupancy', { count: room.max_occupancy })
-                        : null}
-                      {room.size_sqm !== null
-                        ? ` · ${t('rooms.size', { count: room.size_sqm })}`
-                        : ''}
-                      {room.bed_type !== null && room.bed_type !== '' ? ` · ${room.bed_type}` : ''}
+            {rooms.map((room) => {
+              const roomPath = `/hotel/${slugFr}/chambres/${room.slug}`;
+              return (
+                <li key={room.id}>
+                  <article className="border-border bg-bg rounded-lg border p-4 sm:p-5">
+                    <header className="flex flex-wrap items-baseline justify-between gap-2">
+                      <h3 className="text-fg font-serif text-lg">
+                        <Link href={roomPath} className="hover:underline">
+                          {room.name ?? room.room_code}
+                        </Link>
+                      </h3>
+                      <p className="text-muted text-xs">
+                        {room.max_occupancy !== null
+                          ? t('rooms.occupancy', { count: room.max_occupancy })
+                          : null}
+                        {room.size_sqm !== null
+                          ? ` · ${t('rooms.size', { count: room.size_sqm })}`
+                          : ''}
+                        {room.bed_type !== null && room.bed_type !== ''
+                          ? ` · ${room.bed_type}`
+                          : ''}
+                      </p>
+                    </header>
+                    {room.description !== null && room.description !== '' ? (
+                      <p className="text-muted mt-2 text-sm">{room.description}</p>
+                    ) : null}
+                    {room.amenities.length > 0 ? (
+                      <ul className="mt-3 flex flex-wrap gap-1.5">
+                        {room.amenities.map((amenity) => (
+                          <li
+                            key={amenity}
+                            className="border-border text-muted rounded-md border px-2 py-0.5 text-xs"
+                          >
+                            {amenity}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    <p className="mt-3 text-sm">
+                      <Link
+                        href={roomPath}
+                        className="text-fg hover:text-fg/80 inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
+                      >
+                        {t('rooms.viewDetail')}
+                        <span aria-hidden>→</span>
+                      </Link>
                     </p>
-                  </header>
-                  {room.description !== null && room.description !== '' ? (
-                    <p className="text-muted mt-2 text-sm">{room.description}</p>
-                  ) : null}
-                  {room.amenities.length > 0 ? (
-                    <ul className="mt-3 flex flex-wrap gap-1.5">
-                      {room.amenities.map((amenity) => (
-                        <li
-                          key={amenity}
-                          className="border-border text-muted rounded-md border px-2 py-0.5 text-xs"
-                        >
-                          {amenity}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </article>
-              </li>
-            ))}
+                  </article>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-muted text-sm">{t('noRooms')}</p>
         )}
       </section>
 
-      <section aria-labelledby="faq-title" className="mb-12">
-        <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">
-          {t('sections.faq')}
-        </h2>
-        {faqs.length > 0 ? (
-          <ul className="divide-border flex flex-col divide-y">
-            {faqs.map((f, i) => (
-              <li key={i} className="py-4">
-                <details className="group">
-                  <summary className="text-fg cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden">
-                    <span
-                      className="mr-2 inline-block transition-transform group-open:rotate-90"
-                      aria-hidden
-                    >
-                      ›
-                    </span>
-                    {f.question}
-                  </summary>
-                  <p className="text-muted mt-2 text-sm">{f.answer}</p>
-                </details>
-              </li>
-            ))}
-          </ul>
-        ) : (
+      {hasAnyPolicy(policies) ? <HotelPolicies locale={locale} policies={policies} /> : null}
+
+      {faqGroups.length > 0 ? (
+        <HotelFaq locale={locale} groups={faqGroups} />
+      ) : (
+        <section aria-labelledby="faq-title" className="mb-12">
+          <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">
+            {t('sections.faq')}
+          </h2>
           <p className="text-muted text-sm">{t('noFaq')}</p>
-        )}
-      </section>
+        </section>
+      )}
+
+      <HotelReassurance locale={locale} />
 
       <footer className="text-muted mt-10 flex flex-col gap-2 text-xs">
         <p>{t('loyaltyHint')}</p>

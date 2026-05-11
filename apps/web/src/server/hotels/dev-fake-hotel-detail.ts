@@ -47,6 +47,7 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     city: 'Paris',
     district: '1er arrondissement',
     address: '1 rue de Rivoli',
+    postal_code: '75001',
     latitude: 48.8566,
     longitude: 2.3522,
     description_fr:
@@ -85,6 +86,11 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     google_reviews_count: 312,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
+    // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the
+    // HotelFactSheet UI. Synthetic values for the E2E hotel are fine; the
+    // JSON-LD only emits them when positive.
+    number_of_rooms: 80,
+    number_of_suites: 12,
     // No hero/gallery for the E2E synthetic hotel — keeps the fake
     // testable without Cloudinary credentials at build time.
     hero_image: null,
@@ -98,6 +104,7 @@ function buildRooms(): readonly HotelRoomRow[] {
   return [
     {
       id: '22222222-2222-4222-8222-222222222222',
+      slug: 'chambre-deluxe-roi',
       room_code: 'TEST-KING',
       name: 'Chambre Deluxe Roi',
       description: 'Vue jardin, lit king-size, salle de bain en marbre.',
@@ -108,6 +115,7 @@ function buildRooms(): readonly HotelRoomRow[] {
     },
     {
       id: '33333333-3333-4333-8333-333333333333',
+      slug: 'suite-junior-tuileries',
       room_code: 'TEST-SUITE',
       name: 'Suite Junior Tuileries',
       description: 'Vue Tuileries, salon séparé, bain à remous.',
