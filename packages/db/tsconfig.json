@@ -6,5 +6,5 @@
     "noEmit": true
   },
   "include": ["src/**/*", "scripts/**/*", "migrations/**/*.sql"],
-  "exclude": ["scripts/seed-dev.ts"]
+  "exclude": ["scripts/seed-dev.ts", "scripts/seed-peninsula-paris.ts"]
 }

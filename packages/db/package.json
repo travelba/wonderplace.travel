@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit",
     "migrate": "tsx scripts/migrate.ts",
     "seed:dev": "tsx scripts/seed-dev.ts",
+    "seed:peninsula": "tsx scripts/seed-peninsula-paris.ts",
+    "teardown:peninsula": "tsx scripts/teardown-peninsula-paris.ts",
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:push": "drizzle-kit push"
   },
