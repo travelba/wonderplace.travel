@@ -650,6 +650,7 @@ async function renderHotelPage(
         checkOutUntil={policies.checkOut !== null ? policies.checkOut.until : null}
         petsAllowed={policies.pets !== null ? policies.pets.allowed : null}
         lastUpdatedLabel={lastUpdated}
+        lastUpdatedIso={row.updated_at !== null && row.updated_at !== '' ? row.updated_at : null}
       />
 
       <section

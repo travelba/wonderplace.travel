@@ -17,6 +17,16 @@ interface HotelFactSheetProps {
   readonly checkOutUntil: string | null;
   readonly petsAllowed: boolean | null;
   readonly lastUpdatedLabel: string | null;
+  /**
+   * Raw ISO-8601 timestamp of the last edit on this hotel record.
+   *
+   * We accept both the human-formatted `lastUpdatedLabel` *and* the
+   * machine-readable ISO so the badge can emit `<time dateTime="…">`
+   * — that lets crawlers (Google's Last-Modified surfacing, LLM
+   * ingestion pipelines, copy-paste-into-LLM workflows) parse the
+   * exact date without re-implementing locale-aware date parsing.
+   */
+  readonly lastUpdatedIso: string | null;
 }
 
 /**
@@ -72,6 +82,7 @@ export async function HotelFactSheet({
   checkOutUntil,
   petsAllowed,
   lastUpdatedLabel,
+  lastUpdatedIso,
 }: HotelFactSheetProps): Promise<React.ReactElement | null> {
   const t = await getTranslations({ locale, namespace: 'hotelPage.factSheet' });
 
@@ -160,8 +171,37 @@ export async function HotelFactSheet({
         ))}
       </dl>
       {lastUpdatedLabel !== null ? (
-        <p data-freshness className="text-muted mt-4 text-xs">
-          {t('updatedAt', { date: lastUpdatedLabel })}
+        <p
+          data-freshness
+          className="border-border text-muted mt-5 inline-flex max-w-full items-center gap-1.5 rounded-full border bg-white/60 px-3 py-1 text-xs"
+          aria-label={t('updatedAtAria', { date: lastUpdatedLabel })}
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            viewBox="0 0 16 16"
+            width={12}
+            height={12}
+            className="text-accent shrink-0"
+          >
+            <path
+              d="M5 1.5v1.25M11 1.5v1.25M2.5 5.75h11M3.5 3.25h9a1 1 0 0 1 1 1V13a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1V4.25a1 1 0 0 1 1-1Z"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.25}
+              strokeLinecap="round"
+            />
+          </svg>
+          <span className="truncate">
+            {t('updatedAtShort')}{' '}
+            {lastUpdatedIso !== null ? (
+              <time dateTime={lastUpdatedIso} className="text-fg font-medium">
+                {lastUpdatedLabel}
+              </time>
+            ) : (
+              <span className="text-fg font-medium">{lastUpdatedLabel}</span>
+            )}
+          </span>
         </p>
       ) : null}
     </section>

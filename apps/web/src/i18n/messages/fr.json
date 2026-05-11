@@ -448,7 +448,9 @@
       "petsYes": "Acceptés",
       "petsNo": "Non acceptés",
       "geoLabel": "Coordonnées",
-      "updatedAt": "Informations mises à jour le {date}."
+      "updatedAt": "Informations mises à jour le {date}.",
+      "updatedAtShort": "Mis à jour le",
+      "updatedAtAria": "Informations mises à jour le {date}"
     },
     "reassurance": {
       "title": "Pourquoi réserver avec ConciergeTravel ?",

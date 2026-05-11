@@ -215,6 +215,36 @@ test.describe('hotel detail page', () => {
     expect(f.mainEntity?.length).toBe(2);
   });
 
+  test('renders a refined freshness badge with a machine-readable <time>', async ({ page }) => {
+    await page.goto(FR_PATH);
+
+    // The fact sheet block lives between H1 and the AEO answer. The
+    // freshness pill is the trailing `<p data-freshness>` inside it
+    // and MUST carry a `<time dateTime="…">` so crawlers and copy-paste
+    // workflows don't have to parse a locale-aware human label.
+    const factSheet = page.locator('section[aria-labelledby="fact-sheet-title"]');
+    await expect(factSheet).toBeVisible();
+
+    const freshness = factSheet.locator('p[data-freshness]');
+    await expect(freshness).toBeVisible();
+
+    const time = freshness.locator('time');
+    await expect(time).toHaveCount(1);
+
+    const iso = await time.getAttribute('datetime');
+    expect(iso).not.toBeNull();
+    // Supabase `timestamptz` round-trips to an ISO-8601 instant. Allow
+    // either the bare YYYY-MM-DD shape or the full Zulu form — both
+    // are valid `dateTime` values per HTML.
+    expect(iso).toMatch(/^\d{4}-\d{2}-\d{2}([T ].+)?$/);
+
+    // The aria-label on the pill must mention the rendered date so
+    // screen readers don't read the small calendar icon as the source
+    // of meaning.
+    const aria = await freshness.getAttribute('aria-label');
+    expect(aria?.length ?? 0).toBeGreaterThan(0);
+  });
+
   test('page is indexable and uses ISR (no noindex, has cache-control)', async ({ page }) => {
     const response = await page.goto(FR_PATH);
     expect(response?.status()).toBe(200);
