@@ -11,6 +11,7 @@ import { HotelAmenities } from '@/components/hotel/hotel-amenities';
 import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
 import { HotelFaq } from '@/components/hotel/hotel-faq';
+import { HotelFeaturedReviews } from '@/components/hotel/hotel-featured-reviews';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
@@ -39,6 +40,7 @@ import {
   hasAnyPolicy,
   readFaq,
   readFaqByCategory,
+  readFeaturedReviews,
   readGallery,
   readHeroImage,
   readHighlights,
@@ -261,6 +263,7 @@ async function renderHotelPage(
   const inventory = readInventoryCounts(row);
   const storySections = readHotelStory(row, locale);
   const signatureExperiences = readSignatureExperiences(row, locale);
+  const featuredReviews = readFeaturedReviews(row, locale);
   const faqs = readFaq(row, locale);
   const faqGroups = readFaqByCategory(row, locale);
   const heroPublicId = readHeroImage(row);
@@ -330,6 +333,24 @@ async function renderHotelPage(
     // `petsAllowed` is a boolean: explicit `false` is informative for
     // travellers + Google, so we forward whatever the policy says.
     ...(policies.pets !== null ? { petsAllowed: policies.pets.allowed } : {}),
+    // Featured editorial reviews (Phase 10.14 / CDC §2.10). The builder
+    // caps at 5 internally; we forward everything we have and let it
+    // decide. Empty array is omitted so the builder doesn't emit
+    // `review: []`.
+    ...(featuredReviews.length > 0
+      ? {
+          featuredReviews: featuredReviews.map((r) => ({
+            source: r.source,
+            quote: r.quote,
+            ...(r.sourceUrl !== null ? { sourceUrl: r.sourceUrl } : {}),
+            ...(r.author !== null ? { author: r.author } : {}),
+            ...(r.rating !== null && r.maxRating !== null
+              ? { rating: r.rating, maxRating: r.maxRating }
+              : {}),
+            ...(r.dateIso !== null ? { date: r.dateIso } : {}),
+          })),
+        }
+      : {}),
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
       : {}),
@@ -717,6 +738,8 @@ async function renderHotelPage(
       </section>
 
       <HotelAwards locale={locale} awards={awards} />
+
+      <HotelFeaturedReviews locale={locale} reviews={featuredReviews} />
 
       {amadeusCategories.length > 0 ? (
         <section

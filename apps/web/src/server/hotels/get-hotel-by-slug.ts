@@ -64,6 +64,7 @@ export const HotelDetailRowSchema = z.object({
   policies: z.unknown().nullable().optional(),
   awards: z.unknown().nullable().optional(),
   signature_experiences: z.unknown().nullable().optional(),
+  featured_reviews: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
   long_description_sections: z.unknown().nullable().optional(),
@@ -100,7 +101,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /**
  * Loose postal-code validation — accepts French 5-digit codes plus DOM-TOM
@@ -1038,6 +1039,109 @@ export function readSignatureExperiences(
     bookingRequired: e.booking_required,
     imagePublicId: e.image_public_id ?? null,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// featured_reviews (jsonb) — CDC §2.10 (editorial pull-quotes)
+// ---------------------------------------------------------------------------
+
+/**
+ * Publication-date guard: ISO-8601 `YYYY-MM-DD`, leap years not
+ * validated at this level (Zod's `z.string().date()` would refuse
+ * `2024-02-30` but is a Zod 3.23+ feature; we ship a self-contained
+ * regex to keep the runtime predictable across Zod versions).
+ */
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * HTTPS-only URL guard reused from the awards schema spirit. We
+ * accept up to 2048 chars to fit real-world long URLs (Forbes
+ * Travel Guide query-stringed canonical links can exceed 200).
+ */
+const HttpsUrlSchema = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((u) => u.startsWith('https://'), { message: 'review url must be https' });
+
+const FeaturedReviewSchema = z
+  .object({
+    source: z.string().min(1).max(120),
+    source_url: HttpsUrlSchema.optional(),
+    author: z.string().min(1).max(160).optional(),
+    quote_fr: z.string().min(1).max(500).optional(),
+    quote_en: z.string().min(1).max(500).optional(),
+    rating: z.number().min(0).max(100).optional(),
+    max_rating: z.number().int().min(1).max(100).optional(),
+    date_iso: z.string().regex(ISO_DATE_REGEX).optional(),
+  })
+  .refine((r) => r.quote_fr !== undefined || r.quote_en !== undefined, {
+    message: 'at least one of quote_fr/quote_en is required',
+  })
+  .refine((r) => (r.rating !== undefined ? r.max_rating !== undefined : true), {
+    message: 'rating requires max_rating',
+  })
+  .refine(
+    (r) => (r.rating !== undefined && r.max_rating !== undefined ? r.rating <= r.max_rating : true),
+    { message: 'rating must be ≤ max_rating' },
+  );
+
+const FeaturedReviewsSchema = z.array(FeaturedReviewSchema);
+
+export interface LocalisedFeaturedReview {
+  readonly source: string;
+  readonly sourceUrl: string | null;
+  readonly author: string | null;
+  readonly quote: string;
+  readonly rating: number | null;
+  readonly maxRating: number | null;
+  readonly dateIso: string | null;
+}
+
+/**
+ * Returns the editorial featured review quotes for the hotel,
+ * localized. Empty array is a valid "no curated quotes yet" state.
+ *
+ * Sort order: by `date_iso` descending (most recent first), with
+ * date-less entries appended at the end in source order. This
+ * matches the editorial expectation that the freshest accolade
+ * lands at the top of the block — and it's the order LLM
+ * ingestion will prefer for `Hotel.review[]`.
+ *
+ * Cap: callers decide how many to render; the JSON-LD builder caps
+ * at 5 (Google's Rich Results sweet spot) and the UI component
+ * caps at 3 (visual density). We intentionally do NOT cap here.
+ */
+export function readFeaturedReviews(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): readonly LocalisedFeaturedReview[] {
+  const parsed = FeaturedReviewsSchema.safeParse(row.featured_reviews);
+  if (!parsed.success) return [];
+
+  const localized: LocalisedFeaturedReview[] = [];
+  for (const r of parsed.data) {
+    const quote = locale === 'fr' ? (r.quote_fr ?? r.quote_en) : (r.quote_en ?? r.quote_fr);
+    // The schema refinement guarantees at least one quote is present;
+    // narrow defensively for TypeScript without an assertion.
+    if (quote === undefined) continue;
+    localized.push({
+      source: r.source,
+      sourceUrl: r.source_url ?? null,
+      author: r.author ?? null,
+      quote,
+      rating: r.rating ?? null,
+      maxRating: r.max_rating ?? null,
+      dateIso: r.date_iso ?? null,
+    });
+  }
+
+  return localized.sort((left, right) => {
+    if (left.dateIso === null && right.dateIso === null) return 0;
+    if (left.dateIso === null) return 1;
+    if (right.dateIso === null) return -1;
+    return right.dateIso.localeCompare(left.dateIso);
+  });
 }
 
 export interface HotelRoomRow {

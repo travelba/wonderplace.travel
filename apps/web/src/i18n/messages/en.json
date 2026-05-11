@@ -371,7 +371,8 @@
       "awards": "Awards & recognitions",
       "reassurance": "Why book with us",
       "concierge": "Concierge booking",
-      "signatureExperiences": "Signature experiences"
+      "signatureExperiences": "Signature experiences",
+      "featuredReviews": "What the press says"
     },
     "awards": {
       "intro": "Official distinctions and recognitions awarded to this property.",
@@ -383,6 +384,11 @@
       "listAria": "List of the property's signature experiences",
       "bookingRequired": "Reservation required",
       "includedInStay": "Included in your stay"
+    },
+    "featuredReviews": {
+      "intro": "Curated pull-quotes from independent travel media and professional rankings — editorial selection, no compensation.",
+      "listAria": "Editorial pull-quotes for this property",
+      "ratingAria": "Score {value} out of {max}"
     },
     "amenityCategories": {
       "wellness": "Wellness",

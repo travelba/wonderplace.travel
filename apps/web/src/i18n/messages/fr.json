@@ -371,7 +371,8 @@
       "awards": "Distinctions & reconnaissances",
       "reassurance": "Pourquoi réserver avec nous",
       "concierge": "Réservation par concierge",
-      "signatureExperiences": "Expériences signature"
+      "signatureExperiences": "Expériences signature",
+      "featuredReviews": "Ils en parlent"
     },
     "awards": {
       "intro": "Distinctions et reconnaissances officielles attribuées à l'établissement.",
@@ -383,6 +384,11 @@
       "listAria": "Liste des expériences signature de l'établissement",
       "bookingRequired": "Sur réservation",
       "includedInStay": "Inclus dans le séjour"
+    },
+    "featuredReviews": {
+      "intro": "Extraits de presse spécialisée et de classements professionnels — sélection éditoriale, sans rémunération.",
+      "listAria": "Citations éditoriales sur l'établissement",
+      "ratingAria": "Note {value} sur {max}"
     },
     "amenityCategories": {
       "wellness": "Bien-être",

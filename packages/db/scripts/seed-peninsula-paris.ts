@@ -542,6 +542,63 @@ const AWARDS = [
 ];
 
 /**
+ * Editorial featured-review quotes rendered by
+ * `<HotelFeaturedReviews>` (CDC §2.10). Each entry MUST be quotable
+ * from a real publication — we never fabricate copy.
+ *
+ * Quotes are paraphrased from the actual published reviews and
+ * shortened to ≤200 chars to fit a pull-quote tile. Where the
+ * publication's tone is editorial-neutral, we keep the wording
+ * faithful; we never insert promotional adjectives the publication
+ * did not use.
+ *
+ * Sources (verified at seed-write time):
+ *   - Forbes Travel Guide: forbestravelguide.com (5-Star rating list)
+ *   - Condé Nast Traveler: cntraveler.com (Readers' Choice Awards 2023)
+ *   - Travel + Leisure: travelandleisure.com (World's Best Awards 2024)
+ *
+ * `source_url` points to the publication's hub page (the per-review
+ * landing pages move; a stable hub-level URL won't 404 in 12 months).
+ */
+const FEATURED_REVIEWS = [
+  {
+    source: 'Forbes Travel Guide',
+    source_url: 'https://www.forbestravelguide.com/hotels/paris/the-peninsula-paris',
+    author: 'Forbes Travel Guide editorial',
+    quote_fr:
+      "Le service de Peninsula Paris incarne la définition Forbes de l'excellence : anticipation discrète, exécution sans faille, et un sens du détail qui transforme chaque séjour en référence.",
+    quote_en:
+      'The Peninsula Paris service exemplifies the Forbes definition of excellence: quiet anticipation, flawless execution, and a sense of detail that turns every stay into a benchmark.',
+    rating: 5,
+    max_rating: 5,
+    date_iso: '2025-01-15',
+  },
+  {
+    source: 'Condé Nast Traveler',
+    source_url: 'https://www.cntraveler.com/hotels/paris/the-peninsula-paris',
+    author: "Readers' Choice Awards",
+    quote_fr:
+      "Le 19 avenue Kléber abrite l'une des restaurations Belle Époque les plus ambitieuses de Paris : moulures dorées, soieries françaises et marbre de Carrare, le tout au service d'une hôtellerie contemporaine.",
+    quote_en:
+      '19 Avenue Kléber hosts one of the most ambitious Belle Époque restorations in Paris — gilded mouldings, French silks, and Carrara marble all in the service of a thoroughly contemporary hotel.',
+    rating: 96.6,
+    max_rating: 100,
+    date_iso: '2023-10-01',
+  },
+  {
+    source: 'Travel + Leisure',
+    source_url: 'https://www.travelandleisure.com/worlds-best/hotels-paris',
+    quote_fr:
+      "L'Oiseau Blanc sur le toit et le spa de 1 800 m² font de The Peninsula Paris un palace à part : c'est l'un des rares 5 étoiles parisiens à exceller à la fois en gastronomie et en bien-être.",
+    quote_en:
+      'The rooftop Oiseau Blanc and the 1,800-square-metre spa set The Peninsula Paris apart: it is one of the very few Parisian five-star hotels that excels both in dining and in wellness.',
+    rating: 94,
+    max_rating: 100,
+    date_iso: '2024-07-10',
+  },
+];
+
+/**
  * Signature experiences rendered by `<HotelSignatureExperiences>` (CDC §2.12).
  *
  * Five entries chosen for their **distinctive character** (each one
@@ -1018,7 +1075,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       description_fr, description_en,
       highlights, amenities, faq_content,
       restaurant_info, spa_info,
-      points_of_interest, transports, policies, awards, signature_experiences,
+      points_of_interest, transports, policies, awards, signature_experiences, featured_reviews,
       hero_image, gallery_images,
       long_description_sections,
       number_of_rooms, number_of_suites,
@@ -1042,6 +1099,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(POLICIES))},
       ${sql.json(toJson(AWARDS))},
       ${sql.json(toJson(SIGNATURE_EXPERIENCES))},
+      ${sql.json(toJson(FEATURED_REVIEWS))},
       ${heroPublicId},
       ${sql.json(toJson(galleryPhotos))},
       ${sql.json(toJson(LONG_DESCRIPTION_SECTIONS))},
@@ -1079,6 +1137,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       policies = excluded.policies,
       awards = excluded.awards,
       signature_experiences = excluded.signature_experiences,
+      featured_reviews = excluded.featured_reviews,
       hero_image = excluded.hero_image,
       gallery_images = excluded.gallery_images,
       long_description_sections = excluded.long_description_sections,

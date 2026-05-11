@@ -62,6 +62,33 @@ export interface HotelJsonLdInput {
    * as "unknown" rather than "no".
    */
   readonly petsAllowed?: boolean;
+  /**
+   * Editorial pull-quote reviews (Forbes, Condé Nast Traveler, Michelin,
+   * etc.). Surfaced as Schema.org `Review[]` items under the Hotel node.
+   *
+   *   - `reviewBody` ← quote.
+   *   - `author.@type = Organization`, `author.name` ← `author ?? source`.
+   *   - `publisher.@type = Organization`, `publisher.name` ← `source`.
+   *   - `reviewRating` ← `{ratingValue, bestRating, worstRating: 0}` when
+   *     `rating` + `maxRating` are both set.
+   *   - `datePublished` ← `date`.
+   *   - `url` ← `sourceUrl` (HTTPS).
+   *
+   * Capped at 5 entries before emission to stay within Google's
+   * documented Hotel rich-result envelope.
+   */
+  readonly featuredReviews?: readonly HotelFeaturedReviewInput[];
+}
+
+export interface HotelFeaturedReviewInput {
+  readonly source: string;
+  readonly sourceUrl?: string;
+  readonly author?: string;
+  readonly quote: string;
+  readonly rating?: number;
+  readonly maxRating?: number;
+  /** Optional ISO-8601 `YYYY-MM-DD` publication date. */
+  readonly date?: string;
 }
 
 const PALACE_AWARD = 'Distinction Palace — Atout France';
@@ -161,6 +188,41 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   }
   if (input.petsAllowed !== undefined) {
     out.petsAllowed = input.petsAllowed;
+  }
+  if (input.featuredReviews !== undefined && input.featuredReviews.length > 0) {
+    // Cap at 5 to mirror Google's documented Hotel rich-result envelope
+    // (https://developers.google.com/search/docs/appearance/structured-data/hotel).
+    // Editorial workflows that exceed 5 entries should curate down before
+    // publication; this is a defensive emission cap, not a hard limit.
+    out.review = input.featuredReviews.slice(0, 5).map((review) => ({
+      '@type': 'Review',
+      reviewBody: review.quote,
+      author: {
+        '@type': 'Organization',
+        name:
+          review.author !== undefined && review.author.length > 0 ? review.author : review.source,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: review.source,
+      },
+      ...(review.sourceUrl !== undefined && review.sourceUrl.length > 0
+        ? { url: review.sourceUrl }
+        : {}),
+      ...(review.date !== undefined && review.date.length > 0
+        ? { datePublished: review.date }
+        : {}),
+      ...(review.rating !== undefined && review.maxRating !== undefined
+        ? {
+            reviewRating: {
+              '@type': 'Rating',
+              ratingValue: review.rating,
+              bestRating: review.maxRating,
+              worstRating: 0,
+            },
+          }
+        : {}),
+    }));
   }
 
   return out;
