@@ -350,6 +350,14 @@
       "districtSeparator": "·",
       "viewMap": "Voir sur la carte"
     },
+    "share": {
+      "button": "Partager",
+      "buttonAria": "Partager la fiche {name}",
+      "toastShared": "Partage effectué",
+      "toastCopied": "Lien copié",
+      "toastFailed": "Copie impossible — sélectionnez le lien manuellement",
+      "manualCopyLabel": "Afficher le lien"
+    },
     "rating": {
       "scoreOf": "{value} / {best}",
       "scoreAria": "Note moyenne de {value} sur {best}",

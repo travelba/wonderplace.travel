@@ -12,6 +12,7 @@ import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
 import { HotelFaq } from '@/components/hotel/hotel-faq';
 import { HotelFeaturedReviews } from '@/components/hotel/hotel-featured-reviews';
+import { HotelShareButton } from '@/components/hotel/hotel-share-button';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
@@ -479,25 +480,33 @@ async function renderHotelPage(
       </nav>
 
       <header className="mb-10">
-        <div className="text-muted flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em]">
-          {row.is_palace ? (
-            <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-amber-900">
-              {t('hero.palace')}
-            </span>
-          ) : (
-            <span className="border-border bg-bg rounded-md border px-2 py-1">
-              {t('hero.stars', { count: row.stars })}
-            </span>
-          )}
-          <span>{row.city}</span>
-          {row.district !== null && row.district !== '' ? (
-            <>
-              <span aria-hidden>{t('hero.districtSeparator')}</span>
-              <span>{row.district}</span>
-            </>
-          ) : null}
-          <span aria-hidden>{t('hero.districtSeparator')}</span>
-          <span>{row.region}</span>
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+          <div className="text-muted flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em]">
+            {row.is_palace ? (
+              <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-amber-900">
+                {t('hero.palace')}
+              </span>
+            ) : (
+              <span className="border-border bg-bg rounded-md border px-2 py-1">
+                {t('hero.stars', { count: row.stars })}
+              </span>
+            )}
+            <span>{row.city}</span>
+            {row.district !== null && row.district !== '' ? (
+              <>
+                <span aria-hidden>{t('hero.districtSeparator')}</span>
+                <span>{row.district}</span>
+              </>
+            ) : null}
+            <span aria-hidden>{t('hero.districtSeparator')}</span>
+            <span>{row.region}</span>
+          </div>
+
+          <HotelShareButton
+            hotelName={name}
+            shareText={description !== null ? truncate(description, 160) : null}
+            canonicalUrl={canonicalUrl}
+          />
         </div>
 
         <h1 className="text-fg mt-3 font-serif text-3xl sm:text-4xl md:text-5xl">{name}</h1>
