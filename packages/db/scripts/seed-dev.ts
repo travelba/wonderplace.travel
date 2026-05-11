@@ -133,6 +133,32 @@ function refuseInProd(env: {
   return false;
 }
 
+/**
+ * Strip the readonly variance and feed the value to `postgres.js` as
+ * a structurally-typed `JSONValue`. `JSON.parse(JSON.stringify(...))`
+ * is the canonical way to do this without an `as any` cast — it also
+ * normalises any non-JSON-safe values (Map, Set, Date, undefined)
+ * that might sneak into a seed payload.
+ *
+ * Why this exists at all
+ * ----------------------
+ * Older revisions of this seed used `${JSON.stringify(value)}::jsonb`.
+ * That works for arrays of primitives (postgres.js binds the
+ * stringified payload as TEXT and the explicit `::jsonb` cast parses
+ * it back into a `jsonb` array on the server). It silently breaks
+ * the moment we introduce arrays of objects — depending on driver
+ * version, the value can end up stored as a `jsonb` scalar STRING
+ * (`jsonb_typeof = 'string'`) instead of an array, and the SELECT
+ * side then fails Zod validation in a non-obvious way.
+ *
+ * Migrating every jsonb column to `sql.json()` makes the binding
+ * type-safe regardless of the payload shape and matches the pattern
+ * used in `seed-peninsula-paris.ts`.
+ */
+function toJson(value: unknown): postgres.JSONValue {
+  return JSON.parse(JSON.stringify(value)) as postgres.JSONValue;
+}
+
 async function upsertHotel(
   sql: postgres.Sql,
   seed: HotelSeed,
@@ -152,7 +178,7 @@ async function upsertHotel(
       ${seed.latitude}, ${seed.longitude},
       ${seed.stars}, ${seed.is_palace}, 'amadeus', ${seed.priority}, true,
       ${seed.description_fr}, ${seed.description_en},
-      ${JSON.stringify(seed.amenities)}::jsonb, ${JSON.stringify(seed.highlights)}::jsonb
+      ${sql.json(toJson(seed.amenities))}, ${sql.json(toJson(seed.highlights))}
     )
     on conflict (slug) do update set
       slug_en = excluded.slug_en,
