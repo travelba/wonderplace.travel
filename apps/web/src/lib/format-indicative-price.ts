@@ -53,3 +53,62 @@ export function formatIndicativePriceParts(
     to: price.toMinor !== null ? fmt.format(price.toMinor / 100) : null,
   };
 }
+
+/**
+ * Aggregate a `priceRange` string for the parent hotel JSON-LD
+ * (Google Hotels `Hotel.priceRange`) from its rooms' indicative
+ * prices.
+ *
+ * The string is a free-form anchor — Google specifically advises
+ * either a currency-prefixed range ("€950–€11 000") or a $-count
+ * sentinel ("$$$$$"). We pick the localised currency range because
+ * it doubles as a useful AEO answer for "how much per night at
+ * X?" without requiring a separate FAQ entry.
+ *
+ * Edge cases:
+ *   - No room has an indicative price → returns null. The page
+ *     skips the `priceRange` field entirely (rather than emitting
+ *     a misleading "from €0").
+ *   - All priced rooms share the same currency → emit. If a hotel
+ *     mixes EUR + USD (e.g. dollar-anchored aspirational suites in
+ *     Paris) we **skip** rather than guess a conversion — silent
+ *     omission beats stale FX.
+ *   - Single price point (one room, no `to`) → "€950" (no range
+ *     dashes). Multiple rooms with identical min == max → idem.
+ */
+export function computeHotelPriceRange(
+  rooms: ReadonlyArray<{ readonly indicativePrice: IndicativePriceMinor | null }>,
+  locale: Locale,
+): string | null {
+  const priced: IndicativePriceMinor[] = [];
+  for (const room of rooms) {
+    if (room.indicativePrice !== null) {
+      priced.push(room.indicativePrice);
+    }
+  }
+  if (priced.length === 0) return null;
+
+  const currencies = new Set(priced.map((p) => p.currency));
+  if (currencies.size !== 1) return null;
+  const [first] = priced;
+  if (first === undefined) return null;
+  const currency = first.currency;
+
+  let minMinor = Number.POSITIVE_INFINITY;
+  let maxMinor = 0;
+  for (const p of priced) {
+    if (p.fromMinor < minMinor) minMinor = p.fromMinor;
+    const top = p.toMinor ?? p.fromMinor;
+    if (top > maxMinor) maxMinor = top;
+  }
+
+  const localeTag = locale === 'fr' ? 'fr-FR' : 'en-GB';
+  const fmt = new Intl.NumberFormat(localeTag, {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  });
+  const low = fmt.format(minMinor / 100);
+  const high = fmt.format(maxMinor / 100);
+  return low === high ? low : `${low}–${high}`;
+}

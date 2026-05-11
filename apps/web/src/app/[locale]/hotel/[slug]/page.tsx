@@ -26,7 +26,7 @@ import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
 import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
-import { formatIndicativePriceParts } from '@/lib/format-indicative-price';
+import { computeHotelPriceRange, formatIndicativePriceParts } from '@/lib/format-indicative-price';
 import { isFakeOffersEnabled } from '@/server/booking/dev-fake-offer';
 import { citySlug } from '@/server/destinations/cities';
 import {
@@ -406,6 +406,16 @@ async function renderHotelPage(
     // `petsAllowed` is a boolean: explicit `false` is informative for
     // travellers + Google, so we forward whatever the policy says.
     ...(policies.pets !== null ? { petsAllowed: policies.pets.allowed } : {}),
+    // Aggregate `priceRange` derived from the rooms' indicative prices
+    // (Phase 10.26 / CDC §2.15). Google Hotels uses this as a coarse
+    // pricing anchor in the SERP card; we emit a locale-aware currency
+    // range ("€950–€11 000") when at least one priced room is editorial,
+    // and skip the field entirely otherwise — silent omission beats an
+    // invented "€0" floor.
+    ...((): { priceRange?: string } => {
+      const range = computeHotelPriceRange(rooms, locale);
+      return range !== null ? { priceRange: range } : {};
+    })(),
     // Featured editorial reviews (Phase 10.14 / CDC §2.10). The builder
     // caps at 5 internally; we forward everything we have and let it
     // decide. Empty array is omitted so the builder doesn't emit
