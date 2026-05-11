@@ -279,4 +279,52 @@ describe('hotelJsonLd', () => {
     });
     expect(node.nearbyAttractions).toBeUndefined();
   });
+
+  it('emits containsPlace[] as HotelRoom sub-nodes pointing at room URLs', () => {
+    const node = hotelJsonLd({
+      name: 'Le Peninsula',
+      url: 'https://example.com/p',
+      containedRooms: [
+        { name: 'Deluxe Room', url: 'https://example.com/p/chambres/deluxe-room' },
+        { name: 'Eiffel Tower Suite', url: 'https://example.com/p/chambres/eiffel-tower-suite' },
+      ],
+    });
+    expect(Array.isArray(node.containsPlace)).toBe(true);
+    if (Array.isArray(node.containsPlace)) {
+      expect(node.containsPlace).toHaveLength(2);
+      expect(node.containsPlace[0]).toEqual({
+        '@type': 'HotelRoom',
+        name: 'Deluxe Room',
+        url: 'https://example.com/p/chambres/deluxe-room',
+      });
+      expect(node.containsPlace[1]).toMatchObject({
+        '@type': 'HotelRoom',
+        name: 'Eiffel Tower Suite',
+      });
+    }
+  });
+
+  it('caps containsPlace to 20 entries', () => {
+    const rooms = Array.from({ length: 25 }, (_, i) => ({
+      name: `Room ${i + 1}`,
+      url: `https://example.com/p/chambres/room-${i + 1}`,
+    }));
+    const node = hotelJsonLd({
+      name: 'Le Peninsula',
+      url: 'https://example.com/p',
+      containedRooms: rooms,
+    });
+    if (Array.isArray(node.containsPlace)) {
+      expect(node.containsPlace).toHaveLength(20);
+    }
+  });
+
+  it('omits containsPlace when no rooms are provided', () => {
+    const node = hotelJsonLd({
+      name: 'Hôtel sans chambres éditoriales',
+      url: 'https://example.com/x',
+      containedRooms: [],
+    });
+    expect(node.containsPlace).toBeUndefined();
+  });
 });

@@ -439,6 +439,29 @@ async function renderHotelPage(
     // forward it as-is so LLM ingestion pipelines and Google can
     // surface "Last updated: …" hints.
     ...(row.updated_at !== null && row.updated_at !== '' ? { dateModified: row.updated_at } : {}),
+    // Editorial room sub-pages exposed as `Hotel.containsPlace[]`
+    // (Phase 10.27 / CDC §2.15). Each entry points at the indexable
+    // room sub-page URL so search engines and LLM ingestion pipelines
+    // can follow the relationship without re-crawling the parent
+    // fiche. The full room JSON-LD (`HotelRoom` + `floorSize` + `bed`
+    // + `containedInPlace` back to the hotel) lives at the sub-page
+    // itself — see `chambres/[roomSlug]/page.tsx`.
+    ...(rooms.length > 0
+      ? {
+          containedRooms: rooms.map((r) => {
+            const slugForLocale =
+              locale === 'en'
+                ? row.slug_en !== null && row.slug_en !== ''
+                  ? row.slug_en
+                  : row.slug
+                : row.slug;
+            return {
+              name: r.name ?? r.room_code,
+              url: `${origin}${withLocalePrefix(locale, `/hotel/${slugForLocale}/chambres/${r.slug}`)}`,
+            };
+          }),
+        }
+      : {}),
     // Nearby attractions (Phase 10.16 / CDC §2.7+§2.15). The builder
     // caps at 10 entries; we forward the top points of interest as
     // already sorted by `readLocation()` (distance asc). Coordinates

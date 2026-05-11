@@ -25,6 +25,24 @@ type HotelBaseNode = Exclude<Hotel, string>;
 export type HotelNode = HotelBaseNode & {
   dateModified?: string;
   nearbyAttractions?: readonly NearbyAttractionNode[] | NearbyAttractionNode;
+  containsPlace?: readonly ContainedRoomNode[] | ContainedRoomNode;
+};
+
+/**
+ * `HotelRoom` sub-place exposed under the parent hotel's
+ * `containsPlace`. Carries `@type`, `name` and `url` so search
+ * engines and LLM ingestion pipelines can follow the link to the
+ * indexable room sub-page without having to re-crawl the parent
+ * fiche. We deliberately keep the shape small (no `floorSize`,
+ * `bed`, etc.) — those facts already live in the *room* JSON-LD
+ * at the sub-page URL and duplicating them inside the parent
+ * graph would bloat the envelope without changing Google's
+ * indexing outcome.
+ */
+type ContainedRoomNode = {
+  '@type': 'HotelRoom';
+  name: string;
+  url: string;
 };
 
 /**
@@ -135,6 +153,26 @@ export interface HotelJsonLdInput {
    * distance is rendered in `<HotelLocation>` already.
    */
   readonly nearbyAttractions?: readonly NearbyAttractionInput[];
+  /**
+   * Editorial room sub-pages exposed as Schema.org
+   * `Hotel.containsPlace` entries. Each entry surfaces as a
+   * `HotelRoom` node carrying `name` + `url` only — the full room
+   * graph (`floorSize`, `bed`, `containedInPlace` back to this
+   * hotel, …) lives at the room sub-page itself, so duplicating it
+   * here would bloat the parent envelope without changing crawl
+   * coverage.
+   *
+   * Capped at 20 entries to keep the JSON envelope tight (Google
+   * stops weighting `containsPlace` past the first dozen, and our
+   * editorial pipeline already collapses 200-key inventories to
+   * 3-5 highlight categories).
+   */
+  readonly containedRooms?: readonly ContainedRoomInput[];
+}
+
+export interface ContainedRoomInput {
+  readonly name: string;
+  readonly url: string;
 }
 
 export interface HotelFeaturedReviewInput {
@@ -314,6 +352,16 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
           }
         : {}),
       ...(poi.sameAs !== undefined && poi.sameAs.length > 0 ? { sameAs: poi.sameAs } : {}),
+    }));
+  }
+  if (input.containedRooms !== undefined && input.containedRooms.length > 0) {
+    // Cap at 20 — editorial pipelines typically curate 3-5 room
+    // categories per hotel; the cap is a defensive ceiling, not a hot
+    // path.
+    out.containsPlace = input.containedRooms.slice(0, 20).map((room) => ({
+      '@type': 'HotelRoom',
+      name: room.name,
+      url: room.url,
     }));
   }
   if (input.featuredReviews !== undefined && input.featuredReviews.length > 0) {
