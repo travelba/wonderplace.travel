@@ -375,6 +375,17 @@
       "issuerWithYear": "{issuer} · {year, number}",
       "viewSource": "Voir la source"
     },
+    "amenityCategories": {
+      "wellness": "Bien-être",
+      "dining": "Restauration",
+      "services": "Services",
+      "family": "Famille & animaux",
+      "connectivity": "Connectivité",
+      "business": "Affaires & événements",
+      "accessibility": "Accessibilité",
+      "sustainability": "Engagement responsable",
+      "other": "Autres équipements"
+    },
     "gallery": {
       "thumbnailsLabel": "Autres photos de l'établissement"
     },

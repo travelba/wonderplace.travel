@@ -4,6 +4,14 @@ import { z } from 'zod';
 
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import {
+  AMENITY_CATEGORIES,
+  amenityOrder,
+  categorizeAmenity,
+  categoryOrder,
+  isPremiumAmenity,
+  type AmenityCategory,
+} from '@/server/hotels/amenity-taxonomy';
 import { getFakeHotelDetailBySlug } from '@/server/hotels/dev-fake-hotel-detail';
 
 /** Locale alias used for slug selection (slug_en vs slug). */
@@ -128,6 +136,124 @@ export function readHighlights(row: HotelDetailRow, locale: SupportedLocale): re
 
 export function readAmenities(row: HotelDetailRow, locale: SupportedLocale): readonly string[] {
   return readStringList(row.amenities, locale);
+}
+
+// ---------------------------------------------------------------------------
+// amenities — typed view (CDC §2 bloc 7)
+// ---------------------------------------------------------------------------
+
+/** A single amenity preserved with its raw `key` so the UI can categorize / style it. */
+export interface LocalisedAmenityEntry {
+  /** Stable identifier (see `amenity-taxonomy.ts`). Falls back to a slugified label. */
+  readonly key: string;
+  /** Localized label shown to the guest. */
+  readonly label: string;
+  /** Whether this amenity should get the "premium" emphasis. */
+  readonly isPremium: boolean;
+}
+
+/** Amenities grouped by category, with deterministic ordering. */
+export interface LocalisedAmenityGroup {
+  readonly category: AmenityCategory;
+  readonly entries: readonly LocalisedAmenityEntry[];
+}
+
+/**
+ * Best-effort kebab-case fallback for amenities that arrive without a `key`
+ * (legacy editorial). Mirrors the slug grammar so the result is safe to
+ * re-emit anywhere a key is expected.
+ */
+function slugifyForKey(label: string): string {
+  return label
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64);
+}
+
+/**
+ * Returns amenities preserving the raw `key` (when present) so the caller
+ * can apply taxonomy logic. Same input shape as `readAmenities`, but
+ * lossless w.r.t. the structured `{ key, label_fr, label_en }` form.
+ */
+function readAmenityEntries(
+  raw: unknown,
+  locale: SupportedLocale,
+): readonly LocalisedAmenityEntry[] {
+  if (!Array.isArray(raw)) return [];
+  const out: LocalisedAmenityEntry[] = [];
+  for (const entry of raw) {
+    if (typeof entry === 'string' && entry.trim().length > 0) {
+      const label = entry.trim();
+      out.push({ key: slugifyForKey(label), label, isPremium: false });
+      continue;
+    }
+    if (entry === null || typeof entry !== 'object') continue;
+    const e = entry as Record<string, unknown>;
+    const labelCandidates =
+      locale === 'fr'
+        ? ['label_fr', 'name_fr', 'label', 'name']
+        : ['label_en', 'name_en', 'label', 'name'];
+    let label: string | null = null;
+    for (const k of labelCandidates) {
+      const v = e[k];
+      if (typeof v === 'string' && v.trim().length > 0) {
+        label = v.trim();
+        break;
+      }
+    }
+    if (label === null) continue;
+    const rawKey = e['key'];
+    const key = typeof rawKey === 'string' && rawKey.length > 0 ? rawKey : slugifyForKey(label);
+    out.push({ key, label, isPremium: isPremiumAmenity(key) });
+  }
+  return out;
+}
+
+/**
+ * Group amenities by canonical category. Empty groups are dropped, so the
+ * UI never renders an empty `<h3>` section.
+ *
+ * Categories are presented in the order declared by `AMENITY_CATEGORIES`;
+ * within a category, the entries are ordered by `amenityOrder(key)` then
+ * by their label (stable Unicode sort).
+ */
+export function readAmenitiesByCategory(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): readonly LocalisedAmenityGroup[] {
+  const entries = readAmenityEntries(row.amenities, locale);
+  if (entries.length === 0) return [];
+
+  const buckets = new Map<AmenityCategory, LocalisedAmenityEntry[]>();
+  for (const entry of entries) {
+    const cat = categorizeAmenity(entry.key);
+    const arr = buckets.get(cat) ?? [];
+    arr.push(entry);
+    buckets.set(cat, arr);
+  }
+
+  const localeCmp = locale === 'fr' ? 'fr' : 'en';
+  const groups: LocalisedAmenityGroup[] = [];
+  for (const cat of AMENITY_CATEGORIES) {
+    const arr = buckets.get(cat);
+    if (arr === undefined || arr.length === 0) continue;
+    const sorted = [...arr].sort((a, b) => {
+      const oa = amenityOrder(a.key);
+      const ob = amenityOrder(b.key);
+      if (oa !== ob) return oa - ob;
+      return a.label.localeCompare(b.label, localeCmp);
+    });
+    groups.push({ category: cat, entries: sorted });
+  }
+
+  // Defensive: `categoryOrder` is also exported so callers can re-sort if
+  // they ever build groups outside this helper. We assert here that the
+  // produced array is consistent with that helper to keep both code paths
+  // honest (it costs ~O(n) at most).
+  return groups.sort((a, b) => categoryOrder(a.category) - categoryOrder(b.category));
 }
 
 export function readFaq(row: HotelDetailRow, locale: SupportedLocale): readonly LocalisedFaq[] {

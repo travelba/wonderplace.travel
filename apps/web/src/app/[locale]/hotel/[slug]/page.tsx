@@ -6,6 +6,7 @@ import { JsonLd } from '@cct/seo';
 
 import { buildCloudinarySrc } from '@cct/ui';
 
+import { HotelAmenities } from '@/components/hotel/hotel-amenities';
 import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
@@ -27,6 +28,7 @@ import {
   getHotelBySlug,
   listPublishedHotelSlugs,
   readAmenities,
+  readAmenitiesByCategory,
   readAwards,
   hasAnyPolicy,
   readFaq,
@@ -238,6 +240,7 @@ async function renderHotelPage(
   const description = pickDescription(row, locale);
   const highlights = readHighlights(row, locale);
   const amenities = readAmenities(row, locale);
+  const amenityGroups = readAmenitiesByCategory(row, locale);
   const restaurants = readRestaurants(row, locale);
   const spa = readSpa(row, locale);
   const location = readLocation(row, locale);
@@ -700,25 +703,7 @@ async function renderHotelPage(
         </section>
       ) : null}
 
-      <section aria-labelledby="amenities-title" className="mb-12">
-        <h2 id="amenities-title" className="text-fg mb-3 font-serif text-2xl">
-          {t('sections.amenities')}
-        </h2>
-        {amenities.length > 0 ? (
-          <ul className="flex flex-wrap gap-2">
-            {amenities.map((a) => (
-              <li
-                key={a}
-                className="border-border bg-bg text-fg rounded-md border px-3 py-1.5 text-sm"
-              >
-                {a}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted text-sm">{t('noAmenities')}</p>
-        )}
-      </section>
+      <HotelAmenities locale={locale} groups={amenityGroups} flat={amenities} />
 
       {restaurants !== null && restaurants.venues.length > 0 ? (
         <HotelRestaurants locale={locale} restaurants={restaurants} />

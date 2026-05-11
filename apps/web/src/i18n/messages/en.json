@@ -375,6 +375,17 @@
       "issuerWithYear": "{issuer} · {year, number}",
       "viewSource": "View source"
     },
+    "amenityCategories": {
+      "wellness": "Wellness",
+      "dining": "Dining",
+      "services": "Services",
+      "family": "Family & pets",
+      "connectivity": "Connectivity",
+      "business": "Business & events",
+      "accessibility": "Accessibility",
+      "sustainability": "Sustainability",
+      "other": "Other amenities"
+    },
     "gallery": {
       "thumbnailsLabel": "Additional photos of the property"
     },
