@@ -352,6 +352,27 @@ async function renderHotelPage(
           })),
         }
       : {}),
+    // Freshness signal (Phase 10.16 / CDC §2.15). `row.updated_at` is
+    // already an ISO-8601 timestamp from Supabase (`timestamptz`); we
+    // forward it as-is so LLM ingestion pipelines and Google can
+    // surface "Last updated: …" hints.
+    ...(row.updated_at !== null && row.updated_at !== '' ? { dateModified: row.updated_at } : {}),
+    // Nearby attractions (Phase 10.16 / CDC §2.7+§2.15). The builder
+    // caps at 10 entries; we forward the top points of interest as
+    // already sorted by `readLocation()` (distance asc). Coordinates
+    // are forwarded when available so Google can render the map
+    // ribbon in the rich result.
+    ...(location.pointsOfInterest.length > 0
+      ? {
+          nearbyAttractions: location.pointsOfInterest.map((p) => ({
+            name: p.name,
+            type: p.type,
+            ...(p.latitude !== null && p.longitude !== null
+              ? { latitude: p.latitude, longitude: p.longitude }
+              : {}),
+          })),
+        }
+      : {}),
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
       : {}),

@@ -3,8 +3,41 @@ import type { Hotel } from 'schema-dts';
 import { aggregateRatingJsonLd, type AggregateRatingInput } from './aggregate-rating';
 import { offerJsonLd, type OfferInput } from './offer';
 
+/**
+ * Hotel JSON-LD node — `schema-dts`' `Hotel` is overly conservative
+ * compared to what Google actually accepts and what the Schema.org
+ * spec defines on parent types. We re-open it with two
+ * well-documented extensions:
+ *
+ *   - `dateModified` (Schema.org: defined on `CreativeWork`, but
+ *     Google's Hotel rich-result documentation explicitly lists it
+ *     as a recommended property on `Hotel` — it's the freshness
+ *     signal LLM ingestion pipelines weight most).
+ *   - `nearbyAttractions` (Schema.org: defined on `LodgingBusiness`
+ *     via the Hotels extension; schema-dts misses it). Carries an
+ *     array of `Place` nodes.
+ *
+ * Re-opening rather than casting keeps the rest of the builder
+ * type-safe — we only widen the two specific fields we need.
+ */
+type HotelBaseNode = Exclude<Hotel, string>;
 /** Hotel without the bare-IRI string union from schema-dts. */
-export type HotelNode = Exclude<Hotel, string>;
+export type HotelNode = HotelBaseNode & {
+  dateModified?: string;
+  nearbyAttractions?: readonly NearbyAttractionNode[] | NearbyAttractionNode;
+};
+
+/**
+ * `Place` subtype emitted under `nearbyAttractions`. We keep it as
+ * a structural type (not a discriminated union) because the set of
+ * `@type` strings is open-ended and depends on the editorial taxonomy.
+ */
+type NearbyAttractionNode = {
+  '@type': string;
+  name: string;
+  geo?: { '@type': 'GeoCoordinates'; latitude: number; longitude: number };
+  sameAs?: string;
+};
 
 export interface HotelAddressInput {
   readonly streetAddress: string;
@@ -78,6 +111,30 @@ export interface HotelJsonLdInput {
    * documented Hotel rich-result envelope.
    */
   readonly featuredReviews?: readonly HotelFeaturedReviewInput[];
+  /**
+   * ISO-8601 timestamp of the last meaningful content update. Surfaces
+   * as `dateModified` on the Hotel node — a strong freshness signal
+   * for both search engines and LLM ingestion pipelines (Perplexity,
+   * SearchGPT) that weight recent content higher.
+   *
+   * Pass `row.updated_at` from the page reader; the builder accepts
+   * either a `YYYY-MM-DDTHH:MM:SSZ` Datetime or a bare `YYYY-MM-DD`.
+   */
+  readonly dateModified?: string;
+  /**
+   * Points of interest within walking distance of the hotel, emitted
+   * as the `nearbyAttractions` Hotel property (Google-supported
+   * extension to Schema.org's `LodgingBusiness`).
+   *
+   * Capped at 10 entries in the builder. Each entry is rendered as a
+   * `TouristAttraction` (or subtype derived from `type`) `Place` with
+   * `name` and an optional `geo` block.
+   *
+   * We intentionally do NOT emit `distance` as Schema.org does not
+   * define a `Distance` property on `Place`; the human-visible
+   * distance is rendered in `<HotelLocation>` already.
+   */
+  readonly nearbyAttractions?: readonly NearbyAttractionInput[];
 }
 
 export interface HotelFeaturedReviewInput {
@@ -89,6 +146,52 @@ export interface HotelFeaturedReviewInput {
   readonly maxRating?: number;
   /** Optional ISO-8601 `YYYY-MM-DD` publication date. */
   readonly date?: string;
+}
+
+/**
+ * Free-form POI input. `type` maps loosely to a Schema.org Place
+ * subtype (see `POI_TYPE_TO_SCHEMA` in this module). Unknown types
+ * fall back to the generic `TouristAttraction`.
+ */
+export interface NearbyAttractionInput {
+  readonly name: string;
+  readonly type: string;
+  readonly latitude?: number;
+  readonly longitude?: number;
+  /** Optional canonical URL of the attraction (Wikidata, Wikipedia, official site). */
+  readonly sameAs?: string;
+}
+
+/**
+ * POI editorial type → Schema.org Place subtype. We picked the
+ * narrowest subtype that still validates as `Place`. Wide categories
+ * (`station`, `area`) fall back to `TouristAttraction` which is the
+ * Google-recommended default for "things tourists go to see".
+ */
+const POI_TYPE_TO_SCHEMA: Readonly<Record<string, string>> = {
+  monument: 'LandmarksOrHistoricalBuildings',
+  landmark: 'LandmarksOrHistoricalBuildings',
+  museum: 'Museum',
+  art_gallery: 'Museum',
+  park: 'Park',
+  garden: 'Park',
+  shopping: 'ShoppingCenter',
+  store: 'ShoppingCenter',
+  restaurant: 'Restaurant',
+  cafe: 'Restaurant',
+  church: 'PlaceOfWorship',
+  cathedral: 'PlaceOfWorship',
+  synagogue: 'PlaceOfWorship',
+  mosque: 'PlaceOfWorship',
+  theater: 'PerformingArtsTheater',
+  theatre: 'PerformingArtsTheater',
+  zoo: 'Zoo',
+  beach: 'Beach',
+};
+
+function poiSchemaType(rawType: string): string {
+  const key = rawType.toLowerCase().trim();
+  return POI_TYPE_TO_SCHEMA[key] ?? 'TouristAttraction';
 }
 
 const PALACE_AWARD = 'Distinction Palace — Atout France';
@@ -188,6 +291,30 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   }
   if (input.petsAllowed !== undefined) {
     out.petsAllowed = input.petsAllowed;
+  }
+  if (input.dateModified !== undefined && input.dateModified.length > 0) {
+    out.dateModified = input.dateModified;
+  }
+  if (input.nearbyAttractions !== undefined && input.nearbyAttractions.length > 0) {
+    // Cap at 10 to keep the JSON-LD envelope tight. Google ignores
+    // anything past the first dozen anyway and oversized graphs hurt
+    // crawl-budget. The visible `<HotelLocation>` component renders
+    // up to 8 POIs already, so 10 here keeps a small buffer for the
+    // "+2 not visible but indexable" pattern.
+    out.nearbyAttractions = input.nearbyAttractions.slice(0, 10).map((poi) => ({
+      '@type': poiSchemaType(poi.type),
+      name: poi.name,
+      ...(poi.latitude !== undefined && poi.longitude !== undefined
+        ? {
+            geo: {
+              '@type': 'GeoCoordinates',
+              latitude: poi.latitude,
+              longitude: poi.longitude,
+            },
+          }
+        : {}),
+      ...(poi.sameAs !== undefined && poi.sameAs.length > 0 ? { sameAs: poi.sameAs } : {}),
+    }));
   }
   if (input.featuredReviews !== undefined && input.featuredReviews.length > 0) {
     // Cap at 5 to mirror Google's documented Hotel rich-result envelope
