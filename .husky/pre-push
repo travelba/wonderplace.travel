@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Catch typing regressions before they hit CI. We deliberately do NOT
+# run unit tests / E2E here — CI covers them and developers push
+# frequently; a sub-second `tsc --noEmit` per package via Turbo cache
+# is the right trade-off between safety and DX.
+pnpm turbo run typecheck

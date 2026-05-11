@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Auto-format staged files via Prettier (see lint-staged config in
+# the root package.json). Runs only on what's staged so it stays fast
+# even when the working tree is large.
+pnpm exec lint-staged
