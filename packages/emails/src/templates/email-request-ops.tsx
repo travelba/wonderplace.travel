@@ -1,12 +1,4 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Text,
-} from '@react-email/components';
+import { Body, Container, Head, Heading, Html, Preview, Text } from '@react-email/components';
 import type { JSX, ReactElement } from 'react';
 
 export interface EmailRequestOpsProps {
@@ -70,9 +62,7 @@ export default function EmailRequestOps(props: EmailRequestOpsProps): JSX.Elemen
             New email-mode booking request — <strong>{props.requestRef}</strong>
           </Heading>
           <table cellPadding={0} cellSpacing={0} style={tableStyle}>
-            <tbody>
-              {rows.filter((r): r is ReactElement => r !== null)}
-            </tbody>
+            <tbody>{rows.filter((r): r is ReactElement => r !== null)}</tbody>
           </table>
           <Text style={{ fontSize: 12, color: '#555', marginTop: 16 }}>
             Internal — do not forward externally. PII redacted in logs.

@@ -26,7 +26,11 @@ const colors = {
   bg: '#ffffff',
 } as const;
 
-const body = { backgroundColor: colors.bg, color: colors.fg, fontFamily: 'Inter,system-ui,sans-serif' };
+const body = {
+  backgroundColor: colors.bg,
+  color: colors.fg,
+  fontFamily: 'Inter,system-ui,sans-serif',
+};
 const container = { maxWidth: 560, margin: '0 auto', padding: 24 };
 const heading = { fontSize: 20, marginBottom: 16, color: colors.fg };
 const para = { fontSize: 14, lineHeight: '1.6', color: colors.fg, marginBottom: 12 };
@@ -80,8 +84,7 @@ export default function EmailRequestGuest(props: EmailRequestGuestProps): JSX.El
           <Text style={para}>{c.body(props.hotelName, props.checkIn, props.checkOut)}</Text>
           <Text style={para}>{c.sla}</Text>
           <Section style={refBox}>
-            {c.refLabel}{' '}
-            <strong>{props.requestRef}</strong>
+            {c.refLabel} <strong>{props.requestRef}</strong>
           </Section>
           <Text style={footer}>{c.sign}</Text>
         </Container>

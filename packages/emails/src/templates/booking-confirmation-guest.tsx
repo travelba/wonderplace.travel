@@ -57,14 +57,35 @@ const totalBox = {
   ...box,
   textAlign: 'center' as const,
 };
-const totalLabelStyle = { fontSize: 11, color: colors.muted, textTransform: 'uppercase' as const, letterSpacing: 1 };
-const totalValueStyle = { fontSize: 24, fontWeight: 600 as const, color: colors.emphasis, marginTop: 4 };
+const totalLabelStyle = {
+  fontSize: 11,
+  color: colors.muted,
+  textTransform: 'uppercase' as const,
+  letterSpacing: 1,
+};
+const totalValueStyle = {
+  fontSize: 24,
+  fontWeight: 600 as const,
+  color: colors.emphasis,
+  marginTop: 4,
+};
 const policyBox = {
   ...box,
   backgroundColor: '#fafafa',
 };
-const policyTitle = { fontSize: 12, color: colors.muted, textTransform: 'uppercase' as const, letterSpacing: 1, marginBottom: 8 };
-const policyText = { fontSize: 13, color: colors.fg, whiteSpace: 'pre-line' as const, lineHeight: '1.6' };
+const policyTitle = {
+  fontSize: 12,
+  color: colors.muted,
+  textTransform: 'uppercase' as const,
+  letterSpacing: 1,
+  marginBottom: 8,
+};
+const policyText = {
+  fontSize: 13,
+  color: colors.fg,
+  whiteSpace: 'pre-line' as const,
+  lineHeight: '1.6',
+};
 const footer = { fontSize: 12, color: colors.muted, marginTop: 24 };
 
 const copy = {
@@ -73,19 +94,21 @@ const copy = {
     title: 'Votre réservation est confirmée',
     subtitle: 'Tous les détails de votre séjour ci-dessous.',
     hello: (n: string) => `Bonjour ${n},`,
-    intro: (h: string, loc: string) => `Votre séjour à ${h} (${loc}) est confirmé. Voici les détails :`,
+    intro: (h: string, loc: string) =>
+      `Votre séjour à ${h} (${loc}) est confirmé. Voici les détails :`,
     stayLabel: 'Séjour',
     refLabel: 'Référence de réservation',
     totalLabel: 'Total réglé',
-    policyLabel: 'Politique d\'annulation',
-    sign: 'À très bientôt,\n— L\'équipe ConciergeTravel',
+    policyLabel: "Politique d'annulation",
+    sign: "À très bientôt,\n— L'équipe ConciergeTravel",
   },
   en: {
     preview: (ref: string) => `Your booking is confirmed — ${ref}`,
     title: 'Your booking is confirmed',
     subtitle: 'All your stay details below.',
     hello: (n: string) => `Hello ${n},`,
-    intro: (h: string, loc: string) => `Your stay at ${h} (${loc}) is confirmed. Here are the details:`,
+    intro: (h: string, loc: string) =>
+      `Your stay at ${h} (${loc}) is confirmed. Here are the details:`,
     stayLabel: 'Stay',
     refLabel: 'Booking reference',
     totalLabel: 'Total charged',
@@ -113,7 +136,16 @@ export default function BookingConfirmationGuest(
           <Text style={para}>{c.intro(props.hotelName, props.hotelLocation)}</Text>
 
           <Section style={box}>
-            <Text style={{ ...para, marginBottom: 4, color: colors.muted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
+            <Text
+              style={{
+                ...para,
+                marginBottom: 4,
+                color: colors.muted,
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: 1,
+              }}
+            >
               {c.stayLabel}
             </Text>
             <Text style={{ ...para, marginBottom: 0, fontSize: 16, fontWeight: 600 }}>
@@ -127,7 +159,16 @@ export default function BookingConfirmationGuest(
           </Section>
 
           <Section style={refBox}>
-            <Text style={{ fontSize: 11, color: colors.muted, textTransform: 'uppercase', letterSpacing: 1, margin: 0, marginBottom: 4 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                color: colors.muted,
+                textTransform: 'uppercase',
+                letterSpacing: 1,
+                margin: 0,
+                marginBottom: 4,
+              }}
+            >
               {c.refLabel}
             </Text>
             <Text style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{props.bookingRef}</Text>
