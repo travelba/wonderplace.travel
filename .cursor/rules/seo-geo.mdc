@@ -6,12 +6,24 @@ alwaysApply: true
 
 # SEO / GEO / AEO — ConciergeTravel.fr
 
+## Décisions structurantes (référencer dans les PR)
+
+| Décision | Tranche | Référence |
+|---|---|---|
+| Hotel URL = `/hotel/<slug>` (slug court, flat) | Adopté V1 contre CDC §3.3 | [ADR-0008](../../docs/adr/0008-url-structure-hotel-flat.md) |
+| Sous-pages chambres `/hotel/<slug>/chambres/<room-slug>` | Adopté V1 | [ADR-0009](../../docs/adr/0009-hotel-room-subpages-indexable.md) |
+| Locales V1 = `fr` + `en` ; V2 = +es/de/it ; V3 = +ar/zh/ja | Phasé | [seo-technical/SKILL.md](../skills/seo-technical/SKILL.md) |
+| `AggregateRating.bestRating: '5'` (jamais `'10'`) | Hard rule | [structured-data-schema-org/SKILL.md](../skills/structured-data-schema-org/SKILL.md) |
+| Indicateurs urgence "X personnes consultent" interdits sauf preuve Amadeus | Hard rule | DSA art. 25 + DGCCRF |
+| ISR `revalidate = 3600` sur fiche hôtel via auth client island | Adopté Sprint 4.1 | [ADR-0007](../../docs/adr/0007-isr-via-auth-client-island.md) |
+
 ## Metadata
 
 - Every public page exports `generateMetadata` with localised title/description.
 - `alternates.canonical` is **mandatory** (relative, e.g. `/hotel/<slug>`).
-- `alternates.languages` includes `fr-FR`, `en`, `x-default`.
+- `alternates.languages` includes `fr-FR`, `en`, `x-default` in V1. V2 will add `es`, `de`, `it`. V3 will add `ar`, `zh`, `ja`.
 - 404 / not-published pages return `{ robots: { index: false, follow: false } }`.
+- Room sub-pages `/hotel/<slug>/chambres/<room-slug>` set their own `alternates.canonical` to themselves — **never** to the parent hotel.
 
 ## JSON-LD
 
@@ -19,11 +31,17 @@ alwaysApply: true
 - Compose with `JsonLd.withSchemaOrgContext(...)` to ensure `@context: "https://schema.org"`.
 - Emit via `JsonLdScript` from `@/components/seo/json-ld` so the CSP nonce is applied. Never inline `<script>` directly.
 - Forbidden: fabricated ratings. `aggregateRating` requires real `reviewCount > 0` from Amadeus or Google Places.
+- `AggregateRating.bestRating` **MUST** be `'5'`. The UI may display `/10` via explicit conversion (`displayed = stored × 2`) but the JSON-LD always emits `/5`.
+- `Offer.priceValidUntil` mandatory on every offer (CDC §2.8) — avoids stale offers indexed without expiry.
+- Hotel detail emits the full schema set: `Hotel` + `Place` + `GeoCoordinates` + `Offer[]` + `AggregateRating` + `Review[]` + `BreadcrumbList` + `FAQPage` + `ImageObject[]` (≥ 30, each with `caption`) + `VideoObject` (if available) + `Award[]` (verified only).
+- Room sub-page emits: `HotelRoom` (or `Room`) + `Offer` + `BreadcrumbList` + `ImageObject[]` (≥ 5) + `isPartOf` pointing at the parent `Hotel`.
 
 ## Anti-cannibalisation
 
 - The hotel detail page is canonical for `/hotel/<slug>`. Search and destination hubs link to it but never duplicate its content.
 - Editorial sections cite the hotel by name + URL; never paste the hotel description verbatim across pages.
+- Room sub-pages stay out of `/destination/<city>` `ItemList` JSON-LD by default — only **signature suites** (`is_signature: true` in Payload) appear there.
+- Room sub-page descriptions must be **unique vs the parent hotel** (≥ 200 words specific to the room).
 
 ## LLM-actionable surfaces (GEO)
 
@@ -32,17 +50,40 @@ alwaysApply: true
 - `agent-skills.json` enumerates LLM-actionable actions with Zod-validated input schemas. Every new public endpoint that an LLM could call should appear here.
 - The catalogue is built from `DEFAULT_AGENT_SKILLS` in `packages/seo/src/agent-skills.ts`. Required keys must always be a subset of declared properties (asserted in tests).
 
-## AEO blocks
+## AEO blocks + FAQ (CDC §2.11, §6 — levier GEO majeur)
 
 - AEO = Answer Engine Optimization: short, quotable answer (40–80 words) paired with `FAQPage` JSON-LD.
 - Validated by `buildAeoBlock` from `@cct/seo`. Ship one block per pillar page (homepage, hotel detail, destination hub).
 - Include a freshness signal in the answer text (e.g. `Mise à jour <date>`) so LLMs surface recency.
 - The visible section uses `data-aeo`, `aria-labelledby`, and renders inside a sober container — no extra styling competing with the body.
+- **FAQ block on hotel detail: 10–15 Q&A obligatoires** (CDC §2.11). The 10 questions canoniques (parking, petit-déj, Wi-Fi, animaux, distance aéroport, piscine, check-in anticipé, transferts, annulation, taxes) must always be present, even with generic answers.
+- FAQ answers: **50–100 mots** each — denser than AEO (40–80), optimised for LLM citation.
+- The first FAQ item renders inside `<details open>` so its text is visible in the DOM at load (LLMs sometimes skip closed `<details>`).
+
+## Factual summary (CDC §2.3)
+
+- 130–150 char "IA-ready" block authored in Payload `factual_summary_fr/_en`.
+- Strict format: `[Type] [étoiles] situé [quartier/ville], à [distance] de [POI majeur], avec [3 USP].`
+- Rendered visually right under the H1 + mapped into `Hotel.description` in JSON-LD.
+- Unique per hotel — Algolia indexing rejects duplicates.
+
+## Freshness signal
+
+- `<LastUpdatedBadge />` visible near the H1 on every editorial page **and** hotel detail.
+- Triple sync: visible UI ↔ `sitemap.xml <lastmod>` ↔ JSON-LD (`dateModified` for `Article`, `dateModified` + `lastReviewed` for `Hotel`).
+- Automated via Payload `afterChange` hooks.
+
+## Urgency indicators — **interdits sauf preuve Amadeus**
+
+- The CDC §2.8 mentions "X personnes consultent / stock restant". **Refused** unless the data is verifiable from an Amadeus availability call (`offer.availability: 'LimitedAvailability'` with real remaining count).
+- Rationale: EU Digital Services Act art. 25 (manipulative interfaces) + DGCCRF sanctions against Booking (2020) and the EU inquiry on Expedia/Tripadvisor (2023-2024). As an IATA-licensed travel agency, fabricated urgency is a real legal risk, not just bad UX.
+- Display "Plus que X chambres" only when sourced from a real ARI call.
 
 ## Sitemap & robots
 
-- Sitemap is generated from Supabase (`hotels`, `editorial_pages`, `redirects`) and emitted by `apps/web/src/app/sitemap.xml/route.ts`.
+- Sitemap is generated from Supabase (`hotels`, `rooms`, `editorial_pages`, `redirects`) and emitted by `apps/web/src/app/sitemap.xml/route.ts`. Sub-sitemaps: `sitemap-hotels.xml`, `sitemap-rooms.xml`, `sitemap-hubs.xml`, `sitemap-editorial.xml`, `sitemap-guides.xml`, `sitemap-pois.xml`.
 - `force-static` + `revalidate = 86400`. Add `lastmod` based on `updated_at`.
 - Disallow `/api/`, `/admin/`, the booking funnel, the account area, and `/monitoring` (Sentry tunnel).
+- Robots allow-list (2026): `Googlebot`, `Google-Extended`, `Bingbot`, `GPTBot`, `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `Perplexity-User`, `ClaudeBot`, `anthropic-ai`, `Applebot`, `Applebot-Extended`.
 
-See `.cursor/skills/seo-technical/SKILL.md`, `.cursor/skills/geo-llm-optimization/SKILL.md`, and `.cursor/skills/structured-data-schema-org/SKILL.md`.
+See `.cursor/skills/seo-technical/SKILL.md`, `.cursor/skills/geo-llm-optimization/SKILL.md`, `.cursor/skills/structured-data-schema-org/SKILL.md`, and `.cursor/rules/hotel-detail-page.mdc` for the 15-block checklist.

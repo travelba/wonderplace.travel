@@ -10,8 +10,19 @@ alwaysApply: true
 
 - Default to **Server Components**. Add `'use client'` only when you genuinely need state, effects, refs, or browser APIs.
 - For pages that don't need per-request data, prefer **ISR** with `export const revalidate = N` over `force-dynamic`.
-- `force-dynamic` is acceptable when a shared layout reads `cookies()`/`headers()` (e.g. auth area in header).
+- `force-dynamic` is acceptable when a shared layout reads `cookies()`/`headers()` (e.g. auth area in header) — but see [ADR-0007](../../docs/adr/0007-isr-via-auth-client-island.md) for the auth client island pattern that re-enables ISR.
 - `generateStaticParams` must defensively return `[]` if upstream data is unavailable — never throw during build.
+
+## Hotel detail + room sub-pages (CDC §2 + ADR-0008/0009)
+
+- **Hotel detail** lives at `app/[locale]/hotel/[slug]/page.tsx` with `export const revalidate = 3600;` (Sprint 4.1, ADR-0007).
+- **Room sub-pages** live at `app/[locale]/hotel/[slug]/chambres/[roomSlug]/page.tsx`:
+  - Same `revalidate = 3600` aligned with the parent (consistent freshness signal).
+  - `generateStaticParams` should perform a **single shared Supabase fetch** that returns both parent slugs and their room slugs, returned as a flat array of `{ slug, roomSlug }` — avoids the N+1 pattern.
+  - `generateMetadata` is localised, `alternates.canonical` = `/hotel/[slug]/chambres/[roomSlug]` (**never** the parent), `alternates.languages` mirrors V1 locales.
+  - If the room has < 5 photos or < 200 words description, return `{ robots: { index: false, follow: false } }` (room remains visible to humans but not indexed until the editor completes it).
+  - JSON-LD: emit `HotelRoom` (or `Room`) + `Offer` + `BreadcrumbList` + `ImageObject[]` + `isPartOf` referencing the parent hotel `@id`.
+- Both pages share the breadcrumb shape: `Accueil > Destination > [Ville] > [Hotel] > [Chambre]`.
 
 ## Metadata & SEO
 

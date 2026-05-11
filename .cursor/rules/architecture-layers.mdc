@@ -45,13 +45,22 @@ Apps **compose** the lower layers. Apps:
 
 ## Cheat-sheet
 
-| Concern                          | Layer                         |
-|----------------------------------|-------------------------------|
-| Booking state machine            | `packages/domain/booking`     |
-| Amadeus OAuth + offer lock       | `packages/integrations/amadeus` |
-| JSON-LD builder                  | `packages/seo`                |
-| RLS-aware Supabase query helper  | `packages/db`                 |
-| `/hotel/[slug]/page.tsx`         | `apps/web`                    |
-| Payload collection definition    | `apps/admin/src/collections`  |
+| Concern                                            | Layer                            |
+|----------------------------------------------------|----------------------------------|
+| Booking state machine                              | `packages/domain/booking`        |
+| Amadeus OAuth + offer lock                         | `packages/integrations/amadeus`  |
+| JSON-LD builder (Hotel, Room, Offer, FAQ, Place)   | `packages/seo/jsonld/`           |
+| AEO block helper, factual summary lint             | `packages/seo`                   |
+| RLS-aware Supabase query helper                    | `packages/db`                    |
+| Hotel detail / room sub-page route                 | `apps/web/src/app/[locale]/hotel/[slug]/...` |
+| Payload collection definitions (Hotels, Rooms, Pois, Awards, MiceEvents) | `apps/admin/src/collections/`    |
+| `HotelImage`, `HotelVideo`, `Hotel360Tour` wrappers | `packages/ui/`                   |
 
-See also `docs/adr/0001-architecture.md` and `.cursor/skills/product-architecture/SKILL.md`.
+## Cross-cutting collections (CDC §2 — fiche hôtel)
+
+The collections introduced by the CDC live in **Payload (apps/admin)**, not in `packages/domain`:
+- `Hotels`, `Rooms`, `Pois`, `Awards`, `MiceEvents`, `Policies` (CDC §2.9), `Media`, `FaqEntries`.
+- Schema mapping to JSON-LD lives in `packages/seo/jsonld/<schema>.ts` (one builder per schema, Zod-validated).
+- Route handlers in `apps/web` are **composition only** — fetch from Supabase via `packages/db`, transform via `packages/seo`, render. No business logic in the route handler itself.
+
+See also `docs/adr/0001-architecture.md`, `docs/adr/0008-url-structure-hotel-flat.md`, `docs/adr/0009-hotel-room-subpages-indexable.md`, and `.cursor/skills/product-architecture/SKILL.md`.

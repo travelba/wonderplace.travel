@@ -1,0 +1,88 @@
+---
+description: Mandatory 15-block architecture for the hotel detail page (CDC v3.0 §2). Checklist for PR review and component composition.
+globs: "apps/web/src/app/[locale]/hotel/[slug]/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Hotel detail page — CDC §2 architecture (15 blocs)
+
+This page is the **strategic surface** that competes against Booking, Hotels.com and the official hotel website. CDC v3.0 §2 defines 15 mandatory blocks. A PR that touches `/hotel/[slug]/page.tsx` must visit this checklist.
+
+## Decisions (do not relitigate without an ADR)
+
+| Décision | Référence |
+|---|---|
+| URL canonique `/hotel/[slug]` (flat slug court) | [ADR-0008](../../docs/adr/0008-url-structure-hotel-flat.md) |
+| Sous-pages chambres `/hotel/[slug]/chambres/[room-slug]` indexables | [ADR-0009](../../docs/adr/0009-hotel-room-subpages-indexable.md) |
+| ISR `revalidate = 3600` via auth client island | [ADR-0007](../../docs/adr/0007-isr-via-auth-client-island.md) |
+| Locales V1 = `fr` + `en` (V2 = +es/de/it, V3 = +ar/zh/ja) | [seo-technical](../skills/seo-technical/SKILL.md) |
+
+## The 15 mandatory blocks
+
+| # | Bloc CDC §2 | Source de données | Composant cible | Schema.org |
+|---|---|---|---|---|
+| 1 | En-tête identité (H1, étoiles, fil d'ariane, note /10 → JSON-LD /5, badges, favori, share, langue, devise) | Supabase `hotels` + Payload editorial | `<HotelHeader>` | `Hotel` + `BreadcrumbList` |
+| 2 | Galerie média (≥ 30 photos catégorisées, 1 vidéo ≥ 30 s, visite 360°, alt enrichi, lightbox clavier) | Payload `media` (≥ 30 + 10 catégories couvertes) | `<HotelGallery>` + `<HotelVideo>` + `<Hotel360Tour>` | `ImageObject[]` (caption obligatoire) + `VideoObject` |
+| 3 | Résumé factuel IA-ready (150 chars, format strict) | Payload `factual_summary_fr/_en` | `<FactualSummary>` | `Hotel.description` |
+| 4 | Description longue narrative (600-1000 mots uniques, H2/H3 structurés, 8-12 mots-clés longue traîne) | Payload `description_long_fr/_en` | `<LongDescription>` | (texte body, dans `Article` si guide associé) |
+| 5 | Types de chambres → sous-pages indexables `/hotel/[slug]/chambres/[room-slug]` | Supabase `rooms` + Payload | `<RoomCardList>` (sur fiche) + page dédiée | `HotelRoom` + `Offer` (sur sous-page) |
+| 6 | Équipements & services (12 catégories, ≥ 80 attributs) | `hotel_amenities` × `amenities` | `<AmenityGrid>` | `amenityFeature[]` |
+| 7 | Localisation & accès (carte interactive, GPS, distances POIs auto, instructions multimodales) | Supabase `hotels.lat/lng` + Payload `pois` | `<HotelMap>` + `<HotelPois>` | `Place` + `GeoCoordinates` + `nearbyAttraction[]` |
+| 8 | Tarifs & moteur de réservation (widget sticky, calendrier, comparateur, TTC, codes promo) | Amadeus offers + Makcorps/Apify comparateur | `<BookingWidget>` (déjà en place, à enrichir) | `Offer[]` avec `priceValidUntil` |
+| 9 | Politiques & infos pratiques (check-in/out, animaux, fumeur, paiement, annulation, taxes explicites) | Payload `policies` | `<HotelPolicies>` | (texte structuré, embed `LodgingBusiness.checkinTime/Out`) |
+| 10 | Avis clients (/10 + sous-notes, distribution, filtres, réponses hôtelier, sources agrégées) | Supabase `reviews` + agrégation Google/Amadeus | `<ReviewsBlock>` | `AggregateRating` (`bestRating: '5'`) + `Review[]` |
+| 11 | FAQ structurée (**10-15 Q&A obligatoires**, dont 10 questions canoniques) | Payload `faq_content` | `<FaqBlock>` | `FAQPage` |
+| 12 | Contenu éditorial local "Que faire autour" (guide ville 2000 mots, top POIs, événements, itinéraires) | Payload `editorial_pages.type = local_guide` | `<LocalGuideTeaser>` (lien profond) | `Article` (sur la page guide elle-même) |
+| 13 | Réassurance & autorité (labels Clef Verte / Michelin Key / LEED, presse, garanties, partenaires) | Payload `awards` (`verified: true` uniquement) | `<TrustSignals>` | `Hotel.award[]` |
+| 14 | Bloc pro / groupes / événements (devis séminaire/mariage, capacités salles, formulaire MICE) | Payload `mice_events` | `<MiceBlock>` | (formulaire — pas de Schema dédié) |
+| 15 | Footer fiche (NAP identique GBP, réseaux sociaux vérifiés, mentions légales, hôtels similaires maillage interne) | `SiteSettings` + Supabase similar hotels | `<HotelFooter>` | `Organization` (rappel) |
+
+## Hard rules (PR doit refuser si manquant)
+
+1. **Photos** : `< 30` photos OU une catégorie vide → publish bloqué côté Payload, mais aussi assertion en E2E.
+2. **FAQ** : `< 10` Q&A → publish bloqué.
+3. **Factual summary** : `length > 150` chars OU format différent du template → lint warning bloquant.
+4. **AggregateRating** : `bestRating: '10'` en JSON-LD → refus systématique.
+5. **Offer** : `priceValidUntil` absent → refus.
+6. **Indicateurs urgence** : "X personnes consultent" sans signal Amadeus `LimitedAvailability` réel → refus DGCCRF/DSA.
+7. **Awards** : `verified: false` rendu en JSON-LD → refus.
+8. **Room sub-page canonical** : pointe vers la fiche parent → refus (annulerait l'indexabilité de la sous-page).
+9. **Vidéos auto-play** : interdit (WCAG 2.2 AA).
+10. **Bloc 12 (guide local)** : doit être un **lien vers** la page guide (`/destination/[city]/guide`), pas une duplication du contenu.
+
+## Composition graphe (target)
+
+```mermaid
+flowchart TB
+  page["page.tsx (RSC, revalidate=3600)"] --> header["1 HotelHeader"]
+  page --> gallery["2 HotelGallery"]
+  page --> summary["3 FactualSummary"]
+  page --> longDesc["4 LongDescription"]
+  page --> rooms["5 RoomCardList \u2192 sous-pages"]
+  page --> amenities["6 AmenityGrid"]
+  page --> location["7 HotelMap + HotelPois"]
+  page --> booking["8 BookingWidget (client island)"]
+  page --> policies["9 HotelPolicies"]
+  page --> reviews["10 ReviewsBlock"]
+  page --> faq["11 FaqBlock"]
+  page --> localGuide["12 LocalGuideTeaser"]
+  page --> trust["13 TrustSignals"]
+  page --> mice["14 MiceBlock"]
+  page --> footer["15 HotelFooter"]
+  page --> jsonld["JsonLdScript x N (Hotel, Place, Offers, AggregateRating, Reviews, BreadcrumbList, FAQPage, ImageObjects, VideoObject, Awards)"]
+```
+
+## Anti-patterns à refuser
+
+- Bloc absent ou remplacé par un placeholder "À venir" sur une fiche publiée.
+- Photo `alt` générique (`"piscine"`) — l'alt doit porter mot-clé + contexte (`"piscine extérieure chauffée Hôtel X Nice"`).
+- Composant client qui re-fetch des données déjà disponibles via le RSC parent.
+- JSON-LD inline `<script>` sans le wrapper `JsonLdScript` (casse la CSP nonce).
+- Dupliquer le contenu d'une chambre dans la description longue de la fiche parent (cannibalisation).
+- Indicateurs urgence fabriqués (CDC §2.8 refusé).
+
+## Références
+
+- CDC v3.0 §2 (architecture fiche, 15 blocs), §3 (URL, i18n, accessibilité), §4 (data model), §6 (SEO/GEO).
+- ADR-0007, ADR-0008, ADR-0009.
+- Skills : `seo-technical`, `geo-llm-optimization`, `structured-data-schema-org`, `content-modeling`, `accessibility`, `performance-engineering`, `booking-engine`.
