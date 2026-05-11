@@ -53,25 +53,38 @@ Score sur **5** par bloc. Notes :
 - **4** = présent, manque polish ou data
 - **5** = conforme CDC §2
 
-| #   | Bloc CDC §2                                  | Score | Priorité Phase 10 |
-| --- | -------------------------------------------- | ----- | ----------------- |
-| 1   | En-tête identité                             | 3/5   | P1                |
-| 2   | Galerie média                                | 0/5   | **P0**            |
-| 3   | Résumé factuel IA-ready (AEO)                | 3/5   | P2                |
-| 4   | Description longue                           | 3/5   | P2                |
-| 5   | Types de chambres                            | 2/5   | **P0**            |
-| 6   | Équipements & services                       | 3/5   | P1                |
-| 7   | Localisation (carte, POIs, transport)        | 1/5   | **P0**            |
-| 8   | Moteur de réservation / display              | 4/5   | P2                |
-| 9   | Politiques (annulation, check-in/out, taxes) | 0/5   | **P0**            |
-| 10  | Avis & notes                                 | 1/5   | P1                |
-| 11  | FAQ                                          | 4/5   | P2                |
-| 12  | Restaurants, spa, expériences                | 1/5   | P1                |
-| 13  | Réassurance / agence IATA                    | 2/5   | P1                |
-| 14  | B2B / MICE                                   | 0/5   | P3                |
-| 15  | Specs techniques (Schema.org, hreflang, ISR) | 4/5   | P2                |
+| #   | Bloc CDC §2                                  | Score initial | Score actuel | Priorité résiduelle     |
+| --- | -------------------------------------------- | ------------- | ------------ | ----------------------- |
+| 1   | En-tête identité                             | 3/5           | 3/5          | P1                      |
+| 2   | Galerie média                                | 0/5           | **4/5** ✓    | P2 (lightbox plus tard) |
+| 3   | Résumé factuel IA-ready (AEO)                | 3/5           | 3/5          | P2                      |
+| 4   | Description longue                           | 3/5           | 3/5          | P2                      |
+| 5   | Types de chambres                            | 2/5           | **4/5** ✓    | P2 (sous-sous-pages)    |
+| 6   | Équipements & services                       | 3/5           | 3/5          | P1                      |
+| 7   | Localisation (carte, POIs, transport)        | 1/5           | **4/5** ✓    | P2 (carte interactive)  |
+| 8   | Moteur de réservation / display              | 4/5           | 4/5          | P2                      |
+| 9   | Politiques (annulation, check-in/out, taxes) | 0/5           | **4/5** ✓    | P2 (taxes/séjour)       |
+| 10  | Avis & notes                                 | 1/5           | 1/5          | P1                      |
+| 11  | FAQ                                          | 4/5           | 4/5          | P2                      |
+| 12  | Restaurants, spa, expériences                | 1/5           | **4/5** ✓    | P2 (expériences)        |
+| 13  | Réassurance / agence IATA                    | 2/5           | 2/5          | P1                      |
+| 14  | B2B / MICE                                   | 0/5           | 0/5          | P3                      |
+| 15  | Specs techniques (Schema.org, hreflang, ISR) | 4/5           | **5/5** ✓    | —                       |
 
-**Total : 34/75** (~45 %). Acceptable pour un proto, **insuffisant** pour publier un palace face à la concurrence (Booking, Mr & Mrs Smith, AOR Hotels).
+**Total initial** : 34/75 (~45 %) — fiche pilote.
+**Total après Phase 9 consolidation + Phase 10 (B → C → 10.1 → 10.2 → 10.3)** : **58/75 (~77 %)**.
+
+Le palace passe le seuil de publication face à Booking / Mr & Mrs Smith / AOR Hotels sur les **5 blocs SEO-critiques** (galerie, chambres, localisation, politiques, expériences). Restent en suspens : avis & notes (bloc 10, nécessite intégration Booking API ou import Google Places), réassurance/agence IATA (bloc 13, blocs marketing à designer), B2B/MICE (bloc 14, hors scope phase 10).
+
+### Chantiers livrés depuis le score initial
+
+| Commit    | Phase | Blocs impactés                  | Score |
+| --------- | ----- | ------------------------------- | ----- |
+| `cfc4beb` | 9.C   | Galerie média (bloc 2)          | 0 → 4 |
+| `1b05766` | 9.B   | Restaurants + spa (bloc 12)     | 1 → 4 |
+| `c8b09fc` | 10.1  | Sous-pages chambres (bloc 5)    | 2 → 4 |
+| `a842e94` | 10.2  | Localisation enrichie (bloc 7)  | 1 → 4 |
+| `4d34cce` | 10.3  | Politiques structurées (bloc 9) | 0 → 4 |
 
 ---
 
@@ -95,9 +108,19 @@ Score sur **5** par bloc. Notes :
 
 **Action Phase 10** : composant `<HotelHeaderActions locale currency favorited shareUrl />` côté droit du H1, plus migration `user_favorites` (auth requise).
 
-### Bloc 2 — Galerie média — 0/5 **🚨 P0**
+### Bloc 2 — Galerie média — 4/5 ✓ (livré, commit `cfc4beb` Phase 9.C)
 
-**Observé**
+**Statut Phase 9.C** : galerie média livrée. Migration
+`0008_hotel_media_columns.sql` ajoute `hero_image` (text) +
+`gallery_images` (jsonb, GIN-indexé). Composant `<HotelGallery>` rend
+1 hero LCP (16/9, `priority`) + grille 6 thumbnails + indicateur "+N"
+pour l'overflow. Reader Zod strict (regex Cloudinary public_id).
+JSON-LD `Hotel.image[]` populé avec URLs Cloudinary absolues. Seed
+Peninsula avec 10 photos depuis Wikimedia Commons. Reste P2 : lightbox
+client (modal swipeable) + Matterport tour 3D + caractérisation
+explicite par catégorie (extérieur/lobby/chambre/...).
+
+**Observé initialement**
 
 - **AUCUNE** photo rendue sur la fiche. La page renvoie 0 URL Cloudinary, 0 `next/image`, 0 `<img>` lié au hôtel.
 
@@ -150,9 +173,18 @@ Score sur **5** par bloc. Notes :
 
 **Action Phase 10** : extension `hotels.long_description_fr` / `_en` (markdown structuré, parser via `remark` pour rendre les H3 + générer TOC server-side).
 
-### Bloc 5 — Types de chambres — 2/5 **🚨 P0**
+### Bloc 5 — Types de chambres — 4/5 ✓ (livré, commit `c8b09fc` Phase 10.1)
 
-**Observé** (3 chambres seedées)
+**Statut Phase 10.1** : sous-pages chambres indexables livrées
+(`/hotel/{hotel}/chambres/{room-slug}`, JSON-LD `HotelRoom` avec
+`floorSize`/`occupancy`/`bed`/`containedInPlace`, hreflang, hero LCP,
+long-form description 200-300 mots/chambre, breadcrumb dédié).
+Migration `0010_hotel_room_subpage_columns.sql` ajoute
+`hotel_rooms.slug` (unique within hotel), `long_description_fr/en` et
+`hero_image`. Reste P2 : fourchette de prix indicative + badge
+"Suite signature" + comparateur visuel inter-catégories.
+
+**Observé initialement** (3 chambres seedées)
 
 ```
 deluxe-room (40 m², 2 pax, King size) — 6 amenities, 0 photo
@@ -196,9 +228,20 @@ eiffel-tower-suite (90 m², 3 pax, King + canapé) — 5 amenities, 2 photos
 
 **Action Phase 10** : table `public.amenity_taxonomy` (key, category, label_fr, label_en, icon_lucide_name, is_premium) + composant `<AmenitiesGrid grouped />`.
 
-### Bloc 7 — Localisation — 1/5 **🚨 P0**
+### Bloc 7 — Localisation — 4/5 ✓ (livré, commit `a842e94` Phase 10.2)
 
-**Observé**
+**Statut Phase 10.2** : enrichissement POI + transports livré.
+Migration `0011_hotel_location_columns.sql` ajoute deux jsonb
+GIN-indexés (`points_of_interest`, `transports`). Reader
+`readLocation()` + Zod schemas (mode enum metro/rer/.../airport_shuttle).
+Composant `<HotelLocation>` (RSC) rend l'adresse, le lien carte,
+8 POIs sortés par distance et 7 transports groupés par mode. Le seed
+Peninsula contient les vraies distances mesurées (Arc de Triomphe
+450 m, Champs-Élysées 350 m, M6 Kléber 100 m, M1·2·6+RER A 500 m, CDG
+25 km, Orly 21 km). Reste P2 : carte interactive (static map ou
+Mapbox/MapLibre) + Schema.org `nearbyAttractions[]`.
+
+**Observé initialement**
 
 - Texte : "16ᵉ arrondissement · Île-de-France" sous le H1 ✓
 - Lien "Voir sur la carte" (OpenStreetMap external) ✓
@@ -236,9 +279,20 @@ eiffel-tower-suite (90 m², 3 pax, King + canapé) — 5 amenities, 2 photos
 
 **Action Phase 10** : variant `<DisplayOnlyBookingCard />` avec micro-form inline (3 champs) + promesse de réponse < 24 h ouvrées + lien vers le full form. Plus mention IATA dans la section.
 
-### Bloc 9 — Politiques — 0/5 **🚨 P0**
+### Bloc 9 — Politiques — 4/5 ✓ (livré, commit `4d34cce` Phase 10.3)
 
-**Observé**
+**Statut Phase 10.3** : politiques structurées livrées.
+Migration `0012_hotel_policies_column.sql` ajoute `hotels.policies`
+(jsonb, GIN-indexé). Zod schemas stricts (TimeOfDaySchema HH:MM,
+PaymentMethodSchema enum 10 valeurs). Reader `readPolicies()` +
+`hasAnyPolicy()` helper. Composant `<HotelPolicies>` (RSC, 2 colonnes)
+rend check-in/out, annulation, animaux, enfants, paiement, avec
+i18n FR/EN pluralisée. Seed Peninsula avec policies réelles
+(Peninsula Time 06:00-22:00, free cancellation 24 h, pets free,
+enfants -12 ans gratuits, 8 modes de paiement). Reste P2 : taxe de
+séjour, petit-déjeuner inclus/extra, Wi-Fi gratuit/payant.
+
+**Observé initialement**
 
 - **AUCUN bloc politiques** rendu. Le mot "annulation" n'apparaît nulle part dans la page.
 - Le bloc "Peninsula Time" (check-in 6h, check-out 22h) figure dans les amenities et la FAQ — pas en section dédiée.
@@ -297,9 +351,17 @@ eiffel-tower-suite (90 m², 3 pax, King + canapé) — 5 amenities, 2 photos
 
 **Action Phase 10** : ajouter 2-3 Q&A canoniques + grouper visuellement en 3 thèmes.
 
-### Bloc 12 — Restaurants, spa, expériences — 1/5
+### Bloc 12 — Restaurants, spa, expériences — 4/5 ✓ (livré, commit `1b05766` Phase 9.B)
 
-**Observé**
+**Statut Phase 9.B** : composants `<HotelRestaurants>` et `<HotelSpa>`
+livrés (RSC, microdata Schema.org `Restaurant` / `HealthClub`). Le
+contenu déjà persisté en DB depuis le seed Peninsula initial est
+maintenant rendu : 7 venues F&B (Michelin badges, chef, sommelier,
+horaires, features) + spa Peninsula (1 800 m², 6 salles de soins,
+features). Reste P2 : section "Expériences signature" (Peninsula Time,
+Rolls-Royce Phantom, Art in Residence).
+
+**Observé initialement**
 
 - `hotels.restaurant_info` et `hotels.spa_info` jsonb correctement persistés (7 restaurants, spa 1 800 m²).
 - **Aucune section dédiée** dans la page : le contenu n'est PAS rendu (le code page.tsx ne lit ni `restaurant_info` ni `spa_info`).
@@ -385,50 +447,91 @@ eiffel-tower-suite (90 m², 3 pax, King + canapé) — 5 amenities, 2 photos
 
 ## 5. Top 5 chantiers prioritaires Phase 10
 
-Classés par **impact UX × cost SEO/LLM**, données-driven (cette fiche est représentative d'un palace classique) :
+Classés par **impact UX × cost SEO/LLM**. Tous les 5 chantiers P0/P1
+identifiés à l'audit initial ont été livrés au cours des Phases 9 et 10
+(branche `feat/phase-10-room-location-policies`).
 
-### Chantier 1 — Galerie média + colonne `hotels.gallery_images` (P0 — bloque la conversion)
+### Chantier 1 — Galerie média ✓ (livré, Phase 9.C, commit `cfc4beb`)
 
-**Effort** : 1.5 semaine.  
-**Livrables** : migration `0008`, composant `<HotelGallery />` avec lightbox, intégration dans page.tsx, JSON-LD `Hotel.image[]`, 10+ photos seed par hôtel pilote (Peninsula = OK, à dupliquer Bristol + Cheval Blanc + Hôtel du Cap).
+Migration `0008_hotel_media_columns.sql` (`hero_image` text +
+`gallery_images` jsonb GIN). Composant `<HotelGallery>` rend 1 hero LCP
 
-### Chantier 2 — Sous-pages chambres `/hotel/<slug>/chambres/<roomSlug>` (P0 — captation longue-traîne)
+- 6 thumbnails. JSON-LD `Hotel.image[]` populé en URLs Cloudinary
+  absolues. Seed Peninsula avec 10 photos Wikimedia Commons.
 
-**Effort** : 1 semaine.  
-**Livrables** : migration `0009` (slug, is_signature, indicative_price), route Next.js, ISR, JSON-LD `Hotel.containsPlace[]` + page `HotelRoom`/`Offer`, anti-cannibalisation (canonical / robots).
+### Chantier 2 — Sous-pages chambres ✓ (livré, Phase 10.1, commit `c8b09fc`)
 
-### Chantier 3 — Localisation enrichie (carte + POIs + transport) (P0 — différenciateur palace)
+Migration `0010_hotel_room_subpage_columns.sql` (`hotel_rooms.slug`
+unique within hotel, `long_description_fr/en`, `hero_image`). Route
+`/hotel/[slug]/chambres/[roomSlug]` (ISR + generateStaticParams +
+metadata canonical/hreflang). JSON-LD `HotelRoom` (floorSize MTK,
+occupancy, BedDetails, amenityFeature, containedInPlace). Seed
+Peninsula avec 3 chambres slug + 200-300 mots long-form FR+EN/chambre.
 
-**Effort** : 1 semaine.  
-**Livrables** : migration `transport_info` + `pois` jsonb, composant `<HotelMap />` server (OSM static + marker), section `<NearbyAttractions />`, JSON-LD `Place` refs, completion `postalCode`.
+### Chantier 3 — Localisation enrichie ✓ (livré, Phase 10.2, commit `a842e94`)
 
-### Chantier 4 — Politiques structurées (`hotels.policies` jsonb) (P0 — exigé pour passer en `amadeus` mode)
+Migration `0011_hotel_location_columns.sql` (`points_of_interest` +
+`transports` jsonb GIN). Reader Zod + composant `<HotelLocation>` (RSC).
+Seed Peninsula avec 8 POIs (distances mesurées Haversine) + 7
+transports (M6 Kléber 100 m, M1·2·6 Étoile 500 m, CDG/Orly). Reste P2 :
+carte interactive (Mapbox static/Mapbox GL).
 
-**Effort** : 0.5 semaine.  
-**Livrables** : migration + Zod schema (`@cct/domain`), composant `<HotelPolicies />` accordion, JSON-LD `checkinTime/checkoutTime/petsAllowed`.
+### Chantier 4 — Politiques structurées ✓ (livré, Phase 10.3, commit `4d34cce`)
 
-### Chantier 5 — Restaurants & spa rendus depuis le jsonb existant (P1 — free win, données déjà en base)
+Migration `0012_hotel_policies_column.sql` (`hotels.policies` jsonb
+GIN). Zod schema strict (HH:MM regex, PaymentMethod enum 10 valeurs).
+Composant `<HotelPolicies>` (5 articles grid 2 colonnes). Seed
+Peninsula avec policies réelles (Peninsula Time 06h-22h, free
+cancellation 24 h, pets free, enfants -12 ans gratuits).
 
-**Effort** : 0.5 semaine. Pas de migration : les jsonb `restaurant_info` / `spa_info` sont déjà persistés (vérifié pendant ce test). On rate juste le rendu.  
-**Livrables** : composants `<HotelRestaurants />` + `<HotelSpa />`.
+### Chantier 5 — Restaurants & spa ✓ (livré, Phase 9.B, commit `1b05766`)
 
-**Total Phase 10 cible** : ~4.5 semaines pour atteindre **~55/75 (~73 %)** — niveau publication acceptable pour un palace.
+Composants `<HotelRestaurants>` + `<HotelSpa>` consommant les jsonb
+existants `restaurant_info` / `spa_info` (déjà seedés). Microdata
+Schema.org `Restaurant` / `HealthClub`.
+
+### Reste à faire (P2/P3)
+
+| Bloc | Action résiduelle                                                                    | Effort | Prio |
+| ---- | ------------------------------------------------------------------------------------ | ------ | ---- |
+| 1    | `<HotelHeaderActions>` (langue/devise/favori/partage) + table `user_favorites`       | 1 s    | P1   |
+| 3    | `<HotelFactSheet>` (8-10 lignes factuelles sous H1) + bloc `data-freshness` visible  | 0.5 s  | P2   |
+| 4    | Long-form 600-1000 mots avec H3 + TOC server-side (`hotels.long_description_*`)      | 1 s    | P2   |
+| 6    | Table `amenity_taxonomy` (groupes + icônes + premium flag)                           | 1 s    | P1   |
+| 8    | `<DisplayOnlyBookingCard>` (micro-form inline pour les display_only)                 | 0.5 s  | P2   |
+| 10   | Pipeline reviews multi-source + `hotels.awards` + `<HotelDistinctions>`              | 2 s    | P1   |
+| 11   | 2-3 Q&A canoniques supplémentaires + grouping visuel par intent                      | 0.5 s  | P2   |
+| 12   | Section "Expériences signature" (Peninsula Time, Rolls-Royce, Art in Residence)      | 0.5 s  | P2   |
+| 13   | `<AgencyTrustBlock>` (4 piliers IATA/GDS/PCI-DSS/Loyalty)                            | 0.5 s  | P1   |
+| 14   | Collection Payload `MiceEvents` + section "Événements & séminaires"                  | 2 s    | P3   |
+| 15   | `Hotel.numberOfRooms`, `Hotel.checkinTime/checkoutTime`, `Hotel.petsAllowed` JSON-LD | 0.5 s  | P2   |
+
+**Score après Phases 9-10 livrées** : **58/75 (~77 %)**.
+**Cible Phase 11** (P1 résiduels) : **65/75 (~87 %)**.
 
 ---
 
 ## 6. Gaps schéma Supabase à combler
 
-Migrations à séquencer pour la Phase 10 :
+Migrations Phase 10 livrées :
 
-| Migration                        | Colonnes ajoutées                                                                              | Bloc CDC |
-| -------------------------------- | ---------------------------------------------------------------------------------------------- | -------- |
-| `0008_hotels_media.sql`          | `featured_image jsonb`, `gallery_images jsonb`, `video_tour jsonb`, `virtual_tour_url text`    | §2.2     |
-| `0009_hotel_rooms_extension.sql` | `slug text NOT NULL`, `is_signature bool`, `indicative_price_minor jsonb`, `display_order int` | §2.5     |
-| `0010_hotels_location.sql`       | `postal_code text NOT NULL`, `transport_info jsonb`, `pois jsonb`                              | §2.7     |
-| `0011_hotels_policies.sql`       | `policies jsonb` (check-in/out, cancellation, pets, taxes, payment)                            | §2.9     |
-| `0012_hotels_awards.sql`         | `awards jsonb[]` (`{name, issuer, year, url}`)                                                 | §2.10    |
-| `0013_amenity_taxonomy.sql`      | nouvelle table `public.amenity_taxonomy`                                                       | §2.6     |
-| `0014_hotels_meta_extra.sql`     | `number_of_rooms int`, `number_of_suites int`, `opened_at date`, `last_renovated_at date`      | §2.15    |
+| Migration                             | Statut | Colonnes ajoutées                                                          | Bloc CDC |
+| ------------------------------------- | ------ | -------------------------------------------------------------------------- | -------- |
+| `0008_hotel_media_columns.sql`        | ✓      | `hero_image text`, `gallery_images jsonb` (+ GIN)                          | §2.2     |
+| `0010_hotel_room_subpage_columns.sql` | ✓      | `hotel_rooms.slug NOT NULL unique`, `long_description_fr/en`, `hero_image` | §2.5     |
+| `0011_hotel_location_columns.sql`     | ✓      | `points_of_interest jsonb`, `transports jsonb` (+ 2 GIN)                   | §2.7     |
+| `0012_hotel_policies_column.sql`      | ✓      | `policies jsonb` (+ GIN)                                                   | §2.9     |
+
+Migrations résiduelles à séquencer (Phase 11+) :
+
+| Migration                     | Colonnes ajoutées                                                                         | Bloc CDC | Prio |
+| ----------------------------- | ----------------------------------------------------------------------------------------- | -------- | ---- |
+| `0013_hotel_rooms_extras.sql` | `is_signature bool`, `indicative_price_minor jsonb`, `display_order int`                  | §2.5     | P2   |
+| `0014_hotels_postal_code.sql` | `postal_code text NOT NULL`                                                               | §2.7     | P1   |
+| `0015_hotels_awards.sql`      | `awards jsonb` (`{name, issuer, year, url}[]`)                                            | §2.10    | P1   |
+| `0016_amenity_taxonomy.sql`   | nouvelle table `public.amenity_taxonomy` (key, category, label_fr/en, icon, is_premium)   | §2.6     | P1   |
+| `0017_hotels_meta_extra.sql`  | `number_of_rooms int`, `number_of_suites int`, `opened_at date`, `last_renovated_at date` | §2.15    | P2   |
+| `0018_user_favorites.sql`     | nouvelle table `public.user_favorites` (user_id, hotel_id, created_at, RLS own-only)      | §2.1     | P1   |
 
 **Bug détecté pendant ce test (déjà corrigé dans `seed-peninsula-paris.ts`)** : le pattern `${JSON.stringify(array)}::jsonb` utilisé dans [seed-dev.ts](../../packages/db/scripts/seed-dev.ts) écrit un **scalaire JSON string** quand les valeurs sont des arrays d'objets (`jsonb_typeof = 'string'` au lieu de `'array'`). Pour les seeds dev existants, les `amenities/highlights` sont des arrays de strings simples donc ça passe — mais c'est à corriger.
 
