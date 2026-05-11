@@ -48,6 +48,13 @@ export const env = createEnv({
     NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().min(1),
     NEXT_PUBLIC_ALGOLIA_SEARCH_KEY: z.string().min(1),
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+    /**
+     * Cloudinary cloud (e.g. "dvbjwh5wy") used to build delivery URLs.
+     * Appears verbatim in every `https://res.cloudinary.com/<cloud>/…`
+     * URL — not a secret. Required client-side for `<HotelImage>` /
+     * `<HotelGallery>`.
+     */
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().min(1),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_SITE_URL: process.env['NEXT_PUBLIC_SITE_URL'],
@@ -58,6 +65,7 @@ export const env = createEnv({
     NEXT_PUBLIC_ALGOLIA_APP_ID: process.env['NEXT_PUBLIC_ALGOLIA_APP_ID'],
     NEXT_PUBLIC_ALGOLIA_SEARCH_KEY: process.env['NEXT_PUBLIC_ALGOLIA_SEARCH_KEY'],
     NEXT_PUBLIC_SENTRY_DSN: process.env['NEXT_PUBLIC_SENTRY_DSN'],
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env['NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME'],
   },
   skipValidation: process.env['SKIP_ENV_VALIDATION'] === 'true',
   emptyStringAsUndefined: true,

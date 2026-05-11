@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
 
+import { buildCloudinarySrc } from '@cct/ui';
+
+import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { PriceComparator } from '@/components/price-comparator';
@@ -22,6 +25,8 @@ import {
   listPublishedHotelSlugs,
   readAmenities,
   readFaq,
+  readGallery,
+  readHeroImage,
   readHighlights,
   readRestaurants,
   readSpa,
@@ -229,6 +234,11 @@ async function renderHotelPage(
   const restaurants = readRestaurants(row, locale);
   const spa = readSpa(row, locale);
   const faqs = readFaq(row, locale);
+  const heroPublicId = readHeroImage(row);
+  const galleryImages = readGallery(row, locale, name);
+  const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const heroDescriptor =
+    heroPublicId !== null ? { publicId: heroPublicId, alt: galleryImages[0]?.alt ?? name } : null;
 
   const defaults = defaultStay();
   const checkIn = pickIsoDate(sp.checkIn, defaults.checkIn);
@@ -245,6 +255,16 @@ async function renderHotelPage(
   const localePath = locale === 'en' ? `/en/hotel/${slugEn}` : `/hotel/${slugFr}`;
   const canonicalUrl = `${origin}${localePath}`;
 
+  // JSON-LD Hotel images: hero + first 5 gallery shots, served as absolute
+  // Cloudinary URLs (Google's rich result test rejects relative paths).
+  const jsonLdImages: string[] = [];
+  if (heroPublicId !== null) {
+    jsonLdImages.push(buildCloudinarySrc({ cloudName, publicId: heroPublicId }));
+  }
+  for (const img of galleryImages.slice(0, 5)) {
+    jsonLdImages.push(buildCloudinarySrc({ cloudName, publicId: img.publicId }));
+  }
+
   const hotelInput: JsonLd.HotelJsonLdInput = {
     name,
     url: canonicalUrl,
@@ -253,6 +273,7 @@ async function renderHotelPage(
     ...(description !== null && description.length > 0
       ? { description: truncate(description, 500) }
       : {}),
+    ...(jsonLdImages.length > 0 ? { images: jsonLdImages } : {}),
     ...(amenities.length > 0 ? { amenityFeatures: amenities } : {}),
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
@@ -444,6 +465,13 @@ async function renderHotelPage(
           </p>
         ) : null}
       </header>
+
+      <HotelGallery
+        locale={locale}
+        cloudName={cloudName}
+        hero={heroDescriptor}
+        images={galleryImages}
+      />
 
       <section
         data-aeo

@@ -85,6 +85,9 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     google_reviews_count: 312,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
+    // No hero/gallery for the E2E synthetic hotel — keeps the fake
+    // testable without Cloudinary credentials at build time.
+    hero_image: null,
     // `locale` reserved for future locale-conditional fields — currently
     // unused but kept in the signature so it's obvious the row CAN vary.
     ...(locale === 'en' ? {} : {}),

@@ -536,6 +536,11 @@ function refuseInProd(env: {
 }
 
 async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
+  // Use the first exterior shot as hero LCP candidate. Remaining
+  // photos populate the gallery grid (skipping the hero to avoid
+  // duplicating the LCP image).
+  const heroPublicId = HOTEL_PHOTOS[0]?.public_id ?? null;
+  const galleryPhotos = HOTEL_PHOTOS.slice(1);
   const rows = await sql<Array<{ id: string; inserted: boolean }>>`
     insert into public.hotels (
       slug, slug_en, name, name_en,
@@ -546,6 +551,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       description_fr, description_en,
       highlights, amenities, faq_content,
       restaurant_info, spa_info,
+      hero_image, gallery_images,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count
     )
@@ -561,6 +567,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(FAQ))},
       ${sql.json(toJson(RESTAURANT_INFO))},
       ${sql.json(toJson(SPA_INFO))},
+      ${heroPublicId},
+      ${sql.json(toJson(galleryPhotos))},
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
       ${HOTEL_RECORD.meta_desc_fr}, ${HOTEL_RECORD.meta_desc_en},
       ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count}
@@ -588,6 +596,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       faq_content = excluded.faq_content,
       restaurant_info = excluded.restaurant_info,
       spa_info = excluded.spa_info,
+      hero_image = excluded.hero_image,
+      gallery_images = excluded.gallery_images,
       meta_title_fr = excluded.meta_title_fr,
       meta_title_en = excluded.meta_title_en,
       meta_desc_fr = excluded.meta_desc_fr,

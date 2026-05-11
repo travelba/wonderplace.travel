@@ -364,7 +364,11 @@
       "booking": "Vérifier les disponibilités",
       "reviewBreakdown": "Ce que disent les voyageurs",
       "restaurants": "Restaurants & bars",
-      "spa": "Spa & bien-être"
+      "spa": "Spa & bien-être",
+      "gallery": "Galerie photos"
+    },
+    "gallery": {
+      "thumbnailsLabel": "Autres photos de l'établissement"
     },
     "reviewCategories": {
       "scoreOf": "{score} / 100",

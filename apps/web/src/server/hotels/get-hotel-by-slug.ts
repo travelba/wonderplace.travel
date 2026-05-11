@@ -50,6 +50,8 @@ export const HotelDetailRowSchema = z.object({
   faq_content: z.unknown().nullable().optional(),
   restaurant_info: z.unknown().nullable().optional(),
   spa_info: z.unknown().nullable().optional(),
+  hero_image: stringOrEmpty,
+  gallery_images: z.unknown().nullable().optional(),
   meta_title_fr: stringOrEmpty,
   meta_title_en: stringOrEmpty,
   meta_desc_fr: stringOrEmpty,
@@ -71,7 +73,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
 export const FaqItemSchema = z.object({
@@ -243,6 +245,60 @@ export function readSpa(row: HotelDetailRow, locale: SupportedLocale): Localised
     treatmentRooms: parsed.data.treatment_rooms ?? null,
     features: localizedFeatures,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Media — hero_image (text) + gallery_images (jsonb)
+// ---------------------------------------------------------------------------
+
+/**
+ * Constraint mirrored from Cloudinary public_id grammar:
+ * folder segments separated by `/`, each segment matches
+ * `[A-Za-z0-9][A-Za-z0-9._-]*`. This rejects spaces, query strings,
+ * absolute URLs and trickery while accepting realistic public_ids.
+ */
+const CloudinaryPublicIdSchema = z
+  .string()
+  .min(1)
+  .max(255)
+  .regex(/^[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/, {
+    message: 'invalid Cloudinary public_id',
+  });
+
+const GalleryImageSchema = z.object({
+  public_id: CloudinaryPublicIdSchema,
+  alt_fr: z.string().min(1).optional(),
+  alt_en: z.string().min(1).optional(),
+  category: z.string().min(1).optional(),
+});
+
+const GalleryImagesSchema = z.array(GalleryImageSchema);
+
+export interface LocalisedGalleryImage {
+  readonly publicId: string;
+  readonly alt: string;
+  readonly category: string | null;
+}
+
+export function readHeroImage(row: HotelDetailRow): string | null {
+  if (row.hero_image === null) return null;
+  const parsed = CloudinaryPublicIdSchema.safeParse(row.hero_image);
+  return parsed.success ? parsed.data : null;
+}
+
+export function readGallery(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+  fallbackName: string,
+): readonly LocalisedGalleryImage[] {
+  const parsed = GalleryImagesSchema.safeParse(row.gallery_images);
+  if (!parsed.success) return [];
+  return parsed.data.map((img) => ({
+    publicId: img.public_id,
+    alt:
+      (locale === 'fr' ? (img.alt_fr ?? img.alt_en) : (img.alt_en ?? img.alt_fr)) ?? fallbackName,
+    category: img.category ?? null,
+  }));
 }
 
 export interface HotelRoomRow {

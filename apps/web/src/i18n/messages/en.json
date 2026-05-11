@@ -364,7 +364,11 @@
       "booking": "Check availability",
       "reviewBreakdown": "What guests are saying",
       "restaurants": "Restaurants & bars",
-      "spa": "Spa & wellness"
+      "spa": "Spa & wellness",
+      "gallery": "Photo gallery"
+    },
+    "gallery": {
+      "thumbnailsLabel": "Additional photos of the property"
     },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
