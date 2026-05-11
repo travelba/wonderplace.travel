@@ -13,6 +13,7 @@ export const env = createEnv({
     UPSTASH_REDIS_REST_URL: z.string().url(),
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
     ALGOLIA_ADMIN_API_KEY: z.string().min(1),
+    ALGOLIA_INDEX_PREFIX: z.string().default('dev_'),
     AMADEUS_ENV: z.enum(['test', 'production']),
     AMADEUS_API_KEY: z.string().min(1),
     AMADEUS_API_SECRET: z.string().min(1),

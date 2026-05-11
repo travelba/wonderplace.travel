@@ -13,6 +13,8 @@
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=@cct/web",
     "dev:admin": "turbo run dev --filter=@cct/admin",
+    "db:migrate": "pnpm --filter @cct/db migrate",
+    "db:seed:dev": "pnpm --filter @cct/db seed:dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
@@ -29,6 +31,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.0",
+    "prettier-plugin-tailwindcss": "^0.6.14",
     "rimraf": "^6.0.1",
     "turbo": "^2.5.0",
     "typescript": "^5.6.3"

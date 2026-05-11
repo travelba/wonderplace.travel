@@ -100,4 +100,23 @@ export function loadSharedEnv(source: NodeJS.ProcessEnv = process.env): SharedEn
   return cached;
 }
 
-export const env = loadSharedEnv();
+/**
+ * Lazy accessor — validates env on first property read (not at module load).
+ * Tests and tooling that only need types/utility functions can import this
+ * module without triggering schema validation, which mirrors the t3-env
+ * pattern used in `apps/web`.
+ */
+export const env: SharedEnv = new Proxy({} as SharedEnv, {
+  get(_target, prop, receiver) {
+    return Reflect.get(loadSharedEnv(), prop, receiver);
+  },
+  has(_target, prop) {
+    return prop in loadSharedEnv();
+  },
+  ownKeys() {
+    return Reflect.ownKeys(loadSharedEnv());
+  },
+  getOwnPropertyDescriptor(_target, prop) {
+    return Object.getOwnPropertyDescriptor(loadSharedEnv(), prop);
+  },
+});
