@@ -32,6 +32,7 @@ export const env = createEnv({
     BREVO_INTERNAL_OPS_EMAIL: z.string().email(),
     SENTRY_ENV: z.enum(['dev', 'preview', 'staging', 'production']).default('dev'),
     SENTRY_RELEASE: z.string().optional(),
+    SENTRY_AUTH_TOKEN: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().min(1),
     CRON_SECRET: z.string().min(16),
     REVALIDATE_SECRET: z.string().min(16),

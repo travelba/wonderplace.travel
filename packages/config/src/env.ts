@@ -68,6 +68,7 @@ const SharedEnvSchema = z.object({
   NEXT_PUBLIC_SENTRY_DSN: optionalUrl,
   SENTRY_ENV: z.enum(['dev', 'preview', 'staging', 'production']).default('dev'),
   SENTRY_RELEASE: z.string().optional(),
+  SENTRY_AUTH_TOKEN: z.string().optional(),
 
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: z.string().min(1),

@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
@@ -100,4 +101,29 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+/**
+ * Sentry wraps the outer layer so the Next.js build emits source maps and the
+ * SDK can upload them at build time (skill: observability-monitoring).
+ *
+ * `tunnelRoute: '/monitoring'` routes browser beacons through our origin to
+ * bypass adblockers — the matching path is already excluded from the
+ * `middleware.ts` matcher.
+ *
+ * `silent: !CI` keeps local builds quiet; CI gets full upload logs. The auth
+ * token is optional: when missing (CI smoke build, dev) no upload happens and
+ * the wrapper degrades to plain `withNextIntl(nextConfig)` semantics.
+ */
+const sentryAuthToken = process.env['SENTRY_AUTH_TOKEN'];
+
+export default withSentryConfig(withNextIntl(nextConfig), {
+  org: 'travelba',
+  project: 'cct-web',
+  ...(sentryAuthToken !== undefined ? { authToken: sentryAuthToken } : {}),
+  silent: process.env['CI'] !== 'true',
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  tunnelRoute: '/monitoring',
+  reactComponentAnnotation: { enabled: true },
+  telemetry: false,
+});
