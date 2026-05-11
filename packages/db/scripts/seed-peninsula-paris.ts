@@ -515,6 +515,15 @@ const LONG_DESCRIPTION_SECTIONS = [
     body_en:
       "The Peninsula Paris Spa spans 1,800 m² over three levels, making it the largest wellness footprint among Parisian palaces. Six treatment rooms, including two duo suites, host Biologique Recherche, ESPA, and Margy's of Monte-Carlo protocols. A hammam, sauna, and relaxation pool round off the experience.\n\nThe 20-metre indoor pool sits beneath a softly lit mosaic ceiling. The fitness club opens 24 hours a day; it is Technogym-equipped and offers personal training on request. A yoga and meditation programme runs every weekend.",
   },
+  {
+    anchor: 'service-et-equipe',
+    title_fr: 'Service & équipe',
+    title_en: 'Service & team',
+    body_fr:
+      "Le Peninsula Paris emploie environ 600 collaborateurs au service de 200 chambres et suites, soit un ratio de trois employés par clé — l'un des plus élevés de l'hôtellerie parisienne et la marque de fabrique du groupe Peninsula Hotels. La concierge-team est affiliée aux Clefs d'Or ; elle parle français, anglais, mandarin, cantonais, italien, espagnol et russe sans intermédiaire, et l'équipe nocturne assure la même couverture 24 h/24.\n\nLe service Peninsula Page met à disposition un personal coordinator dédié dès la réservation : il pré-renseigne les préférences (oreillers, température, presse, vins), réserve les restaurants étoilés du quartier, organise les transferts en Rolls-Royce et coordonne les expériences sur mesure. Au check-in, chaque arrivée reçoit une fiche imprimée du programme du séjour reformulée en langue native.\n\nLa formation interne suit la Peninsula Academy de Hong Kong : trois mois en immersion couvrant l'étiquette française, la sommellerie, l'art de la table et la gestion de crise. Le turn-over reste sous la moyenne sectorielle ; plusieurs chefs de partie et concierges sont passés directement des autres adresses Peninsula (Hong Kong, Tokyo, Beverly Hills, Chicago).",
+    body_en:
+      "The Peninsula Paris employs around 600 staff for its 200 rooms and suites — a ratio of three employees per key, among the highest in Parisian hospitality and a signature trait of the Peninsula Hotels group. The concierge team is affiliated with Les Clefs d'Or; members speak French, English, Mandarin, Cantonese, Italian, Spanish, and Russian directly, and the night team mirrors the same coverage around the clock.\n\nThe Peninsula Page service assigns a personal coordinator to every reservation: they capture preferences (pillow type, room temperature, press, wines), secure tables at Michelin restaurants in the neighbourhood, schedule Rolls-Royce transfers, and orchestrate bespoke experiences. At check-in, each arriving guest receives a printed itinerary translated into their native language.\n\nInternal training follows the Peninsula Academy in Hong Kong: a three-month immersion covering French etiquette, sommellerie, table art, and crisis management. Staff turnover stays below industry average; several chefs de partie and concierges transferred straight from sister Peninsula properties (Hong Kong, Tokyo, Beverly Hills, Chicago).",
+  },
 ];
 
 const AWARDS = [
