@@ -8,6 +8,7 @@ import { buildCloudinarySrc } from '@cct/ui';
 
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
+import { HotelPolicies } from '@/components/hotel/hotel-policies';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { PriceComparator } from '@/components/price-comparator';
@@ -25,11 +26,13 @@ import {
   getHotelBySlug,
   listPublishedHotelSlugs,
   readAmenities,
+  hasAnyPolicy,
   readFaq,
   readGallery,
   readHeroImage,
   readHighlights,
   readLocation,
+  readPolicies,
   readRestaurants,
   readSpa,
   type HotelDetail,
@@ -236,6 +239,7 @@ async function renderHotelPage(
   const restaurants = readRestaurants(row, locale);
   const spa = readSpa(row, locale);
   const location = readLocation(row, locale);
+  const policies = readPolicies(row, locale);
   const faqs = readFaq(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
@@ -776,6 +780,8 @@ async function renderHotelPage(
           <p className="text-muted text-sm">{t('noRooms')}</p>
         )}
       </section>
+
+      {hasAnyPolicy(policies) ? <HotelPolicies locale={locale} policies={policies} /> : null}
 
       <section aria-labelledby="faq-title" className="mb-12">
         <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">

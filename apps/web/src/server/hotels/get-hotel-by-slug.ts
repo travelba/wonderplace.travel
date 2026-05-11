@@ -52,6 +52,7 @@ export const HotelDetailRowSchema = z.object({
   spa_info: z.unknown().nullable().optional(),
   points_of_interest: z.unknown().nullable().optional(),
   transports: z.unknown().nullable().optional(),
+  policies: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
   meta_title_fr: stringOrEmpty,
@@ -75,7 +76,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
 export const FaqItemSchema = z.object({
@@ -407,6 +408,184 @@ export function readLocation(row: HotelDetailRow, locale: SupportedLocale): Loca
     : [];
 
   return { pointsOfInterest, transports };
+}
+
+// ---------------------------------------------------------------------------
+// policies (jsonb)
+// ---------------------------------------------------------------------------
+
+/** `HH:MM` 24-hour time string (e.g. `15:00`, `23:30`). */
+const TimeOfDaySchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, { message: 'expected HH:MM time' });
+
+const PaymentMethodSchema = z.enum([
+  'visa',
+  'mc',
+  'amex',
+  'diners',
+  'jcb',
+  'unionpay',
+  'apple_pay',
+  'google_pay',
+  'cash',
+  'bank_transfer',
+]);
+
+const CheckInPolicySchema = z.object({
+  from: TimeOfDaySchema,
+  until: TimeOfDaySchema.optional(),
+});
+
+const CheckOutPolicySchema = z.object({
+  until: TimeOfDaySchema,
+});
+
+const CancellationPolicySchema = z.object({
+  summary_fr: z.string().min(1).optional(),
+  summary_en: z.string().min(1).optional(),
+  free_until_hours: z.number().int().nonnegative().optional(),
+  penalty_after_fr: z.string().min(1).optional(),
+  penalty_after_en: z.string().min(1).optional(),
+});
+
+const PetsPolicySchema = z.object({
+  allowed: z.boolean(),
+  fee_eur: z.number().nonnegative().optional(),
+  notes_fr: z.string().min(1).optional(),
+  notes_en: z.string().min(1).optional(),
+});
+
+const ChildrenPolicySchema = z.object({
+  welcome: z.boolean(),
+  free_under_age: z.number().int().nonnegative().optional(),
+  extra_bed_fee_eur: z.number().nonnegative().optional(),
+  notes_fr: z.string().min(1).optional(),
+  notes_en: z.string().min(1).optional(),
+});
+
+const PaymentPolicySchema = z.object({
+  methods: z.array(PaymentMethodSchema).min(1),
+  deposit_required: z.boolean().optional(),
+  notes_fr: z.string().min(1).optional(),
+  notes_en: z.string().min(1).optional(),
+});
+
+const PoliciesSchema = z.object({
+  check_in: CheckInPolicySchema.optional(),
+  check_out: CheckOutPolicySchema.optional(),
+  cancellation: CancellationPolicySchema.optional(),
+  pets: PetsPolicySchema.optional(),
+  children: ChildrenPolicySchema.optional(),
+  payment: PaymentPolicySchema.optional(),
+});
+
+export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
+
+export interface LocalisedCheckInPolicy {
+  readonly from: string;
+  readonly until: string | null;
+}
+export interface LocalisedCheckOutPolicy {
+  readonly until: string;
+}
+export interface LocalisedCancellationPolicy {
+  readonly summary: string | null;
+  readonly freeUntilHours: number | null;
+  readonly penaltyAfter: string | null;
+}
+export interface LocalisedPetsPolicy {
+  readonly allowed: boolean;
+  readonly feeEur: number | null;
+  readonly notes: string | null;
+}
+export interface LocalisedChildrenPolicy {
+  readonly welcome: boolean;
+  readonly freeUnderAge: number | null;
+  readonly extraBedFeeEur: number | null;
+  readonly notes: string | null;
+}
+export interface LocalisedPaymentPolicy {
+  readonly methods: readonly PaymentMethod[];
+  readonly depositRequired: boolean | null;
+  readonly notes: string | null;
+}
+
+export interface LocalisedPolicies {
+  readonly checkIn: LocalisedCheckInPolicy | null;
+  readonly checkOut: LocalisedCheckOutPolicy | null;
+  readonly cancellation: LocalisedCancellationPolicy | null;
+  readonly pets: LocalisedPetsPolicy | null;
+  readonly children: LocalisedChildrenPolicy | null;
+  readonly payment: LocalisedPaymentPolicy | null;
+}
+
+const EMPTY_POLICIES: LocalisedPolicies = {
+  checkIn: null,
+  checkOut: null,
+  cancellation: null,
+  pets: null,
+  children: null,
+  payment: null,
+};
+
+export function readPolicies(row: HotelDetailRow, locale: SupportedLocale): LocalisedPolicies {
+  const parsed = PoliciesSchema.safeParse(row.policies);
+  if (!parsed.success) return EMPTY_POLICIES;
+  const p = parsed.data;
+
+  const pickFr = (fr: string | undefined, en: string | undefined): string | null =>
+    (locale === 'fr' ? (fr ?? en) : (en ?? fr)) ?? null;
+
+  return {
+    checkIn:
+      p.check_in !== undefined ? { from: p.check_in.from, until: p.check_in.until ?? null } : null,
+    checkOut: p.check_out !== undefined ? { until: p.check_out.until } : null,
+    cancellation:
+      p.cancellation !== undefined
+        ? {
+            summary: pickFr(p.cancellation.summary_fr, p.cancellation.summary_en),
+            freeUntilHours: p.cancellation.free_until_hours ?? null,
+            penaltyAfter: pickFr(p.cancellation.penalty_after_fr, p.cancellation.penalty_after_en),
+          }
+        : null,
+    pets:
+      p.pets !== undefined
+        ? {
+            allowed: p.pets.allowed,
+            feeEur: p.pets.fee_eur ?? null,
+            notes: pickFr(p.pets.notes_fr, p.pets.notes_en),
+          }
+        : null,
+    children:
+      p.children !== undefined
+        ? {
+            welcome: p.children.welcome,
+            freeUnderAge: p.children.free_under_age ?? null,
+            extraBedFeeEur: p.children.extra_bed_fee_eur ?? null,
+            notes: pickFr(p.children.notes_fr, p.children.notes_en),
+          }
+        : null,
+    payment:
+      p.payment !== undefined
+        ? {
+            methods: p.payment.methods,
+            depositRequired: p.payment.deposit_required ?? null,
+            notes: pickFr(p.payment.notes_fr, p.payment.notes_en),
+          }
+        : null,
+  };
+}
+
+export function hasAnyPolicy(p: LocalisedPolicies): boolean {
+  return (
+    p.checkIn !== null ||
+    p.checkOut !== null ||
+    p.cancellation !== null ||
+    p.pets !== null ||
+    p.children !== null ||
+    p.payment !== null
+  );
 }
 
 export interface HotelRoomRow {

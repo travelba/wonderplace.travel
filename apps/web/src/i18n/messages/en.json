@@ -366,7 +366,8 @@
       "restaurants": "Restaurants & bars",
       "spa": "Spa & wellness",
       "gallery": "Photo gallery",
-      "location": "Location & access"
+      "location": "Location & access",
+      "policies": "Stay policies"
     },
     "gallery": {
       "thumbnailsLabel": "Additional photos of the property"
@@ -435,6 +436,40 @@
         "train": "Train",
         "taxi": "Taxi",
         "airport_shuttle": "Airport shuttle"
+      }
+    },
+    "policies": {
+      "checkInOutTitle": "Check-in & check-out",
+      "checkInLabel": "Check-in",
+      "checkInFrom": "From {from}",
+      "checkInRange": "From {from} to {until}",
+      "checkOutLabel": "Check-out",
+      "checkOutUntil": "Until {until}",
+      "cancellationTitle": "Cancellation",
+      "cancellationFreeUntil": "{count, plural, one {Free cancellation up to # hour before arrival} other {Free cancellation up to # hours before arrival}}",
+      "petsTitle": "Pets",
+      "petsAllowedFree": "Pets are welcome at no extra charge.",
+      "petsAllowedFee": "Pets are welcome ({amount} € fee).",
+      "petsNotAllowed": "Pets are not allowed.",
+      "childrenTitle": "Children",
+      "childrenWelcome": "Children are welcome.",
+      "childrenNotWelcome": "Adults-only property.",
+      "childrenFreeUnder": "Free of charge for children under {age}.",
+      "childrenExtraBed": "Extra bed: {amount} € per night.",
+      "paymentTitle": "Accepted payment",
+      "paymentDepositRequired": "Deposit required at booking.",
+      "paymentNoDeposit": "No deposit required at booking.",
+      "paymentMethod": {
+        "visa": "Visa",
+        "mc": "Mastercard",
+        "amex": "American Express",
+        "diners": "Diners Club",
+        "jcb": "JCB",
+        "unionpay": "UnionPay",
+        "apple_pay": "Apple Pay",
+        "google_pay": "Google Pay",
+        "cash": "Cash",
+        "bank_transfer": "Bank transfer"
       }
     },
     "booking": {

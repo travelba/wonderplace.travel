@@ -366,7 +366,8 @@
       "restaurants": "Restaurants & bars",
       "spa": "Spa & bien-être",
       "gallery": "Galerie photos",
-      "location": "Emplacement & accès"
+      "location": "Emplacement & accès",
+      "policies": "Conditions de séjour"
     },
     "gallery": {
       "thumbnailsLabel": "Autres photos de l'établissement"
@@ -435,6 +436,40 @@
         "train": "Train",
         "taxi": "Taxi",
         "airport_shuttle": "Navette aéroport"
+      }
+    },
+    "policies": {
+      "checkInOutTitle": "Arrivée & départ",
+      "checkInLabel": "Arrivée",
+      "checkInFrom": "À partir de {from}",
+      "checkInRange": "De {from} à {until}",
+      "checkOutLabel": "Départ",
+      "checkOutUntil": "Jusqu'à {until}",
+      "cancellationTitle": "Annulation",
+      "cancellationFreeUntil": "{count, plural, one {Annulation gratuite jusqu'à # h avant l'arrivée} other {Annulation gratuite jusqu'à # h avant l'arrivée}}",
+      "petsTitle": "Animaux",
+      "petsAllowedFree": "Animaux acceptés (sans supplément).",
+      "petsAllowedFee": "Animaux acceptés (supplément de {amount} €).",
+      "petsNotAllowed": "Animaux non acceptés.",
+      "childrenTitle": "Enfants",
+      "childrenWelcome": "Enfants bienvenus.",
+      "childrenNotWelcome": "Établissement réservé aux adultes.",
+      "childrenFreeUnder": "Gratuit pour les enfants de moins de {age} ans.",
+      "childrenExtraBed": "Lit d'appoint : {amount} € la nuit.",
+      "paymentTitle": "Paiement accepté",
+      "paymentDepositRequired": "Acompte requis lors de la réservation.",
+      "paymentNoDeposit": "Aucun acompte requis à la réservation.",
+      "paymentMethod": {
+        "visa": "Visa",
+        "mc": "Mastercard",
+        "amex": "American Express",
+        "diners": "Diners Club",
+        "jcb": "JCB",
+        "unionpay": "UnionPay",
+        "apple_pay": "Apple Pay",
+        "google_pay": "Google Pay",
+        "cash": "Espèces",
+        "bank_transfer": "Virement bancaire"
       }
     },
     "booking": {

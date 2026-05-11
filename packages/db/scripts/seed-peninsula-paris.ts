@@ -384,6 +384,54 @@ const POINTS_OF_INTEREST = [
   },
 ];
 
+const POLICIES = {
+  check_in: {
+    // Peninsula Time programme allows check-in from 6:00 AM (subject to
+    // availability). The standard advertised check-in is 15:00 but the
+    // earliest possible time is what guests actually search for.
+    from: '06:00',
+    until: '23:00',
+  },
+  check_out: {
+    // Peninsula Time allows check-out until 22:00 free of charge.
+    until: '22:00',
+  },
+  cancellation: {
+    summary_fr:
+      "Conditions d'annulation propres à chaque tarif. Tarifs flexibles : annulation gratuite jusqu'à 24 h avant l'arrivée. Tarifs non-remboursables : aucun remboursement après réservation.",
+    summary_en:
+      'Cancellation policy varies by rate. Flexible rates: free cancellation up to 24 h before arrival. Non-refundable rates: no refund after booking.',
+    free_until_hours: 24,
+    penalty_after_fr:
+      'En cas d’annulation tardive sur un tarif flexible, la première nuit est débitée.',
+    penalty_after_en: 'Late cancellation on a flexible rate: the first night is charged.',
+  },
+  pets: {
+    allowed: true,
+    fee_eur: 0,
+    notes_fr:
+      'Chiens de petite et moyenne taille bienvenus. Merci de prévenir la conciergerie en amont.',
+    notes_en: 'Small and medium-sized dogs welcome. Please notify the concierge desk in advance.',
+  },
+  children: {
+    welcome: true,
+    free_under_age: 12,
+    extra_bed_fee_eur: 150,
+    notes_fr:
+      'Lits bébé fournis gratuitement sur demande. Programme « Peninsula Academy » d’ateliers enfants disponible certains jours.',
+    notes_en:
+      'Cribs provided free of charge on request. The "Peninsula Academy" kids workshop programme runs on selected dates.',
+  },
+  payment: {
+    methods: ['visa', 'mc', 'amex', 'diners', 'jcb', 'unionpay', 'apple_pay', 'cash'] as const,
+    deposit_required: false,
+    notes_fr:
+      'Empreinte de carte demandée à l’arrivée pour les extras. Aucun pré-paiement requis sur les tarifs flexibles.',
+    notes_en:
+      'Card pre-authorisation at arrival to cover incidentals. No prepayment required on flexible rates.',
+  },
+};
+
 const TRANSPORTS = [
   {
     mode: 'metro' as const,
@@ -716,7 +764,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       description_fr, description_en,
       highlights, amenities, faq_content,
       restaurant_info, spa_info,
-      points_of_interest, transports,
+      points_of_interest, transports, policies,
       hero_image, gallery_images,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count
@@ -735,6 +783,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(SPA_INFO))},
       ${sql.json(toJson(POINTS_OF_INTEREST))},
       ${sql.json(toJson(TRANSPORTS))},
+      ${sql.json(toJson(POLICIES))},
       ${heroPublicId},
       ${sql.json(toJson(galleryPhotos))},
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
@@ -766,6 +815,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       spa_info = excluded.spa_info,
       points_of_interest = excluded.points_of_interest,
       transports = excluded.transports,
+      policies = excluded.policies,
       hero_image = excluded.hero_image,
       gallery_images = excluded.gallery_images,
       meta_title_fr = excluded.meta_title_fr,
