@@ -11,6 +11,7 @@ import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
+import { HotelReassurance } from '@/components/hotel/hotel-reassurance';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { PriceComparator } from '@/components/price-comparator';
@@ -37,6 +38,7 @@ import {
   readHighlights,
   readLocation,
   readPolicies,
+  readPostalCode,
   readRestaurants,
   readSpa,
   type HotelDetail,
@@ -246,6 +248,7 @@ async function renderHotelPage(
   const location = readLocation(row, locale);
   const policies = readPolicies(row, locale);
   const awards = readAwards(row, locale);
+  const postalCode = readPostalCode(row);
   const faqs = readFaq(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
@@ -304,12 +307,18 @@ async function renderHotelPage(
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
       : {}),
-    ...(row.address !== null && row.address !== ''
+    // Google Rich Results require a non-empty `postalCode` to validate the
+    // PostalAddress block; we therefore only emit the address when both
+    // `address` and `postalCode` are present. Editorial entries without a
+    // postal code (legacy rows pre-migration 0014) fall back to no address
+    // node — better than emitting an invalid one and being silently
+    // dropped by the indexer.
+    ...(row.address !== null && row.address !== '' && postalCode !== null
       ? {
           address: {
             streetAddress: row.address,
             addressLocality: row.city,
-            postalCode: '',
+            postalCode,
             addressCountry: 'FR',
             addressRegion: row.region,
           },
@@ -716,6 +725,7 @@ async function renderHotelPage(
         hotelName={name}
         city={row.city}
         address={row.address}
+        postalCode={postalCode}
         latitude={row.latitude}
         longitude={row.longitude}
         location={location}
@@ -813,6 +823,8 @@ async function renderHotelPage(
           <p className="text-muted text-sm">{t('noFaq')}</p>
         )}
       </section>
+
+      <HotelReassurance locale={locale} />
 
       <footer className="text-muted mt-10 flex flex-col gap-2 text-xs">
         <p>{t('loyaltyHint')}</p>

@@ -368,7 +368,8 @@
       "gallery": "Galerie photos",
       "location": "Emplacement & accès",
       "policies": "Conditions de séjour",
-      "awards": "Distinctions & reconnaissances"
+      "awards": "Distinctions & reconnaissances",
+      "reassurance": "Pourquoi réserver avec nous"
     },
     "awards": {
       "intro": "Distinctions et reconnaissances officielles attribuées à l'établissement.",
@@ -385,6 +386,20 @@
       "accessibility": "Accessibilité",
       "sustainability": "Engagement responsable",
       "other": "Autres équipements"
+    },
+    "reassurance": {
+      "title": "Pourquoi réserver avec ConciergeTravel ?",
+      "listAria": "Garanties et engagements ConciergeTravel",
+      "iataLabel": "Agence accréditée IATA",
+      "iataDetail": "Tarifs nets négociés via les GDS, sans intermédiaire ni surcharge.",
+      "apstLabel": "Garantie financière APST",
+      "apstDetail": "Vos paiements sont sécurisés par l'Association Professionnelle de Solidarité du Tourisme.",
+      "paymentLabel": "Paiement sécurisé 3DS2",
+      "paymentDetail": "Solution Amadeus Payments — PCI DSS niveau 1, authentification forte 3-D Secure.",
+      "gdprLabel": "Données hébergées dans l'UE",
+      "gdprDetail": "Hébergement Supabase Europe — conforme RGPD, aucune revente de vos coordonnées.",
+      "supportLabel": "Conseillers 7 jours/7",
+      "supportDetail": "Une équipe francophone répond à vos questions par e-mail sous 24 h ouvrées."
     },
     "gallery": {
       "thumbnailsLabel": "Autres photos de l'établissement"

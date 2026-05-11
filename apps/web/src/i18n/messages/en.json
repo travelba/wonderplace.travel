@@ -368,7 +368,8 @@
       "gallery": "Photo gallery",
       "location": "Location & access",
       "policies": "Stay policies",
-      "awards": "Awards & recognitions"
+      "awards": "Awards & recognitions",
+      "reassurance": "Why book with us"
     },
     "awards": {
       "intro": "Official distinctions and recognitions awarded to this property.",
@@ -385,6 +386,20 @@
       "accessibility": "Accessibility",
       "sustainability": "Sustainability",
       "other": "Other amenities"
+    },
+    "reassurance": {
+      "title": "Why book with ConciergeTravel?",
+      "listAria": "ConciergeTravel guarantees and commitments",
+      "iataLabel": "IATA-accredited agency",
+      "iataDetail": "GDS net rates negotiated directly, no intermediary, no markup.",
+      "apstLabel": "APST financial guarantee",
+      "apstDetail": "Your payments are protected by the Association Professionnelle de Solidarité du Tourisme.",
+      "paymentLabel": "Secure 3DS2 payment",
+      "paymentDetail": "Amadeus Payments — PCI DSS level 1, 3-D Secure strong authentication.",
+      "gdprLabel": "Data hosted in the EU",
+      "gdprDetail": "Supabase Europe hosting — GDPR-compliant, your details are never resold.",
+      "supportLabel": "Advisors 7 days a week",
+      "supportDetail": "A French-speaking team replies to your enquiries by email within 24 business hours."
     },
     "gallery": {
       "thumbnailsLabel": "Additional photos of the property"

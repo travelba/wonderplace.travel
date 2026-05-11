@@ -47,6 +47,7 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     city: 'Paris',
     district: '1er arrondissement',
     address: '1 rue de Rivoli',
+    postal_code: '75001',
     latitude: 48.8566,
     longitude: 2.3522,
     description_fr:

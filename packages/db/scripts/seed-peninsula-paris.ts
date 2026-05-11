@@ -749,6 +749,7 @@ const HOTEL_RECORD = {
   city: 'Paris',
   district: '16ᵉ arrondissement',
   address: '19 Avenue Kléber, 75116 Paris',
+  postal_code: '75116',
   latitude: 48.8702,
   longitude: 2.2932,
   booking_mode: 'display_only' as const,
@@ -806,7 +807,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
     insert into public.hotels (
       slug, slug_en, name, name_en,
       stars, is_palace,
-      region, department, city, district, address,
+      region, department, city, district, address, postal_code,
       latitude, longitude,
       booking_mode, priority, is_published,
       description_fr, description_en,
@@ -820,7 +821,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
     values (
       ${HOTEL_RECORD.slug}, ${HOTEL_RECORD.slug_en}, ${HOTEL_RECORD.name}, ${HOTEL_RECORD.name_en},
       ${HOTEL_RECORD.stars}, ${HOTEL_RECORD.is_palace},
-      ${HOTEL_RECORD.region}, ${HOTEL_RECORD.department}, ${HOTEL_RECORD.city}, ${HOTEL_RECORD.district}, ${HOTEL_RECORD.address},
+      ${HOTEL_RECORD.region}, ${HOTEL_RECORD.department}, ${HOTEL_RECORD.city}, ${HOTEL_RECORD.district}, ${HOTEL_RECORD.address}, ${HOTEL_RECORD.postal_code},
       ${HOTEL_RECORD.latitude}, ${HOTEL_RECORD.longitude},
       ${HOTEL_RECORD.booking_mode}, ${HOTEL_RECORD.priority}, ${HOTEL_RECORD.is_published},
       ${HOTEL_RECORD.description_fr}, ${HOTEL_RECORD.description_en},
@@ -850,6 +851,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       city = excluded.city,
       district = excluded.district,
       address = excluded.address,
+      postal_code = excluded.postal_code,
       latitude = excluded.latitude,
       longitude = excluded.longitude,
       booking_mode = excluded.booking_mode,

@@ -49,6 +49,7 @@ export const HotelDetailRowSchema = z.object({
   city: z.string(),
   district: stringOrEmpty,
   address: stringOrEmpty,
+  postal_code: stringOrEmpty,
   latitude: numberOrNull,
   longitude: numberOrNull,
   description_fr: stringOrEmpty,
@@ -85,7 +86,26 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+
+/**
+ * Loose postal-code validation — accepts French 5-digit codes plus DOM-TOM
+ * (97xxx / 98xxx) and the typical EU shapes for future international
+ * properties. Editorial mistakes (whitespace, accents) are normalized.
+ */
+const POSTAL_CODE_REGEX = /^[A-Z0-9][A-Z0-9 -]{2,9}[A-Z0-9]$/i;
+
+/**
+ * Returns the row's postal code if it parses, otherwise `null`. Whitespace
+ * is trimmed so editorial entries copy/pasted with trailing spaces still
+ * pass.
+ */
+export function readPostalCode(row: HotelDetailRow): string | null {
+  if (row.postal_code === null) return null;
+  const trimmed = row.postal_code.trim();
+  if (trimmed.length === 0) return null;
+  return POSTAL_CODE_REGEX.test(trimmed) ? trimmed : null;
+}
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
 export const FaqItemSchema = z.object({

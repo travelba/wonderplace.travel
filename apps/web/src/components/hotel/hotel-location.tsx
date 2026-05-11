@@ -12,6 +12,7 @@ interface HotelLocationProps {
   readonly hotelName: string;
   readonly city: string;
   readonly address: string | null;
+  readonly postalCode: string | null;
   readonly latitude: number | null;
   readonly longitude: number | null;
   readonly location: LocalisedLocation;
@@ -64,6 +65,7 @@ export async function HotelLocation({
   hotelName,
   city,
   address,
+  postalCode,
   latitude,
   longitude,
   location,
@@ -73,6 +75,17 @@ export async function HotelLocation({
   if (!hasPois && !hasTransports && address === null) return null;
 
   const t = await getTranslations({ locale, namespace: 'hotelPage' });
+
+  // Build the canonical address string. When `postalCode` is provided and
+  // the street already includes the city, we preserve as-is to avoid the
+  // dreaded "75116 75116 Paris" duplication. Otherwise we append a clean
+  // `postalCode city` tail.
+  const addressLine: string | null =
+    address !== null
+      ? postalCode !== null && !address.includes(postalCode)
+        ? `${address}, ${postalCode} ${city}`
+        : address
+      : null;
 
   const mapHref =
     latitude !== null && longitude !== null
@@ -88,9 +101,9 @@ export async function HotelLocation({
         {t('sections.location')}
       </h2>
 
-      {address !== null ? (
+      {addressLine !== null ? (
         <p className="text-fg text-sm">
-          <span className="text-muted">{t('location.addressLabel')}</span> {address}
+          <span className="text-muted">{t('location.addressLabel')}</span> {addressLine}
         </p>
       ) : (
         <p className="text-fg text-sm">
