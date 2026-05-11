@@ -65,6 +65,7 @@ export const HotelDetailRowSchema = z.object({
   awards: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
+  long_description_sections: z.unknown().nullable().optional(),
   number_of_rooms: z
     .number()
     .int()
@@ -98,7 +99,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /**
  * Loose postal-code validation — accepts French 5-digit codes plus DOM-TOM
@@ -131,6 +132,70 @@ export function readPostalCode(row: HotelDetailRow): string | null {
 export interface HotelInventoryCounts {
   readonly totalRooms: number | null;
   readonly suites: number | null;
+}
+
+/**
+ * Long-form story section (CDC §2.4). Each entry maps 1:1 to an
+ * `<h3 id="{anchor}">` + body paragraphs on the public hotel page.
+ *
+ *   - `anchor` is the URL-safe slug used both for the `<h3 id>` and
+ *     for the table of contents link. Must be lowercase, kebab-cased.
+ *   - `title_*` and `body_*` are required per locale, but we accept
+ *     locale-only entries (e.g. French-only seed for legacy hotels).
+ *   - `body_*` accepts CRLF or LF and is split on blank lines to
+ *     render multi-paragraph bodies.
+ *
+ * We intentionally do NOT accept inline markdown in `body_*`; the
+ * structured `title + body` already covers 95% of editorial needs
+ * and we avoid shipping a markdown parser. A future migration could
+ * widen the schema with a `format: 'plain' | 'markdown'` discriminator.
+ */
+const ANCHOR_REGEX = /^[a-z][a-z0-9-]{1,40}$/;
+const LongDescriptionSectionSchema = z.object({
+  anchor: z.string().regex(ANCHOR_REGEX, { message: 'expected lowercase kebab anchor' }),
+  title_fr: z.string().min(1).optional(),
+  title_en: z.string().min(1).optional(),
+  body_fr: z.string().min(1).optional(),
+  body_en: z.string().min(1).optional(),
+});
+const LongDescriptionSectionsSchema = z.array(LongDescriptionSectionSchema);
+
+export interface LocalisedHotelStorySection {
+  readonly anchor: string;
+  readonly title: string;
+  readonly paragraphs: readonly string[];
+}
+
+/**
+ * Returns the hotel's long-form story as an ordered list of localised
+ * sections. Falls back to the other locale when a per-section
+ * translation is missing, and drops sections that have neither a
+ * title nor a body to show.
+ */
+export function readHotelStory(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): readonly LocalisedHotelStorySection[] {
+  const parsed = LongDescriptionSectionsSchema.safeParse(row.long_description_sections);
+  if (!parsed.success) return [];
+
+  const out: LocalisedHotelStorySection[] = [];
+  for (const section of parsed.data) {
+    const title =
+      locale === 'fr'
+        ? (section.title_fr ?? section.title_en)
+        : (section.title_en ?? section.title_fr);
+    const body =
+      locale === 'fr' ? (section.body_fr ?? section.body_en) : (section.body_en ?? section.body_fr);
+    if (title === undefined || body === undefined) continue;
+    const paragraphs = body
+      .split(/\r?\n\r?\n+/u)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+    if (paragraphs.length === 0) continue;
+    out.push({ anchor: section.anchor, title, paragraphs });
+  }
+  return out;
 }
 
 export function readInventoryCounts(row: HotelDetailRow): HotelInventoryCounts {

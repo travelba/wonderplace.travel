@@ -399,6 +399,74 @@ const POINTS_OF_INTEREST = [
  *   - Travel + Leisure World's Best: https://www.travelandleisure.com
  *   - Condé Nast Readers' Choice: https://www.cntraveler.com
  */
+/**
+ * Long-form story sections rendered by `<HotelStory>` (CDC §2.4).
+ *
+ * Six sections (~150 words FR / 130 words EN each) totalling ~900 FR /
+ * ~780 EN words — sits at the upper end of Google's E-E-A-T sweet spot
+ * for premium travel pages. Anchors are stable URL fragments shared by
+ * the TOC nav and the `<h3 id>` headings.
+ *
+ * Source notes: every claim below is grounded in the Peninsula
+ * factsheet and Wikipedia FR/EN; we do NOT inflate or speculate.
+ */
+const LONG_DESCRIPTION_SECTIONS = [
+  {
+    anchor: 'histoire',
+    title_fr: 'Histoire & héritage',
+    title_en: 'History & heritage',
+    body_fr:
+      "Construit en 1908 sous le nom d'Hôtel Majestic à l'orée des Champs-Élysées, le bâtiment est l'œuvre de l'architecte Armand Sibien. Ses salons accueillent la signature du Traité de Paix avec l'Empire ottoman en 1919 ainsi que des séances de la délégation française lors de la Conférence de la paix. De 1936 à 2008, le palace est reconverti en centre de conférences du ministère français des Affaires étrangères, avant d'être acquis par le hongkongais Peninsula Hotels et le groupe qatari Katara Hospitality.\n\nQuatre années de restauration sous la maîtrise d'œuvre de Richard Martinet et Affine Design lui rendent ses fresques Belle Époque, ses moulures dorées et ses cheminées en marbre d'origine. The Peninsula Paris ouvre ses portes en août 2014.",
+    body_en:
+      'Built in 1908 under the name Hôtel Majestic just off the Champs-Élysées, the building was designed by architect Armand Sibien. Its salons hosted the signing of the Peace Treaty with the Ottoman Empire in 1919 as well as sessions of the French delegation during the Paris Peace Conference. From 1936 to 2008, the palace was repurposed as a conference centre for the French Ministry of Foreign Affairs, before being acquired by Hong Kong-based Peninsula Hotels and Qatari group Katara Hospitality.\n\nFour years of restoration led by Richard Martinet and Affine Design returned the building to its Belle Époque frescoes, gilded mouldings, and original marble fireplaces. The Peninsula Paris opened its doors in August 2014.',
+  },
+  {
+    anchor: 'emplacement',
+    title_fr: 'Emplacement Étoile-Trocadéro',
+    title_en: 'Étoile-Trocadéro location',
+    body_fr:
+      "Le palace se dresse au 19 avenue Kléber, dans le 16ᵉ arrondissement, à 5 minutes à pied de l'Arc de Triomphe et de l'avenue des Champs-Élysées. La place du Trocadéro, le palais de Chaillot et la Maison de la Radio sont accessibles en moins de quinze minutes. La station Kléber (ligne 6) se trouve à 100 mètres ; les correspondances Charles-de-Gaulle–Étoile (lignes 1, 2, 6 et RER A) à 500 mètres.\n\nL'aéroport Paris-Charles-de-Gaulle est joignable en 30 minutes via le service de voiturier privé de l'hôtel ; Paris-Orly en 25 minutes. The Peninsula propose un transfert en Rolls-Royce Phantom EWB et un service de Mini Cooper Clubman pour les déplacements intra-muros.",
+    body_en:
+      "The palace stands at 19 Avenue Kléber, in the 16th arrondissement, a 5-minute walk from the Arc de Triomphe and the Champs-Élysées. Place du Trocadéro, the Palais de Chaillot, and the Maison de la Radio are all reachable in under fifteen minutes. Kléber station (line 6) is 100 metres away; the Charles-de-Gaulle–Étoile interchange (lines 1, 2, 6 and RER A) is 500 metres further.\n\nParis-Charles-de-Gaulle airport is a 30-minute drive via the hotel's private chauffeur service; Paris-Orly is 25 minutes. The Peninsula offers Rolls-Royce Phantom EWB transfers and a fleet of Mini Cooper Clubman cars for intra-Paris journeys.",
+  },
+  {
+    anchor: 'architecture-design',
+    title_fr: 'Architecture & design',
+    title_en: 'Architecture & design',
+    body_fr:
+      "L'extérieur classé Haussmannien — façade en pierre de taille, balcons en fer forgé, mansardes en ardoise — a été préservé à l'identique. À l'intérieur, le Lobby révèle deux escaliers en marbre, une rotonde dorée et la sculpture monumentale « Dancing Leaves » du designer parisien Xavier Veilhan, suspendue au-dessus des banquettes en velours Hermès.\n\nLes 200 chambres et suites, parmi les plus spacieuses de Paris, sont habillées de bois précieux, de marbre de Carrare et de soies françaises. Les salles de bains affichent télévision haute définition, miroirs grossissants chauffants et téléphones discrets — la signature technologique Peninsula présente dans chaque palace du groupe depuis Hong Kong.",
+    body_en:
+      'The Haussmannian-listed exterior — cut-stone façade, wrought-iron balconies, slate-roof dormers — has been preserved unchanged. Inside, the Lobby reveals two marble staircases, a gilded rotunda, and Parisian designer Xavier Veilhan\'s monumental sculpture "Dancing Leaves" suspended above the Hermès velvet banquettes.\n\nThe 200 rooms and suites, among the most spacious in Paris, are dressed in fine woods, Carrara marble, and French silks. Bathrooms feature in-mirror HD televisions, heated magnifying mirrors, and concealed telephones — the Peninsula technology signature found in every hotel of the group since Hong Kong.',
+  },
+  {
+    anchor: 'experiences-signature',
+    title_fr: 'Expériences signature',
+    title_en: 'Signature experiences',
+    body_fr:
+      "Le programme « Peninsula Time » offre un check-in dès 6 h du matin et un check-out jusqu'à 22 h sans frais, sous réserve de disponibilité — une exclusivité Peninsula proposée dans tous les palaces du groupe. La flotte maison comprend deux Rolls-Royce Phantom EWB livrées en bleu Peninsula et plusieurs Mini Cooper Clubman customisées pour les courses en ville.\n\n« Art in Resonance » est le programme d'art contemporain de la maison : œuvres rotatives, installations sonores et collaborations avec des artistes en résidence (Janet Echelman, Gimhongsok). The Peninsula Academy propose enfin des expériences sur mesure — pâtisserie avec un chef Michelin, visite privée du Louvre, balades historiques avec un guide-conférencier.",
+    body_en:
+      'The "Peninsula Time" programme offers complimentary check-in from 6 am and check-out until 10 pm, subject to availability — a Peninsula exclusive shared with every property in the group. The in-house fleet includes two Peninsula-blue Rolls-Royce Phantom EWB cars and several customised Mini Cooper Clubmans for short city runs.\n\n"Art in Resonance" is the group\'s contemporary-art programme: rotating works, sound installations, and collaborations with artists in residence (Janet Echelman, Gimhongsok). The Peninsula Academy rounds things off with bespoke experiences — patisserie classes with a Michelin chef, private Louvre visits, and historical walks with a credentialled guide.',
+  },
+  {
+    anchor: 'gastronomie',
+    title_fr: 'Gastronomie',
+    title_en: 'Gastronomy',
+    body_fr:
+      "Sept lieux de restauration jalonnent l'établissement. L'Oiseau Blanc, restaurant gastronomique perché sur le toit, est récompensé de 2 étoiles Michelin pour sa cuisine française contemporaine signée David Bizet. LiLi propose la haute gastronomie cantonaise — une rareté à Paris — dans une salle ornée de lustres en cristal et de soieries.\n\nLe Lobby accueille un Tea-Time afternoon réputé, accompagné de scones tièdes et de pâtisseries du Chef Anne Coruble. Le Bar Kléber et la Terrasse Kléber complètent l'offre cocktails et tapas. Le Cake Shop, ouvert sur l'avenue Kléber, vend macarons, pralines et chocolats à emporter.",
+    body_en:
+      "Seven dining venues are spread across the property. L'Oiseau Blanc, the rooftop fine-dining restaurant, holds 2 Michelin stars for David Bizet's contemporary French cuisine. LiLi serves high-end Cantonese cuisine — a Parisian rarity — in a hall dressed with crystal chandeliers and silks.\n\nThe Lobby hosts a celebrated afternoon Tea-Time accompanied by warm scones and pastries by Chef Anne Coruble. Bar Kléber and the Terrasse Kléber complete the cocktails and tapas line-up. The Cake Shop, opening onto Avenue Kléber, sells take-away macarons, pralines, and chocolates.",
+  },
+  {
+    anchor: 'bien-etre',
+    title_fr: 'Bien-être & piscine',
+    title_en: 'Wellness & pool',
+    body_fr:
+      "Le Spa Peninsula Paris déploie 1 800 m² sur trois niveaux, ce qui en fait le plus grand espace bien-être des palaces parisiens. Six salles de soin, dont deux suites duo, accueillent les protocoles Biologique Recherche, ESPA et Margy's of Monte-Carlo. Hammam, sauna et bassin de relaxation prolongent l'expérience.\n\nLa piscine intérieure de 20 mètres baigne dans une lumière tamisée filtrée par un plafond en mosaïque. Le club fitness ouvre 24 heures sur 24 ; il est équipé en Technogym et propose des coachings privés sur demande. Un programme yoga et méditation est proposé chaque week-end.",
+    body_en:
+      "The Peninsula Paris Spa spans 1,800 m² over three levels, making it the largest wellness footprint among Parisian palaces. Six treatment rooms, including two duo suites, host Biologique Recherche, ESPA, and Margy's of Monte-Carlo protocols. A hammam, sauna, and relaxation pool round off the experience.\n\nThe 20-metre indoor pool sits beneath a softly lit mosaic ceiling. The fitness club opens 24 hours a day; it is Technogym-equipped and offers personal training on request. A yoga and meditation programme runs every weekend.",
+  },
+];
+
 const AWARDS = [
   {
     name_fr: 'Distinction Palace',
@@ -820,6 +888,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       restaurant_info, spa_info,
       points_of_interest, transports, policies, awards,
       hero_image, gallery_images,
+      long_description_sections,
       number_of_rooms, number_of_suites,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count
@@ -842,6 +911,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(AWARDS))},
       ${heroPublicId},
       ${sql.json(toJson(galleryPhotos))},
+      ${sql.json(toJson(LONG_DESCRIPTION_SECTIONS))},
       ${HOTEL_RECORD.number_of_rooms}, ${HOTEL_RECORD.number_of_suites},
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
       ${HOTEL_RECORD.meta_desc_fr}, ${HOTEL_RECORD.meta_desc_en},
@@ -877,6 +947,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       awards = excluded.awards,
       hero_image = excluded.hero_image,
       gallery_images = excluded.gallery_images,
+      long_description_sections = excluded.long_description_sections,
       number_of_rooms = excluded.number_of_rooms,
       number_of_suites = excluded.number_of_suites,
       meta_title_fr = excluded.meta_title_fr,

@@ -387,6 +387,10 @@
       "sustainability": "Sustainability",
       "other": "Other amenities"
     },
+    "story": {
+      "tocTitle": "Contents",
+      "tocLabel": "Story table of contents"
+    },
     "factSheet": {
       "title": "{name} factsheet",
       "addressLabel": "Address",

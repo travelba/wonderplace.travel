@@ -15,6 +15,7 @@ import { HotelPolicies } from '@/components/hotel/hotel-policies';
 import { HotelReassurance } from '@/components/hotel/hotel-reassurance';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
+import { HotelStory } from '@/components/hotel/hotel-story';
 import { PriceComparator } from '@/components/price-comparator';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
@@ -37,6 +38,7 @@ import {
   readGallery,
   readHeroImage,
   readHighlights,
+  readHotelStory,
   readInventoryCounts,
   readLocation,
   readPolicies,
@@ -252,6 +254,7 @@ async function renderHotelPage(
   const awards = readAwards(row, locale);
   const postalCode = readPostalCode(row);
   const inventory = readInventoryCounts(row);
+  const storySections = readHotelStory(row, locale);
   const faqs = readFaq(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
@@ -672,20 +675,18 @@ async function renderHotelPage(
         />
       </div>
 
-      {description !== null && description.length > 0 ? (
-        <section aria-labelledby="about-title" className="mb-12">
-          <h2 id="about-title" className="text-fg mb-3 font-serif text-2xl">
-            {t('sections.about')}
-          </h2>
-          <div className="prose text-fg/90 max-w-prose text-base">
-            {description.split(/\n\n+/u).map((paragraph, idx) => (
-              <p key={idx} className="mb-3 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <HotelStory
+        locale={locale}
+        sections={storySections}
+        heroParagraphs={
+          description !== null && description.length > 0
+            ? description
+                .split(/\n\n+/u)
+                .map((p) => p.trim())
+                .filter((p) => p.length > 0)
+            : null
+        }
+      />
 
       <section aria-labelledby="highlights-title" className="mb-12">
         <h2 id="highlights-title" className="text-fg mb-3 font-serif text-2xl">

@@ -387,6 +387,10 @@
       "sustainability": "Engagement responsable",
       "other": "Autres équipements"
     },
+    "story": {
+      "tocTitle": "Sommaire",
+      "tocLabel": "Sommaire de la présentation"
+    },
     "factSheet": {
       "title": "Fiche d'identité {name}",
       "addressLabel": "Adresse",
