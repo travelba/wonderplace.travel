@@ -567,6 +567,17 @@
         "google_pay": "Google Pay",
         "cash": "Cash",
         "bank_transfer": "Bank transfer"
+      },
+      "cityTaxTitle": "City tax",
+      "cityTaxAmount": "{amount} {currency} per guest per night, billed in addition to the room rate.",
+      "cityTaxFreeUnder": "Waived for children under {age}.",
+      "wifiTitle": "Wi-Fi",
+      "wifiIncluded": "Complimentary high-speed Wi-Fi included.",
+      "wifiNotIncluded": "Wi-Fi available as a paid add-on. Ask the front desk for details.",
+      "wifiIncludedScope": {
+        "whole_property": "Complimentary high-speed Wi-Fi in all rooms and public spaces.",
+        "public_areas": "Complimentary Wi-Fi in public spaces; in-room access available as a paid option.",
+        "rooms": "Complimentary Wi-Fi in all rooms."
       }
     },
     "booking": {

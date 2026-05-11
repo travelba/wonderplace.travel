@@ -788,6 +788,44 @@ const PaymentPolicySchema = z.object({
   notes_en: z.string().min(1).optional(),
 });
 
+/**
+ * City / tourist tax (taxe de séjour).
+ *
+ * Modeled as a per-person-per-night flat amount in the property's
+ * currency because that's how French municipalities (and most EU
+ * jurisdictions) publish their rates — even when the tax is
+ * technically tiered by category (e.g. palace, 5★, 4★). The
+ * Île-de-France 25 % regional surtax in Paris is typically rolled
+ * into the displayed amount and called out in `notes_fr/en` so that
+ * the public-facing copy is unambiguous.
+ *
+ * Editors set `free_under_age` when minors are exempt (most French
+ * municipalities exempt under-18s, but some apply ages 12 or 16).
+ */
+const CityTaxPolicySchema = z.object({
+  amount_per_person_per_night: z.number().nonnegative(),
+  currency: z.enum(['EUR', 'USD', 'GBP', 'CHF']).default('EUR'),
+  free_under_age: z.number().int().nonnegative().optional(),
+  notes_fr: z.string().min(1).optional(),
+  notes_en: z.string().min(1).optional(),
+});
+
+/**
+ * Wi-Fi policy. Booking engines and OTAs penalise hotels with
+ * paywalled Wi-Fi heavily — surfacing "Wi-Fi haut débit inclus
+ * dans toutes les chambres" prominently is a documented conversion
+ * lever, and palaces typically include it. We model it as a
+ * structured node (not a free amenity flag) because the *scope*
+ * matters: some properties include public-areas Wi-Fi but charge
+ * for in-room access.
+ */
+const WifiPolicySchema = z.object({
+  included: z.boolean(),
+  scope: z.enum(['whole_property', 'public_areas', 'rooms']).optional(),
+  notes_fr: z.string().min(1).optional(),
+  notes_en: z.string().min(1).optional(),
+});
+
 const PoliciesSchema = z.object({
   check_in: CheckInPolicySchema.optional(),
   check_out: CheckOutPolicySchema.optional(),
@@ -795,6 +833,8 @@ const PoliciesSchema = z.object({
   pets: PetsPolicySchema.optional(),
   children: ChildrenPolicySchema.optional(),
   payment: PaymentPolicySchema.optional(),
+  city_tax: CityTaxPolicySchema.optional(),
+  wifi: WifiPolicySchema.optional(),
 });
 
 export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
@@ -827,6 +867,17 @@ export interface LocalisedPaymentPolicy {
   readonly depositRequired: boolean | null;
   readonly notes: string | null;
 }
+export interface LocalisedCityTaxPolicy {
+  readonly amountPerPersonPerNight: number;
+  readonly currency: 'EUR' | 'USD' | 'GBP' | 'CHF';
+  readonly freeUnderAge: number | null;
+  readonly notes: string | null;
+}
+export interface LocalisedWifiPolicy {
+  readonly included: boolean;
+  readonly scope: 'whole_property' | 'public_areas' | 'rooms' | null;
+  readonly notes: string | null;
+}
 
 export interface LocalisedPolicies {
   readonly checkIn: LocalisedCheckInPolicy | null;
@@ -835,6 +886,8 @@ export interface LocalisedPolicies {
   readonly pets: LocalisedPetsPolicy | null;
   readonly children: LocalisedChildrenPolicy | null;
   readonly payment: LocalisedPaymentPolicy | null;
+  readonly cityTax: LocalisedCityTaxPolicy | null;
+  readonly wifi: LocalisedWifiPolicy | null;
 }
 
 const EMPTY_POLICIES: LocalisedPolicies = {
@@ -844,6 +897,8 @@ const EMPTY_POLICIES: LocalisedPolicies = {
   pets: null,
   children: null,
   payment: null,
+  cityTax: null,
+  wifi: null,
 };
 
 export function readPolicies(row: HotelDetailRow, locale: SupportedLocale): LocalisedPolicies {
@@ -891,6 +946,23 @@ export function readPolicies(row: HotelDetailRow, locale: SupportedLocale): Loca
             notes: pickFr(p.payment.notes_fr, p.payment.notes_en),
           }
         : null,
+    cityTax:
+      p.city_tax !== undefined
+        ? {
+            amountPerPersonPerNight: p.city_tax.amount_per_person_per_night,
+            currency: p.city_tax.currency,
+            freeUnderAge: p.city_tax.free_under_age ?? null,
+            notes: pickFr(p.city_tax.notes_fr, p.city_tax.notes_en),
+          }
+        : null,
+    wifi:
+      p.wifi !== undefined
+        ? {
+            included: p.wifi.included,
+            scope: p.wifi.scope ?? null,
+            notes: pickFr(p.wifi.notes_fr, p.wifi.notes_en),
+          }
+        : null,
   };
 }
 
@@ -901,7 +973,9 @@ export function hasAnyPolicy(p: LocalisedPolicies): boolean {
     p.cancellation !== null ||
     p.pets !== null ||
     p.children !== null ||
-    p.payment !== null
+    p.payment !== null ||
+    p.cityTax !== null ||
+    p.wifi !== null
   );
 }
 

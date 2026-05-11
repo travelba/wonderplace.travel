@@ -735,6 +735,33 @@ const POLICIES = {
     notes_en:
       'Card pre-authorisation at arrival to cover incidentals. No prepayment required on flexible rates.',
   },
+  // Paris palace city tax rate as of 2026: 5.20 € (palace tier) × 1.25
+  // Île-de-France regional surtax = 6.50 € per guest per night. Under-
+  // 18s are exempt by national rule (CGI art. L.2333-31). We surface
+  // the post-surtax figure so the displayed amount matches what guests
+  // actually see on the final bill.
+  city_tax: {
+    amount_per_person_per_night: 6.5,
+    currency: 'EUR' as const,
+    free_under_age: 18,
+    notes_fr:
+      'Taxe de séjour palace (5,20 €) majorée de la surtaxe régionale Île-de-France (+25 %). Mineurs exonérés.',
+    notes_en:
+      'Palace-tier city tax (€5.20) plus the Île-de-France regional surtax (+25 %). Under-18s exempt.',
+  },
+  // Wi-Fi at The Peninsula Paris: fibre-grade complimentary access in
+  // every room and public space, with an in-room Pageone tablet that
+  // doubles as a controller. Surfacing this is a documented conversion
+  // lever for palace properties (legacy OTAs flag paywalled Wi-Fi as a
+  // negative attribute and bury it in 4★/5★ comparison filters).
+  wifi: {
+    included: true,
+    scope: 'whole_property' as const,
+    notes_fr:
+      'Fibre optique haut débit dans toutes les chambres et tous les espaces publics. Tablette Pageone fournie en chambre.',
+    notes_en:
+      'High-speed fibre Wi-Fi throughout the property. In-room Pageone tablet provided in every room.',
+  },
 };
 
 const TRANSPORTS = [

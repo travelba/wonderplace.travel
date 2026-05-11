@@ -164,6 +164,42 @@ export async function HotelPolicies({
             ) : null}
           </article>
         ) : null}
+
+        {policies.cityTax !== null ? (
+          <article className="border-border bg-bg rounded-lg border p-4">
+            <h3 className="text-fg mb-2 font-medium">{t('policies.cityTaxTitle')}</h3>
+            <p className="text-fg text-sm">
+              {t('policies.cityTaxAmount', {
+                amount: policies.cityTax.amountPerPersonPerNight.toFixed(2),
+                currency: policies.cityTax.currency,
+              })}
+            </p>
+            {policies.cityTax.freeUnderAge !== null ? (
+              <p className="text-muted mt-2 text-sm">
+                {t('policies.cityTaxFreeUnder', { age: policies.cityTax.freeUnderAge })}
+              </p>
+            ) : null}
+            {policies.cityTax.notes !== null ? (
+              <p className="text-muted mt-2 text-sm">{policies.cityTax.notes}</p>
+            ) : null}
+          </article>
+        ) : null}
+
+        {policies.wifi !== null ? (
+          <article className="border-border bg-bg rounded-lg border p-4">
+            <h3 className="text-fg mb-2 font-medium">{t('policies.wifiTitle')}</h3>
+            <p className="text-fg text-sm">
+              {policies.wifi.included
+                ? policies.wifi.scope !== null
+                  ? t(`policies.wifiIncludedScope.${policies.wifi.scope}`)
+                  : t('policies.wifiIncluded')
+                : t('policies.wifiNotIncluded')}
+            </p>
+            {policies.wifi.notes !== null ? (
+              <p className="text-muted mt-2 text-sm">{policies.wifi.notes}</p>
+            ) : null}
+          </article>
+        ) : null}
       </div>
     </section>
   );
