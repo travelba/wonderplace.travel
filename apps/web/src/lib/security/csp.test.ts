@@ -46,6 +46,11 @@ describe('buildCspHeader', () => {
     expect(header).toMatch(/img-src[^;]*https:\/\/res\.cloudinary\.com/);
     expect(header).toMatch(/media-src[^;]*https:\/\/res\.cloudinary\.com/);
   });
+
+  it('allows Wikimedia Maps tiles for img-src (used by HotelStaticMap)', () => {
+    const header = buildCspHeader({ nonce: 'n', isDev: false });
+    expect(header).toMatch(/img-src[^;]*https:\/\/maps\.wikimedia\.org/);
+  });
 });
 
 describe('generateNonce', () => {

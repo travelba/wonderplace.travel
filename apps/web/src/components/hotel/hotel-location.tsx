@@ -7,6 +7,8 @@ import type {
   TransportMode,
 } from '@/server/hotels/get-hotel-by-slug';
 
+import { HotelStaticMap } from './hotel-static-map';
+
 interface HotelLocationProps {
   readonly locale: 'fr' | 'en';
   readonly hotelName: string;
@@ -111,8 +113,17 @@ export async function HotelLocation({
         </p>
       )}
 
+      {latitude !== null && longitude !== null ? (
+        <HotelStaticMap
+          locale={locale}
+          hotelName={hotelName}
+          latitude={latitude}
+          longitude={longitude}
+        />
+      ) : null}
+
       {mapHref !== null ? (
-        <p className="mt-2 text-sm">
+        <p className="mt-3 text-sm">
           <a
             href={mapHref}
             target="_blank"
