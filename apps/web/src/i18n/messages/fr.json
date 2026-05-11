@@ -369,7 +369,8 @@
       "location": "Emplacement & accès",
       "policies": "Conditions de séjour",
       "awards": "Distinctions & reconnaissances",
-      "reassurance": "Pourquoi réserver avec nous"
+      "reassurance": "Pourquoi réserver avec nous",
+      "concierge": "Réservation par concierge"
     },
     "awards": {
       "intro": "Distinctions et reconnaissances officielles attribuées à l'établissement.",
@@ -390,6 +391,17 @@
     "story": {
       "tocTitle": "Sommaire",
       "tocLabel": "Sommaire de la présentation"
+    },
+    "displayOnly": {
+      "headline": "Réservation par concierge ConciergeTravel",
+      "explainer": "{name} n'est pas disponible à la réservation en ligne. Indiquez vos dates, nous vous transmettons une proposition personnalisée par e-mail.",
+      "sla": "Réponse sous 24 heures ouvrées.",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "adults": "Adultes",
+      "children": "Enfants",
+      "trustChip": "Agence IATA accréditée. Aucune carte demandée à cette étape, paiement uniquement après acceptation du devis.",
+      "submit": "Demander un devis"
     },
     "factSheet": {
       "title": "Fiche d'identité {name}",

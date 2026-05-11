@@ -6,6 +6,7 @@ import { JsonLd } from '@cct/seo';
 
 import { buildCloudinarySrc } from '@cct/ui';
 
+import { DisplayOnlyBookingCard } from '@/components/hotel/display-only-booking-card';
 import { HotelAmenities } from '@/components/hotel/hotel-amenities';
 import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
@@ -565,9 +566,9 @@ async function renderHotelPage(
         className="border-border bg-bg mb-12 rounded-lg border p-5 sm:p-6"
       >
         <h2 id="booking-title" className="text-fg font-serif text-xl sm:text-2xl">
-          {t('sections.booking')}
+          {bookable ? t('sections.booking') : t('sections.concierge')}
         </h2>
-        <p className="text-muted mt-2 text-sm">{t('booking.intro')}</p>
+        {bookable ? <p className="text-muted mt-2 text-sm">{t('booking.intro')}</p> : null}
 
         {bookable ? (
           <form
@@ -641,20 +642,15 @@ async function renderHotelPage(
             </div>
           </form>
         ) : (
-          <div className="mt-5 flex flex-col gap-3">
-            <p className="text-muted text-sm">{t('booking.noOnline')}</p>
-            <p>
-              <Link
-                href={{
-                  pathname: '/reservation/start',
-                  query: { hotelId: row.id, hotelName: name, checkIn, checkOut, adults, children },
-                }}
-                className="border-border bg-bg text-fg hover:bg-muted/10 inline-flex rounded-md border px-4 py-2 text-sm font-medium"
-              >
-                {t('booking.requestEmail')}
-              </Link>
-            </p>
-          </div>
+          <DisplayOnlyBookingCard
+            locale={locale}
+            hotelId={row.id}
+            hotelName={name}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            adults={adults}
+            children={children}
+          />
         )}
       </section>
 

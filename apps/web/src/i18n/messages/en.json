@@ -369,7 +369,8 @@
       "location": "Location & access",
       "policies": "Stay policies",
       "awards": "Awards & recognitions",
-      "reassurance": "Why book with us"
+      "reassurance": "Why book with us",
+      "concierge": "Concierge booking"
     },
     "awards": {
       "intro": "Official distinctions and recognitions awarded to this property.",
@@ -390,6 +391,17 @@
     "story": {
       "tocTitle": "Contents",
       "tocLabel": "Story table of contents"
+    },
+    "displayOnly": {
+      "headline": "ConciergeTravel concierge booking",
+      "explainer": "{name} is not available for online booking. Share your dates and our concierge will email a tailored proposal.",
+      "sla": "Reply within 24 business hours.",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "adults": "Adults",
+      "children": "Children",
+      "trustChip": "IATA-accredited agency. No card details needed at this stage — payment only after you accept the quote.",
+      "submit": "Request a quote"
     },
     "factSheet": {
       "title": "{name} factsheet",
