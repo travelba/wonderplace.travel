@@ -793,6 +793,22 @@ export interface PublishedHotelSlug {
 }
 
 /**
+ * Catalog summary used by GEO/LLM surfaces (llms.txt, llms-full.txt). Carries
+ * only the strict minimum to build a one-line description per hotel — keeps
+ * the LLM corpus compact (no descriptions, no awards).
+ */
+export interface PublishedHotelSummary {
+  readonly slugFr: string;
+  readonly slugEn: string | null;
+  readonly nameFr: string;
+  readonly nameEn: string | null;
+  readonly city: string;
+  readonly stars: number;
+  readonly isPalace: boolean;
+  readonly priority: 'P0' | 'P1' | 'P2';
+}
+
+/**
  * Service-role read for build-time (`generateStaticParams`) and `force-static`
  * route handlers (sitemap). No request cookies needed; we re-apply the same
  * `is_published = true` filter that the RLS policy `hotels_select_published`
@@ -824,6 +840,66 @@ export async function listPublishedHotelSlugs(): Promise<readonly PublishedHotel
     // No Supabase env (CI smoke, preview) — prerender no slug at build
     // time. The dynamic page still resolves at request time via the
     // seam or the regular Supabase path.
+    return [];
+  }
+}
+
+const HotelSummaryRowSchema = z.object({
+  slug: z.string(),
+  slug_en: stringOrEmpty,
+  name: z.string(),
+  name_en: stringOrEmpty,
+  city: z.string(),
+  stars: z.number().int().min(1).max(5),
+  is_palace: z.boolean(),
+  priority: PrioritySchema,
+});
+
+/**
+ * Service-role catalog read for GEO/LLM surfaces (`llms.txt`,
+ * `llms-full.txt`). Returns up to `limit` published hotels ordered by
+ * editorial priority then name. Mirrors `hotels_select_published` (anon RLS
+ * filters `is_published = true`).
+ */
+export async function listPublishedHotelSummaries(
+  limit = 50,
+): Promise<readonly PublishedHotelSummary[]> {
+  // Guard against accidental fan-out — Supabase silently caps very large
+  // limits, but an explicit bound documents intent.
+  const safeLimit = Math.max(1, Math.min(500, limit));
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from('hotels')
+      .select('slug, slug_en, name, name_en, city, stars, is_palace, priority')
+      .eq('is_published', true)
+      .order('priority', { ascending: true })
+      .order('name', { ascending: true })
+      .limit(safeLimit);
+    if (error || !Array.isArray(data)) return [];
+
+    const out: PublishedHotelSummary[] = [];
+    for (const raw of data) {
+      const parsed = HotelSummaryRowSchema.safeParse(raw);
+      if (!parsed.success) continue;
+      const row = parsed.data;
+      if (!isValidSlug(row.slug)) continue;
+      out.push({
+        slugFr: row.slug,
+        slugEn:
+          row.slug_en !== null && row.slug_en.length > 0 && isValidSlug(row.slug_en)
+            ? row.slug_en
+            : null,
+        nameFr: row.name,
+        nameEn: row.name_en !== null && row.name_en.length > 0 ? row.name_en : null,
+        city: row.city,
+        stars: row.stars,
+        isPalace: row.is_palace,
+        priority: row.priority,
+      });
+    }
+    return out;
+  } catch {
     return [];
   }
 }

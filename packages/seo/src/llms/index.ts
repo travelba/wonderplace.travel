@@ -6,12 +6,14 @@
  * LLM can answer factual questions without crawling the full site. Keep both
  * deterministic so caching is stable and revalidation is cheap.
  */
+export interface LlmsTxtSectionItem {
+  readonly url: string;
+  readonly description: string;
+}
+
 export interface LlmsTxtSection {
   readonly title: string;
-  readonly items: ReadonlyArray<{
-    readonly url: string;
-    readonly description: string;
-  }>;
+  readonly items: ReadonlyArray<LlmsTxtSectionItem>;
 }
 
 export interface LlmsTxtInput {
