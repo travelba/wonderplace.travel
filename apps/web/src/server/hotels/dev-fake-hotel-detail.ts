@@ -98,6 +98,7 @@ function buildRooms(): readonly HotelRoomRow[] {
   return [
     {
       id: '22222222-2222-4222-8222-222222222222',
+      slug: 'chambre-deluxe-roi',
       room_code: 'TEST-KING',
       name: 'Chambre Deluxe Roi',
       description: 'Vue jardin, lit king-size, salle de bain en marbre.',
@@ -108,6 +109,7 @@ function buildRooms(): readonly HotelRoomRow[] {
     },
     {
       id: '33333333-3333-4333-8333-333333333333',
+      slug: 'suite-junior-tuileries',
       room_code: 'TEST-SUITE',
       name: 'Suite Junior Tuileries',
       description: 'Vue Tuileries, salon séparé, bain à remous.',

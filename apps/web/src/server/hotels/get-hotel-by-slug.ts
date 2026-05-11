@@ -303,6 +303,7 @@ export function readGallery(
 
 export interface HotelRoomRow {
   readonly id: string;
+  readonly slug: string;
   readonly room_code: string;
   readonly name: string | null;
   readonly description: string | null;
@@ -314,6 +315,7 @@ export interface HotelRoomRow {
 
 const HotelRoomDbRowSchema = z.object({
   id: z.string().uuid(),
+  slug: stringOrEmpty,
   room_code: z.string(),
   name_fr: stringOrEmpty,
   name_en: stringOrEmpty,
@@ -324,6 +326,9 @@ const HotelRoomDbRowSchema = z.object({
   size_sqm: z.number().int().nullable(),
   amenities: z.unknown().nullable().optional(),
 });
+
+const ROOM_LIST_COLUMNS =
+  'id, slug, room_code, name_fr, name_en, description_fr, description_en, max_occupancy, bed_type, size_sqm, amenities';
 
 /** Slug shape: `^[a-z0-9]+(?:-[a-z0-9]+)*$` (matches `hotels_slug_ck`). */
 export function isValidSlug(candidate: string): boolean {
@@ -386,9 +391,7 @@ export async function getHotelBySlug(
 
     const roomsRes = await supabase
       .from('hotel_rooms')
-      .select(
-        'id, room_code, name_fr, name_en, description_fr, description_en, max_occupancy, bed_type, size_sqm, amenities',
-      )
+      .select(ROOM_LIST_COLUMNS)
       .eq('hotel_id', parsed.data.id);
 
     const rooms: HotelRoomRow[] = [];
@@ -398,6 +401,7 @@ export async function getHotelBySlug(
         if (!r.success) continue;
         rooms.push({
           id: r.data.id,
+          slug: r.data.slug ?? r.data.room_code,
           room_code: r.data.room_code,
           name:
             locale === 'fr'

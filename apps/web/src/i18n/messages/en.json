@@ -388,7 +388,8 @@
     "rooms": {
       "occupancy": "{count, plural, one {# guest} other {# guests}}",
       "size": "{count} sqm",
-      "amenities": "Amenities"
+      "amenities": "Amenities",
+      "viewDetail": "View room"
     },
     "aeo": {
       "question": "How do I book {name} through ConciergeTravel?",
@@ -430,6 +431,33 @@
     },
     "loyaltyHint": "Loyalty rewards from the first night for Little catalog hotels.",
     "lastUpdated": "Page updated on {date}"
+  },
+  "roomPage": {
+    "meta": {
+      "titleFallback": "{roomName} — {hotelName} | ConciergeTravel",
+      "descriptionFallback": "{roomName} at {hotelName}, {city}. Details, amenities and photos. Book direct with ConciergeTravel, IATA agency."
+    },
+    "breadcrumb": {
+      "label": "Breadcrumb",
+      "home": "Home",
+      "hotels": "Hotels"
+    },
+    "eyebrow": "Room · {hotelName}",
+    "facts": {
+      "size": "Size:",
+      "sizeValue": "{count} sqm",
+      "occupancy": "Occupancy:",
+      "occupancyValue": "{count, plural, one {# guest} other {# guests}}",
+      "bed": "Bedding:"
+    },
+    "sections": {
+      "description": "Overview",
+      "amenities": "Room amenities",
+      "gallery": "Photo gallery"
+    },
+    "noDescription": "Detailed description coming soon.",
+    "returnHint": "Book {hotelName} by picking your dates on the hotel page.",
+    "returnCta": "Back to {hotelName}"
   },
   "account": {
     "meta": {

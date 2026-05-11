@@ -388,7 +388,8 @@
     "rooms": {
       "occupancy": "{count, plural, one {# voyageur} other {# voyageurs}}",
       "size": "{count} m²",
-      "amenities": "Équipements"
+      "amenities": "Équipements",
+      "viewDetail": "Voir la chambre"
     },
     "aeo": {
       "question": "Comment réserver {name} via ConciergeTravel ?",
@@ -430,6 +431,33 @@
     },
     "loyaltyHint": "Programme de fidélité dès la première nuit pour les hôtels du réseau Little.",
     "lastUpdated": "Fiche mise à jour le {date}"
+  },
+  "roomPage": {
+    "meta": {
+      "titleFallback": "{roomName} — {hotelName} | ConciergeTravel",
+      "descriptionFallback": "{roomName} à {hotelName}, {city}. Détails, équipements et photos. Réservez en direct avec ConciergeTravel, agence IATA."
+    },
+    "breadcrumb": {
+      "label": "Fil d'Ariane",
+      "home": "Accueil",
+      "hotels": "Hôtels"
+    },
+    "eyebrow": "Chambre · {hotelName}",
+    "facts": {
+      "size": "Surface :",
+      "sizeValue": "{count} m²",
+      "occupancy": "Capacité :",
+      "occupancyValue": "{count, plural, one {# voyageur} other {# voyageurs}}",
+      "bed": "Literie :"
+    },
+    "sections": {
+      "description": "Présentation",
+      "amenities": "Équipements de la chambre",
+      "gallery": "Galerie photos"
+    },
+    "noDescription": "Description détaillée à venir.",
+    "returnHint": "Réservez {hotelName} en sélectionnant vos dates sur la fiche établissement.",
+    "returnCta": "Retour à la fiche {hotelName}"
   },
   "errors": {
     "notFoundTitle": "Page introuvable",

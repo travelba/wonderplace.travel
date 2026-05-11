@@ -705,39 +705,57 @@ async function renderHotelPage(
         </h2>
         {rooms.length > 0 ? (
           <ul className="flex flex-col gap-4">
-            {rooms.map((room) => (
-              <li key={room.id}>
-                <article className="border-border bg-bg rounded-lg border p-4 sm:p-5">
-                  <header className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="text-fg font-serif text-lg">{room.name ?? room.room_code}</h3>
-                    <p className="text-muted text-xs">
-                      {room.max_occupancy !== null
-                        ? t('rooms.occupancy', { count: room.max_occupancy })
-                        : null}
-                      {room.size_sqm !== null
-                        ? ` · ${t('rooms.size', { count: room.size_sqm })}`
-                        : ''}
-                      {room.bed_type !== null && room.bed_type !== '' ? ` · ${room.bed_type}` : ''}
+            {rooms.map((room) => {
+              const roomPath = `/hotel/${slugFr}/chambres/${room.slug}`;
+              return (
+                <li key={room.id}>
+                  <article className="border-border bg-bg rounded-lg border p-4 sm:p-5">
+                    <header className="flex flex-wrap items-baseline justify-between gap-2">
+                      <h3 className="text-fg font-serif text-lg">
+                        <Link href={roomPath} className="hover:underline">
+                          {room.name ?? room.room_code}
+                        </Link>
+                      </h3>
+                      <p className="text-muted text-xs">
+                        {room.max_occupancy !== null
+                          ? t('rooms.occupancy', { count: room.max_occupancy })
+                          : null}
+                        {room.size_sqm !== null
+                          ? ` · ${t('rooms.size', { count: room.size_sqm })}`
+                          : ''}
+                        {room.bed_type !== null && room.bed_type !== ''
+                          ? ` · ${room.bed_type}`
+                          : ''}
+                      </p>
+                    </header>
+                    {room.description !== null && room.description !== '' ? (
+                      <p className="text-muted mt-2 text-sm">{room.description}</p>
+                    ) : null}
+                    {room.amenities.length > 0 ? (
+                      <ul className="mt-3 flex flex-wrap gap-1.5">
+                        {room.amenities.map((amenity) => (
+                          <li
+                            key={amenity}
+                            className="border-border text-muted rounded-md border px-2 py-0.5 text-xs"
+                          >
+                            {amenity}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    <p className="mt-3 text-sm">
+                      <Link
+                        href={roomPath}
+                        className="text-fg hover:text-fg/80 inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
+                      >
+                        {t('rooms.viewDetail')}
+                        <span aria-hidden>→</span>
+                      </Link>
                     </p>
-                  </header>
-                  {room.description !== null && room.description !== '' ? (
-                    <p className="text-muted mt-2 text-sm">{room.description}</p>
-                  ) : null}
-                  {room.amenities.length > 0 ? (
-                    <ul className="mt-3 flex flex-wrap gap-1.5">
-                      {room.amenities.map((amenity) => (
-                        <li
-                          key={amenity}
-                          className="border-border text-muted rounded-md border px-2 py-0.5 text-xs"
-                        >
-                          {amenity}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </article>
-              </li>
-            ))}
+                  </article>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-muted text-sm">{t('noRooms')}</p>

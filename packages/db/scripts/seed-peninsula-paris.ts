@@ -77,15 +77,19 @@ interface CloudinaryImage {
 }
 
 interface RoomSeed {
+  readonly slug: string;
   readonly room_code: string;
   readonly name_fr: string;
   readonly name_en: string;
   readonly description_fr: string;
   readonly description_en: string;
+  readonly long_description_fr: string;
+  readonly long_description_en: string;
   readonly max_occupancy: number;
   readonly bed_type: string;
   readonly size_sqm: number;
   readonly amenities: readonly LocalisedAmenity[];
+  readonly hero_image: string | null;
   readonly images: readonly CloudinaryImage[];
 }
 
@@ -365,6 +369,7 @@ const HOTEL_PHOTOS: readonly CloudinaryImage[] = [
 
 const ROOMS: readonly RoomSeed[] = [
   {
+    slug: 'chambre-deluxe',
     room_code: 'deluxe-room',
     name_fr: 'Chambre Deluxe',
     name_en: 'Deluxe Room',
@@ -372,6 +377,10 @@ const ROOMS: readonly RoomSeed[] = [
       "Décorées avec raffinement, nos Chambres Deluxe peuvent accueillir jusqu'à deux personnes. Elles offrent un espace de repos confortable, un dressing et de somptueuses salles de bain en marbre avec douche à l'italienne séparée et télévision encastrée. Vues sur l'avenue Kléber, la rue Pérouse ou les cours intérieures.",
     description_en:
       'Delicately furnished with luxury touches, our Deluxe Rooms accommodate up to two guests. They offer a comfortable sitting area, a dressing room and sumptuous marble bathrooms with separate rain shower and inset television. Views over Avenue Kléber, Rue Pérouse or the peaceful inner courtyards.',
+    long_description_fr:
+      "Première catégorie du Peninsula Paris, la Chambre Deluxe incarne déjà toute la grammaire stylistique du palace : 40 m² d'élégance feutrée, dressing séparé, salle de bain en marbre et la signature maison — un écran de télévision encastré dans le miroir au-dessus de la baignoire.\n\nLa décoration mêle patrimoine français classique et touches contemporaines orientales, dans la lignée des autres adresses du groupe Peninsula. Le mobilier sur-mesure, les rideaux occultants automatisés et le système de tablette en chambre (commandes lumière, climatisation, room service, divertissement) traduisent l'attention portée au moindre détail.\n\nL'orientation varie selon la chambre : avenue Kléber, rue Pérouse, ou les paisibles cours intérieures de l'ancien Hôtel Majestic. Une option idéale pour un court séjour à Paris, à 5 minutes à pied de l'Arc de Triomphe et des Champs-Élysées.",
+    long_description_en:
+      "The entry-level category at The Peninsula Paris, the Deluxe Room already showcases the palace's full design vocabulary: 40 sqm of hushed elegance, a walk-in dressing area, a marble bathroom and Peninsula's signature touch — a television screen embedded in the mirror above the bathtub.\n\nThe decor blends classic French heritage with subtle contemporary oriental notes, in line with the wider Peninsula portfolio. Bespoke furniture, motorised blackout curtains and the in-room control tablet (lighting, climate, room service, entertainment) all reflect the meticulous attention to detail.\n\nOrientation varies by room: Avenue Kléber, Rue Pérouse, or the quiet inner courtyards of the former Hôtel Majestic. An ideal short-stay choice in Paris, a 5-minute walk from the Arc de Triomphe and the Champs-Élysées.",
     max_occupancy: 2,
     bed_type: 'King size',
     size_sqm: 40,
@@ -383,9 +392,11 @@ const ROOMS: readonly RoomSeed[] = [
       { key: 'nespresso', label_fr: 'Machine Nespresso', label_en: 'Nespresso machine' },
       { key: 'wifi', label_fr: 'Wi-Fi haut débit', label_en: 'High-speed Wi-Fi' },
     ],
+    hero_image: 'cct/test/peninsula-paris/exterior-2',
     images: [],
   },
   {
+    slug: 'chambre-premier',
     room_code: 'premier-room',
     name_fr: 'Chambre Premier',
     name_en: 'Premier Room',
@@ -393,6 +404,10 @@ const ROOMS: readonly RoomSeed[] = [
       "Nos Chambres Premier offrent davantage d'espace et un coin salon distinct. Vues dégagées sur l'avenue Kléber ou les cours intérieures. Décor inspiré du patrimoine français avec touches contemporaines orientales, signé Henry Leung.",
     description_en:
       'Our Premier Rooms offer more space and a separate sitting area. Open views over Avenue Kléber or the inner courtyards. Decor inspired by French heritage with contemporary oriental touches, designed by Henry Leung.',
+    long_description_fr:
+      "Les Chambres Premier prolongent la grammaire des Deluxe en y ajoutant 10 m² supplémentaires et un véritable coin salon. À 50 m², elles conviennent parfaitement aux voyageurs qui privilégient l'espace de vie au mètre carré supplémentaire dans la chambre à coucher.\n\nLa salle de bain en marbre s'élargit : double vasque, baignoire indépendante et douche à l'italienne séparée. Le walk-in dressing offre un espace de rangement à la hauteur d'un long séjour, et la tablette en chambre regroupe l'ensemble des commandes — lumière, climatisation, rideaux, télévision et room service.\n\nLes Chambres Premier donnent côté avenue Kléber ou sur les cours intérieures de l'hôtel. Une catégorie particulièrement appréciée pour les séjours d'affaires ou les week-ends romantiques où l'on attend du palace à la fois calme et services.",
+    long_description_en:
+      'The Premier Rooms build on the Deluxe template with an additional 10 sqm of breathing room and a true separate sitting area. At 50 sqm, they suit guests who value living space alongside a generous bedroom.\n\nThe marble bathroom is upgraded with a double vanity, a freestanding bathtub and a separate rain shower. The walk-in dressing area offers ample storage for longer stays, and the in-room tablet consolidates lighting, climate, curtain, television and room service controls.\n\nPremier Rooms face Avenue Kléber or the inner courtyards. A category especially favoured for business trips and romantic weekends where guests expect a palace to deliver both peace and refined service.',
     max_occupancy: 2,
     bed_type: 'King size',
     size_sqm: 50,
@@ -419,9 +434,11 @@ const ROOMS: readonly RoomSeed[] = [
       },
       { key: 'nespresso', label_fr: 'Machine Nespresso', label_en: 'Nespresso machine' },
     ],
+    hero_image: 'cct/test/peninsula-paris/exterior-3',
     images: [],
   },
   {
+    slug: 'suite-tour-eiffel',
     room_code: 'eiffel-tower-suite',
     name_fr: 'Suite Tour Eiffel',
     name_en: 'Eiffel Tower Suite',
@@ -429,6 +446,10 @@ const ROOMS: readonly RoomSeed[] = [
       'Suite signature avec une vue exceptionnelle sur la Tour Eiffel. Chambre, salon séparé et salle de bain en marbre avec baignoire indépendante. Mobilier sur mesure, oeuvres d’art contemporaines (Manolo Valdés, Niki de Saint Phalle dans le cadre du programme « Art in Residence » Opera Gallery).',
     description_en:
       'Signature suite with an exceptional view of the Eiffel Tower. Bedroom, separate sitting room, and marble bathroom with freestanding bathtub. Bespoke furniture, contemporary artworks (Manolo Valdés, Niki de Saint Phalle, through the Opera Gallery "Art in Residence" programme).',
+    long_description_fr:
+      "La Suite Tour Eiffel est l'une des cinq suites signature du Peninsula Paris. À 90 m², elle se déploie sur une chambre principale, un salon séparé et une salle de bain en marbre avec baignoire indépendante face à une fenêtre orientée plein sud — d'où la perspective rare sur la Tour Eiffel et la Seine.\n\nLe mobilier est entièrement sur-mesure et la suite accueille en permanence des œuvres du programme « Art in Residence » mené avec l'Opera Gallery (Manolo Valdés, Niki de Saint Phalle, Manuel Mérida selon les saisons). Le service majordome est disponible 24h/24, et la suite ouvre l'accès aux avantages signature du Peninsula : connexion privative au lounge des suites, transfert depuis l'aéroport en Rolls-Royce Phantom EWB sur demande, et participation prioritaire au programme Peninsula Time (check-in dès 6h, check-out jusqu'à 22h sans frais).\n\nIdéale pour un séjour de noces ou un anniversaire important, la suite peut accueillir trois voyageurs avec son canapé convertible.",
+    long_description_en:
+      'The Eiffel Tower Suite is one of the five signature suites at The Peninsula Paris. Spanning 90 sqm, it features a main bedroom, a separate sitting room and a marble bathroom with a freestanding bathtub set against a south-facing window — opening onto the rare framed view of the Eiffel Tower and the Seine.\n\nFurniture is fully bespoke and the suite permanently hosts rotating artworks from the Opera Gallery "Art in Residence" programme (Manolo Valdés, Niki de Saint Phalle, Manuel Mérida depending on the season). Butler service is available 24/7, and the suite unlocks Peninsula\'s signature suite perks: dedicated suites lounge access, optional Rolls-Royce Phantom EWB airport transfer, and priority enrolment in the Peninsula Time programme (check-in from 6 am, check-out until 10 pm, free of charge).\n\nA fitting choice for honeymoons or milestone anniversaries, the suite sleeps three with its convertible sofa.',
     max_occupancy: 3,
     bed_type: 'King size + canapé convertible',
     size_sqm: 90,
@@ -459,6 +480,7 @@ const ROOMS: readonly RoomSeed[] = [
         label_en: '"Art in Residence" Opera Gallery artworks',
       },
     ],
+    hero_image: 'cct/test/peninsula-paris/suite-eiffel-1',
     images: [
       {
         public_id: 'cct/test/peninsula-paris/suite-eiffel-1',
@@ -623,23 +645,26 @@ async function resetAndInsertRooms(sql: postgres.TransactionSql, hotelId: string
   for (const room of ROOMS) {
     await sql`
       insert into public.hotel_rooms (
-        hotel_id, room_code,
+        hotel_id, slug, room_code,
         name_fr, name_en,
         description_fr, description_en,
+        long_description_fr, long_description_en,
         max_occupancy, bed_type, size_sqm,
-        amenities, images
+        amenities, images, hero_image
       )
       values (
-        ${hotelId}, ${room.room_code},
+        ${hotelId}, ${room.slug}, ${room.room_code},
         ${room.name_fr}, ${room.name_en},
         ${room.description_fr}, ${room.description_en},
+        ${room.long_description_fr}, ${room.long_description_en},
         ${room.max_occupancy}, ${room.bed_type}, ${room.size_sqm},
         ${sql.json(toJson(room.amenities))},
-        ${sql.json(toJson(room.images))}
+        ${sql.json(toJson(room.images))},
+        ${room.hero_image}
       )
     `;
     console.info(
-      `[seed:peninsula]   ↳ room ${room.room_code.padEnd(20)} (${room.size_sqm} m², ${room.images.length} photo${room.images.length === 1 ? '' : 's'})`,
+      `[seed:peninsula]   ↳ room ${room.slug.padEnd(22)} (${room.size_sqm} m², ${room.images.length} photo${room.images.length === 1 ? '' : 's'})`,
     );
   }
 }
