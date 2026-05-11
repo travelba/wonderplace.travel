@@ -21,7 +21,6 @@
     "@payloadcms/db-postgres": "^3.20.0",
     "@payloadcms/next": "^3.20.0",
     "@payloadcms/richtext-lexical": "^3.20.0",
-    "@payloadcms/storage-cloudinary": "^3.20.0",
     "@payloadcms/translations": "^3.20.0",
     "next": "catalog:",
     "payload": "^3.20.0",

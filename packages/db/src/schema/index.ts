@@ -1,6 +1,6 @@
 /**
- * Drizzle schema — concrete tables defined in Phase 2 alongside SQL migrations.
- * The SQL migrations are the source of truth; this schema mirrors them for
- * type-safe queries from `apps/web` and `apps/admin`.
+ * Drizzle schema — mirrors `packages/db/migrations/*.sql` once query helpers adopt Drizzle SQL builders.
+ *
+ * Increment when a new numbered migration lands; migrations remain the DDL source of truth.
  */
-export const SCHEMA_VERSION = 0;
+export const SCHEMA_VERSION = 1 as const;

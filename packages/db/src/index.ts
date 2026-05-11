@@ -3,5 +3,5 @@
  * Schema (Drizzle types) + supabase admin client factory.
  * Migrations live under ./migrations/*.sql, executed via scripts/migrate.ts.
  */
-export * from './schema';
-export { createSupabaseAdminClient, type SupabaseAdminClient } from './client';
+export * from './schema/index.js';
+export { createSupabaseAdminClient, type SupabaseAdminClient } from './client.js';
