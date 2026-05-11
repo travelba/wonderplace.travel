@@ -18,6 +18,7 @@ Invoke when:
 
 ```
 docs/
+├── 00-conception-et-phasage.md  # CDC phasing map, doc ↔ phase, MVP vs post-MVP, ADR index
 ├── 01-architecture.md           # Layers, monorepo, rendering matrix, dependencies
 ├── 02-data-model.md             # Tables, RLS, JSONB shapes, ERD
 ├── 03-integrations/

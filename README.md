@@ -84,6 +84,7 @@ URLs locales :
 
 ## Documentation
 
+- [`docs/00-conception-et-phasage.md`](docs/00-conception-et-phasage.md) — phasage CDC, cartographie docs ↔ phases, MVP vs post-MVP, reprise conception
 - [`docs/01-architecture.md`](docs/01-architecture.md) — couches, monorepo, rendu hybride
 - [`docs/02-data-model.md`](docs/02-data-model.md) — schéma Supabase + RLS
 - [`docs/03-integrations/`](docs/03-integrations/) — runbooks par vendor
