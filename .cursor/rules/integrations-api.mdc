@@ -1,0 +1,69 @@
+---
+description: Vendor API integration patterns for ConciergeTravel.fr (HTTP client, Zod, retries, Redis cache, idempotency, error mapping).
+globs: "packages/integrations/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# API integrations — ConciergeTravel.fr
+
+Every vendor adapter under `packages/integrations/<vendor>/` follows the same pattern. Deviation requires an ADR.
+
+## Folder layout
+
+```
+packages/integrations/<vendor>/
+  client.ts         # public entry — exposes typed functions
+  types.ts          # Zod schemas for every request + response
+  errors.ts         # typed error union, mapped from HTTP status
+  cache-keys.ts     # Redis key builders + TTL constants
+  __tests__/*.ts    # MSW-mocked unit tests
+```
+
+## HTTP client
+
+- Use the shared client in `packages/integrations/_http`. It provides timeouts, retry policy (exponential back-off with jitter), and circuit breaker hooks.
+- Default timeouts: 5 s connect, 10 s overall.
+- Retries: 2 retries on 5xx, network errors, or `429`. **Never** retry on 4xx that aren't `429`.
+- Respect `Retry-After` headers.
+
+## Validation — Zod everywhere
+
+- Every vendor response is `safeParse`'d by a Zod schema declared in `types.ts`. **Never `as` cast.**
+- Schemas are precise: numbers are numbers (no string parsing in the schema), enums are explicit, dates are validated.
+- Failed parses surface as `VendorContractError` with the raw payload elided (no PII in logs).
+
+## Authentication
+
+- OAuth tokens cached in Redis with a margin of safety (`expires_in - 60s`).
+- Stampede protection: wrap the token refresh in a Redis mutex (single inflight refresh per process cluster).
+- API keys read from `@cct/config/env`. Never embed in code, never log.
+
+## Caching
+
+- Reads are cached in Redis when:
+  - The endpoint is idempotent
+  - The TTL doesn't violate the vendor's freshness contract (hotel ARI = 5 min, hotel sentiments = 24 h, etc.)
+- Keys follow `cct:<vendor>:<scope>:<key>`. Versioned via a `cct:v<n>:` prefix when the schema changes.
+
+## Idempotency
+
+- Mutating endpoints (booking creation, offer lock) require an idempotency key.
+- Key is generated server-side, persisted in Redis for the SLA window, and replayed on retry.
+
+## Errors
+
+- Vendor errors map to a typed union: `RateLimited | VendorContractError | UpstreamUnavailable | NotFound | Conflict | ValidationFailed`.
+- Apps translate the union to user-facing messages. **Never leak vendor error strings to the UI.**
+
+## Observability
+
+- Wrap every external call in a Sentry span (`Sentry.startSpan` or `withSentry`).
+- Tag with `vendor`, `endpoint`, `status`. Don't include PII in tags.
+- Counter metrics for retries, circuit breaker opens, cache hits/misses.
+
+## Tests
+
+- Every public function in `client.ts` has at least one MSW-mocked happy path and one failure path.
+- Schema regressions are caught by snapshot tests on a small set of canonical responses (`__tests__/fixtures/<vendor>/`).
+
+See `.cursor/skills/api-integration/SKILL.md` and the per-vendor skills (`amadeus-gds`, `little-hotelier`, `competitive-pricing-comparison`).

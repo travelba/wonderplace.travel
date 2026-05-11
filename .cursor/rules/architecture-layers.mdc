@@ -1,0 +1,57 @@
+---
+description: DDD bounded contexts and layering rules for ConciergeTravel.fr. The 4 layers and what's allowed/forbidden in each.
+globs: "{packages,apps}/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Architecture layers — ConciergeTravel.fr
+
+The repo is a four-layer monorepo. **Each layer has a strict allow-list of what it may import.**
+A pull request that breaks layering must be rejected.
+
+## Layer 1 — `packages/domain/`
+
+Pure TypeScript business logic. **Forbidden:**
+- `fetch`, `axios`, `next/*`, `react`, `@supabase/*`, `@upstash/*`, `@sentry/*`
+- `Date.now()`, `new Date()` (inject a clock as a function)
+- `Math.random()` (inject a randomness source)
+- Any I/O
+
+**Allowed:** `zod`, branded types, discriminated unions, pure functions returning `Result<T, E>`.
+Anything that smells like infrastructure goes in `packages/integrations/` or the apps.
+
+## Layer 2 — `packages/integrations/<vendor>/`
+
+Vendor adapters. **Mandatory pattern:**
+- Typed config via `packages/config`
+- HTTP client with retries + circuit breaker (`packages/integrations/_http`)
+- Zod schemas for **every** vendor response — never `as` cast
+- Redis caching (`packages/integrations/_redis`) keyed by `cct:<vendor>:<scope>:<key>`
+- Typed error union, mapped to domain errors at the boundary
+
+**Forbidden:** importing `next/*` or `react`. Apps consume integrations, never the reverse.
+
+## Layer 3 — `packages/seo/`, `packages/emails/`, `packages/ui/`, `packages/db/`
+
+Pure cross-cutting helpers. May depend on `@cct/domain` and small external libs (`zod`, `clsx`, …).
+Each export must have a `.test.ts` covering at least one happy path and one failure path.
+
+## Layer 4 — Apps (`apps/web`, `apps/admin`)
+
+Apps **compose** the lower layers. Apps:
+- Read env via `@cct/config/env-web` (web) or `env` (server-only).
+- Map domain errors to user-facing responses (server actions, route handlers).
+- Never re-implement business logic. If you're tempted to inline a rule, lift it to `@cct/domain`.
+
+## Cheat-sheet
+
+| Concern                          | Layer                         |
+|----------------------------------|-------------------------------|
+| Booking state machine            | `packages/domain/booking`     |
+| Amadeus OAuth + offer lock       | `packages/integrations/amadeus` |
+| JSON-LD builder                  | `packages/seo`                |
+| RLS-aware Supabase query helper  | `packages/db`                 |
+| `/hotel/[slug]/page.tsx`         | `apps/web`                    |
+| Payload collection definition    | `apps/admin/src/collections`  |
+
+See also `docs/adr/0001-architecture.md` and `.cursor/skills/product-architecture/SKILL.md`.

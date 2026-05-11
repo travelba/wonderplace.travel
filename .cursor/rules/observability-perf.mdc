@@ -1,0 +1,49 @@
+---
+description: Observability and performance rules for ConciergeTravel.fr (Sentry, logs, Web Vitals, caching, bundle size).
+globs: "{apps,packages}/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Observability + performance — ConciergeTravel.fr
+
+## Sentry
+
+- Server / edge init in `apps/web/src/instrumentation.ts`, client init in `apps/web/src/instrumentation-client.ts`.
+- Don't init Sentry anywhere else. Don't ship a second `Sentry.init` from a component.
+- `sendDefaultPii: false`. Session Replay is opt-in via the analytics consent — don't bypass.
+- Wrap external calls in `Sentry.startSpan({ op: 'http.client', name: '<vendor>.<endpoint>' }, …)`.
+- Use `global-error.tsx` for the last-resort boundary; locale `error.tsx` also calls `Sentry.captureException`.
+
+## Structured logs
+
+- Use `pino` (`@cct/observability/logger`) — never `console.log` in production code paths.
+- Fields: `req_id`, `route`, `user_id_hash`, `vendor`, `latency_ms`, `status`. **Never** raw email, phone, name.
+- Log levels: `debug` (dev only), `info` (user-facing actions), `warn` (recoverable), `error` (Sentry-captured).
+
+## Web Vitals
+
+- LCP target: ≤ 2.5 s on mid-tier mobile. Above-the-fold hero image uses `next/image` with `priority` and Cloudinary `f_auto,q_auto`.
+- Avoid client-side waterfalls. Fetch in Server Components; pass data down.
+- Defer non-critical client islands (`dynamic(() => import(...), { ssr: false, loading: () => null })`).
+
+## Bundle hygiene
+
+- No `lodash`, no `moment`. Use the native equivalent or a focused alternative.
+- Tree-shake aggressively. If a dep ships CJS only, document the trade-off in the PR.
+- `next-bundle-analyzer` runs on demand (`pnpm --filter @cct/web analyze`) — keep first-load JS < 180 KB gzipped on the marketing routes.
+
+## Caching layers (top-down)
+
+1. **CDN / Vercel edge** — `s-maxage` set in route headers.
+2. **Next.js fetch cache** — controlled by `next: { revalidate, tags }`.
+3. **React server cache** — request-scoped, automatic with `cache()` wrapper.
+4. **Redis (Upstash)** — vendor responses, idempotency keys, tokens.
+
+Cache invalidation flows from Payload hooks → `revalidateTag(...)` → fetch cache → CDN.
+
+## Alerts
+
+- Sentry alert on error rate > 1 % over 5 min, p95 latency > 2 s on `/recherche`, payment failures spike.
+- Vercel Analytics + Web Vitals shipped to the same dashboard as Sentry.
+
+See `.cursor/skills/observability-monitoring/SKILL.md`, `.cursor/skills/performance-engineering/SKILL.md`, `.cursor/skills/redis-caching/SKILL.md`.

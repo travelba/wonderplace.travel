@@ -1,0 +1,53 @@
+---
+description: Security rules for ConciergeTravel.fr — CSP, nonces, secrets, PII, GDPR, auth.
+globs: "{apps,packages}/**/*.{ts,tsx,sql}"
+alwaysApply: true
+---
+
+# Security — ConciergeTravel.fr
+
+## Content Security Policy
+
+- CSP is built by `apps/web/src/lib/security/csp.ts` and applied in `middleware.ts`.
+- `script-src` uses a **per-request nonce** + `'strict-dynamic'`. Never add `'unsafe-inline'` or `'unsafe-eval'` to `script-src`.
+- The nonce is exposed via the `x-nonce` request header (`NONCE_HEADER`). Server Components read it through `headers()`.
+- Every `<script>` that emits JSON or executes JS must carry the nonce — use `JsonLdScript` for structured data.
+- New third-party origin → update the whitelist in `csp.ts` and add a regression test in `csp.test.ts`.
+
+## Secrets & env
+
+- Secrets are read **only** via `@cct/config/env` (server) and `@cct/config/env-web` (client-safe, `NEXT_PUBLIC_*` only).
+- Both are validated with Zod / `@t3-oss/env-nextjs`. A missing or malformed env in production must fail loud at startup.
+- Never `console.log` an env value. Never write a secret into a comment.
+
+## CSRF & idempotency
+
+- Server Actions are CSRF-protected by Next.js. **Don't disable it.**
+- Booking-side actions (payment, offer lock, request creation) require an idempotency key generated server-side and persisted in Redis for the request lifetime.
+
+## Rate limiting
+
+- Every public-facing endpoint or action goes through `@upstash/ratelimit` keyed by `req.ip + scope`.
+- Tests bypass rate limits via `CCT_DISABLE_RATE_LIMITS=1`. Never bypass via `NODE_ENV` checks.
+
+## PII & logging
+
+- **Never log** email, phone, full address, payment data, IBAN, or full names. Use stable hashes when correlation is needed.
+- Sentry: `sendDefaultPii: false`, `replayIntegration({ maskAllText: true, maskAllInputs: true, blockAllMedia: true })`. Don't toggle these.
+
+## Auth
+
+- Supabase Auth + RBAC (`customer | editor | seo | operator | admin`). Roles are JWT claims, not table rows.
+- Server-side gating uses the middleware-refreshed session. **Don't trust** a client-side role for sensitive UI.
+
+## SQL & RLS
+
+- See `supabase-rls.mdc` — RLS is the last line of defence. Never disable it on user-facing tables.
+- Use parameterised queries via the Supabase JS client. **Never** string-concat SQL.
+
+## Webhooks & inbound mail
+
+- Verify webhook signatures (HMAC) before any side effect. Reject unsigned payloads.
+- Sender allowlists for inbound email triggers; sanitise any HTML before parsing.
+
+See `.cursor/skills/security-engineering/SKILL.md`.

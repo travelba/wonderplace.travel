@@ -1,0 +1,52 @@
+---
+description: Supabase PostgreSQL migrations, RLS and performance rules for ConciergeTravel.fr.
+globs: "{packages/db,apps/admin}/**/*.{sql,ts}"
+alwaysApply: true
+---
+
+# Supabase + PostgreSQL — ConciergeTravel.fr
+
+## Migrations
+
+- Migrations live in `packages/db/migrations/NNNN_<scope>_<slug>.sql`. Sequence is monotonic, never edit an applied migration.
+- Every migration must end with a one-line entry in `public._cct_sql_migrations` (`insert … on conflict do nothing`).
+- Forward-only. To "undo", write a new `00NN_revert_<thing>.sql`.
+
+## RLS — performance
+
+- **Always** wrap `auth.uid()` / `auth.jwt()` in a `select` subquery so the planner caches the lookup once per statement:
+
+```sql
+-- ✅ Good — single sub-plan evaluation
+using (user_id = (select auth.uid()))
+using (((select auth.jwt()) ->> 'role') = 'admin')
+
+-- ❌ Bad — re-evaluated for each row, flagged by Supabase advisor
+using (user_id = auth.uid())
+using ((auth.jwt() ->> 'role') = 'admin')
+```
+
+- Split `FOR ALL` into the smallest viable policies (`FOR SELECT`, `FOR INSERT`, etc.) to avoid the `multiple_permissive_policies` warning.
+- Customer-facing tables must include an explicit `to authenticated` clause. Never expose data to `anon` unless the table is public-by-design.
+
+## Indexes
+
+- **Every foreign key gets a covering index.** This is non-negotiable; the Supabase advisor will complain otherwise.
+- Composite indexes follow query order. Prefer partial indexes for status filters (`where status = 'pending'`).
+- Use `pg_trgm` for text search only when Algolia is not the right tool.
+
+## Functions & triggers
+
+- `SECURITY DEFINER` functions invoked by Supabase Auth (e.g. `handle_new_auth_user`) must `REVOKE EXECUTE` from `public`, `anon`, `authenticated` — the trigger keeps invoking them via the table owner.
+- Always set `set search_path = public, pg_temp` on `SECURITY DEFINER` functions.
+
+## Internal tables
+
+- `public._cct_sql_migrations` is internal: revoke all grants on `anon`/`authenticated`, leave RLS disabled. Service role is the only consumer.
+
+## Application code
+
+- Server reads use `createServerClient` (cookie-aware). Service-role reads use `getSupabaseAdminClient` and must never run inside a Server Component that renders to the browser.
+- Wrap every Supabase call in a try/catch that returns a `Result` union; never let `PostgrestError` reach UI components.
+
+See `.cursor/skills/supabase-postgres-rls/SKILL.md` and migrations 0005–0007 for the canonical patterns.

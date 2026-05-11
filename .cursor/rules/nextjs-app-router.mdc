@@ -1,0 +1,59 @@
+---
+description: Next.js 15 App Router conventions for ConciergeTravel.fr (Server Components, dynamic, ISR, metadata, middleware, nonce).
+globs: "apps/web/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Next.js App Router — ConciergeTravel.fr
+
+## Rendering strategy
+
+- Default to **Server Components**. Add `'use client'` only when you genuinely need state, effects, refs, or browser APIs.
+- For pages that don't need per-request data, prefer **ISR** with `export const revalidate = N` over `force-dynamic`.
+- `force-dynamic` is acceptable when a shared layout reads `cookies()`/`headers()` (e.g. auth area in header).
+- `generateStaticParams` must defensively return `[]` if upstream data is unavailable — never throw during build.
+
+## Metadata & SEO
+
+- Every page exports `generateMetadata`. Localised `title`/`description` come from `next-intl`.
+- Set `alternates.canonical` + `alternates.languages` (fr-FR, en, x-default).
+- 404-able pages (`getXyz === null`) must return `{ robots: { index: false, follow: false } }`.
+- Use `JsonLdScript` from `@/components/seo/json-ld` for every JSON-LD payload (it reads the CSP nonce). Never inline `<script>` directly.
+
+## Server Actions / Route Handlers
+
+- Validate input with **Zod** at the boundary. Reject with a discriminated `Result` union.
+- Never let a domain error bubble as a stack trace. Map to user-friendly i18n keys.
+- Use idempotency keys (`request-id` cookie or `Idempotency-Key` header) on booking-side actions.
+
+## Middleware
+
+- `apps/web/src/middleware.ts` is the single source of truth for: locale routing, Supabase session refresh, CSP nonce.
+- The nonce is propagated via `request.headers.set('x-nonce', …)` so Server Components can read it.
+- Don't add headers in `next.config.ts`; consolidate them in middleware so they survive ISR.
+
+## Data fetching
+
+- Server Components fetch directly (no `useEffect`). Wrap with `unstable_cache` only when a vendor call is genuinely shared across routes.
+- Tag fetches with `next: { tags: ['hotel:<id>'] }` so editors can `revalidateTag` from Payload hooks.
+- Always handle the "env not configured" case (Supabase, Algolia, Redis) — fall back gracefully so dev / preview environments don't 500.
+
+## i18n
+
+- Use `next-intl` translations. **Never** hard-code French/English strings in `.tsx`.
+- Plural / dynamic keys go in `messages/{fr,en}.json`. Keep keys parallel; missing-translation tests run in CI.
+
+## Folder layout
+
+```
+apps/web/src/
+  app/[locale]/...   # localised public routes
+  app/.well-known/   # agent-skills.json, etc.
+  app/sitemap.xml/   # route handlers (force-static)
+  components/        # shared client + server components
+  server/            # server-only helpers (Supabase queries, batch fetchers)
+  lib/               # framework-agnostic helpers (csp, env, utils)
+  i18n/              # routing, navigation, messages
+```
+
+See `.cursor/skills/nextjs-app-router/SKILL.md` for deeper guidance and ADR-0004 for the layout decision.

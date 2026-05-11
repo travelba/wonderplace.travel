@@ -1,0 +1,52 @@
+---
+description: Playwright E2E + test seam conventions for ConciergeTravel.fr (dev-fake modules, env flags, CI bypass).
+globs: "apps/web/{e2e,src/server}/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# E2E testing — ConciergeTravel.fr
+
+## Strategy
+
+- Three rings:
+  1. **Unit** (Vitest) — pure domain logic + integration packages with MSW.
+  2. **Integration** (Vitest + MSW) — vendor clients hitting mocked HTTP.
+  3. **E2E** (Playwright) — every user journey that affects revenue or compliance.
+
+A new business rule **must** add at least one unit test in `packages/domain/`.
+A new user journey (booking, search, account, comparator) **must** add a Playwright spec.
+
+## Test seams (dev-fake modules)
+
+When an E2E flow depends on a vendor (Amadeus, Makcorps, Algolia, Supabase…), we ship **environment-gated test seams**.
+
+- Modules live next to the consumer code as `dev-fake-<thing>.ts`.
+- They are gated by env flags (`CCT_E2E_FAKE_HOTEL_ID`, `CCT_E2E_FAKE_PAID_HOTEL_ID`, …).
+- The flag is the only way to activate them: production code paths must never branch on `NODE_ENV === 'test'`.
+- Document each new seam in `docs/adr/0006-e2e-test-seams.md` (or add a successor ADR).
+
+```ts
+// ✅ Good — gated by an explicit opt-in env flag
+if (isFakeOffersEnabled()) {
+  return synthFakeOffer(input);
+}
+
+// ❌ Bad — would silently fake in production
+if (process.env.NODE_ENV === 'test') { … }
+```
+
+## Playwright conventions
+
+- Tests live in `apps/web/e2e/<journey>.spec.ts`. One spec file per journey.
+- Use **role-based queries** (`page.getByRole('button', { name: /réserver/i })`) over CSS selectors.
+- Always include an **accessibility assertion** (axe scan) on the rendered page before exiting.
+- Test in **both locales** when the spec exercises locale-specific copy.
+- Set `CCT_DISABLE_RATE_LIMITS=1` in the test env so rate limiters don't flake.
+
+## CI
+
+- Playwright browsers cached in `.github/workflows/ci.yml`.
+- E2E job runs after lint + typecheck + unit — fail fast on cheap signals.
+- Long-running tests get `test.slow()`; the suite must stay under 5 min wall-clock.
+
+See `.cursor/skills/test-strategy/SKILL.md`.

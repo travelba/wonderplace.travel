@@ -1,0 +1,48 @@
+---
+description: SEO + GEO + AEO conventions for ConciergeTravel.fr (metadata, JSON-LD, robots.txt, llms.txt, agent-skills, AEO blocks).
+globs: "{packages/seo,apps/web/src/app}/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# SEO / GEO / AEO — ConciergeTravel.fr
+
+## Metadata
+
+- Every public page exports `generateMetadata` with localised title/description.
+- `alternates.canonical` is **mandatory** (relative, e.g. `/hotel/<slug>`).
+- `alternates.languages` includes `fr-FR`, `en`, `x-default`.
+- 404 / not-published pages return `{ robots: { index: false, follow: false } }`.
+
+## JSON-LD
+
+- All builders live in `@cct/seo/jsonld/*` and return plain objects validated by Zod.
+- Compose with `JsonLd.withSchemaOrgContext(...)` to ensure `@context: "https://schema.org"`.
+- Emit via `JsonLdScript` from `@/components/seo/json-ld` so the CSP nonce is applied. Never inline `<script>` directly.
+- Forbidden: fabricated ratings. `aggregateRating` requires real `reviewCount > 0` from Amadeus or Google Places.
+
+## Anti-cannibalisation
+
+- The hotel detail page is canonical for `/hotel/<slug>`. Search and destination hubs link to it but never duplicate its content.
+- Editorial sections cite the hotel by name + URL; never paste the hotel description verbatim across pages.
+
+## LLM-actionable surfaces (GEO)
+
+- `robots.txt` allow-lists the official LLM crawlers (2026): `Google-Extended`, `GPTBot`, `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `Perplexity-User`, `ClaudeBot`, `anthropic-ai`, `Applebot-Extended`.
+- `llms.txt` references **only routes that exist** — broken links destroy trust. CI should check 200s.
+- `agent-skills.json` enumerates LLM-actionable actions with Zod-validated input schemas. Every new public endpoint that an LLM could call should appear here.
+- The catalogue is built from `DEFAULT_AGENT_SKILLS` in `packages/seo/src/agent-skills.ts`. Required keys must always be a subset of declared properties (asserted in tests).
+
+## AEO blocks
+
+- AEO = Answer Engine Optimization: short, quotable answer (40–80 words) paired with `FAQPage` JSON-LD.
+- Validated by `buildAeoBlock` from `@cct/seo`. Ship one block per pillar page (homepage, hotel detail, destination hub).
+- Include a freshness signal in the answer text (e.g. `Mise à jour <date>`) so LLMs surface recency.
+- The visible section uses `data-aeo`, `aria-labelledby`, and renders inside a sober container — no extra styling competing with the body.
+
+## Sitemap & robots
+
+- Sitemap is generated from Supabase (`hotels`, `editorial_pages`, `redirects`) and emitted by `apps/web/src/app/sitemap.xml/route.ts`.
+- `force-static` + `revalidate = 86400`. Add `lastmod` based on `updated_at`.
+- Disallow `/api/`, `/admin/`, the booking funnel, the account area, and `/monitoring` (Sentry tunnel).
+
+See `.cursor/skills/seo-technical/SKILL.md`, `.cursor/skills/geo-llm-optimization/SKILL.md`, and `.cursor/skills/structured-data-schema-org/SKILL.md`.
