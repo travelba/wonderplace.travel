@@ -1085,6 +1085,10 @@ const HOTEL_RECORD = {
   google_place_id: null as string | null,
   google_rating: null as number | null,
   google_reviews_count: null as number | null,
+  // Front-desk telephone in E.164 format (no spaces, leading "+", country
+  // code, 4-15 digits). The Peninsula Paris reception line, verified on
+  // peninsula.com/en/paris/contact-us as of 2026-05.
+  phone_e164: '+33158122888',
 };
 
 /**
@@ -1132,7 +1136,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       long_description_sections,
       number_of_rooms, number_of_suites,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
-      google_place_id, google_rating, google_reviews_count
+      google_place_id, google_rating, google_reviews_count,
+      phone_e164
     )
     values (
       ${HOTEL_RECORD.slug}, ${HOTEL_RECORD.slug_en}, ${HOTEL_RECORD.name}, ${HOTEL_RECORD.name_en},
@@ -1158,7 +1163,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${HOTEL_RECORD.number_of_rooms}, ${HOTEL_RECORD.number_of_suites},
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
       ${HOTEL_RECORD.meta_desc_fr}, ${HOTEL_RECORD.meta_desc_en},
-      ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count}
+      ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count},
+      ${HOTEL_RECORD.phone_e164}
     )
     on conflict (slug) do update set
       slug_en = excluded.slug_en,
@@ -1202,6 +1208,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       google_place_id = excluded.google_place_id,
       google_rating = excluded.google_rating,
       google_reviews_count = excluded.google_reviews_count,
+      phone_e164 = excluded.phone_e164,
       updated_at = timezone('utc', now())
     returning id, (xmax = 0) as inserted
   `;

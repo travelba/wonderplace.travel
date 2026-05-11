@@ -84,6 +84,7 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     priority: 'P1',
     google_rating: 4.7,
     google_reviews_count: 312,
+    phone_e164: '+33199990000',
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
     // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the

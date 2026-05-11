@@ -49,6 +49,7 @@ import {
   readHotelStory,
   readInventoryCounts,
   readLocation,
+  readPhoneE164,
   readPolicies,
   readPostalCode,
   readRestaurants,
@@ -333,6 +334,7 @@ async function renderHotelPage(
   const policies = readPolicies(row, locale);
   const awards = readAwards(row, locale);
   const postalCode = readPostalCode(row);
+  const phoneE164 = readPhoneE164(row);
   const inventory = readInventoryCounts(row);
   const storySections = readHotelStory(row, locale);
   const signatureExperiences = readSignatureExperiences(row, locale);
@@ -393,6 +395,10 @@ async function renderHotelPage(
     ...(jsonLdImages.length > 0 ? { images: jsonLdImages } : {}),
     ...(amenities.length > 0 ? { amenityFeatures: amenities } : {}),
     ...(jsonLdAwards.length > 0 ? { awards: jsonLdAwards } : {}),
+    // Telephone (Phase 10.29 / CDC §2.15). E.164 format only — `readPhoneE164`
+    // refuses loose / partial entries so the JSON-LD never carries a half-typed
+    // number. Google Hotels uses this for both the SERP card and click-to-call.
+    ...(phoneE164 !== null ? { telephone: phoneE164 } : {}),
     // Inventory counts (Phase 10.8 / CDC §2.15). `numberOfRooms` is
     // omitted when null — Google's rich-result test prefers an absent
     // property to a `null`/0 one.
