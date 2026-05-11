@@ -4,3 +4,5 @@ export * as Booking from './booking';
 export * as Loyalty from './loyalty';
 export * as Pricing from './pricing';
 export * as Editorial from './editorial';
+export * as PriceComparison from './price-comparison';
+export * as Consent from './consent';

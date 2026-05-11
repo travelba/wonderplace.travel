@@ -10,7 +10,9 @@
     "./loyalty": "./src/loyalty/index.ts",
     "./pricing": "./src/pricing/index.ts",
     "./editorial": "./src/editorial/index.ts",
-    "./shared": "./src/shared/index.ts"
+    "./shared": "./src/shared/index.ts",
+    "./price-comparison": "./src/price-comparison/index.ts",
+    "./consent": "./src/consent/index.ts"
   },
   "scripts": {
     "lint": "eslint src --max-warnings=0",
