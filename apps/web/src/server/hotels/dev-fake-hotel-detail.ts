@@ -86,6 +86,11 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     google_reviews_count: 312,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
+    // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the
+    // HotelFactSheet UI. Synthetic values for the E2E hotel are fine; the
+    // JSON-LD only emits them when positive.
+    number_of_rooms: 80,
+    number_of_suites: 12,
     // No hero/gallery for the E2E synthetic hotel — keeps the fake
     // testable without Cloudinary credentials at build time.
     hero_image: null,

@@ -63,6 +63,52 @@ describe('hotelJsonLd', () => {
     expect(node.award).toBeUndefined();
   });
 
+  it('emits starRating with bestRating: 5 when starRating is provided', () => {
+    const node = hotelJsonLd({
+      name: 'Hôtel D',
+      url: 'https://example.com/d',
+      starRating: 4,
+    });
+    expect(node.starRating).toMatchObject({
+      '@type': 'Rating',
+      ratingValue: 4,
+      bestRating: 5,
+    });
+  });
+
+  it('emits numberOfRooms, checkinTime, checkoutTime and petsAllowed when provided', () => {
+    const node = hotelJsonLd({
+      name: 'Le Peninsula',
+      url: 'https://example.com/p',
+      numberOfRooms: 200,
+      checkinTime: '15:00',
+      checkoutTime: '12:00',
+      petsAllowed: true,
+    });
+    expect(node.numberOfRooms).toBe(200);
+    expect(node.checkinTime).toBe('15:00');
+    expect(node.checkoutTime).toBe('12:00');
+    expect(node.petsAllowed).toBe(true);
+  });
+
+  it('omits numberOfRooms when 0 (treated as unknown)', () => {
+    const node = hotelJsonLd({
+      name: 'Hôtel Inconnu',
+      url: 'https://example.com/x',
+      numberOfRooms: 0,
+    });
+    expect(node.numberOfRooms).toBeUndefined();
+  });
+
+  it('emits petsAllowed: false explicitly when refused (not omitted)', () => {
+    const node = hotelJsonLd({
+      name: 'Hôtel No Pets',
+      url: 'https://example.com/np',
+      petsAllowed: false,
+    });
+    expect(node.petsAllowed).toBe(false);
+  });
+
   it('emits offer + aggregateRating only when provided', () => {
     const node = hotelJsonLd({
       name: 'Hôtel C',

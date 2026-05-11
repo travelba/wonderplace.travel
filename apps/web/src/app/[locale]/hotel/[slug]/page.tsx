@@ -36,6 +36,7 @@ import {
   readGallery,
   readHeroImage,
   readHighlights,
+  readInventoryCounts,
   readLocation,
   readPolicies,
   readPostalCode,
@@ -249,6 +250,7 @@ async function renderHotelPage(
   const policies = readPolicies(row, locale);
   const awards = readAwards(row, locale);
   const postalCode = readPostalCode(row);
+  const inventory = readInventoryCounts(row);
   const faqs = readFaq(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
@@ -304,6 +306,19 @@ async function renderHotelPage(
     ...(jsonLdImages.length > 0 ? { images: jsonLdImages } : {}),
     ...(amenities.length > 0 ? { amenityFeatures: amenities } : {}),
     ...(jsonLdAwards.length > 0 ? { awards: jsonLdAwards } : {}),
+    // Inventory counts (Phase 10.8 / CDC §2.15). `numberOfRooms` is
+    // omitted when null — Google's rich-result test prefers an absent
+    // property to a `null`/0 one.
+    ...(inventory.totalRooms !== null ? { numberOfRooms: inventory.totalRooms } : {}),
+    // Check-in / check-out (Phase 10.8 / CDC §2.15). Both come from the
+    // structured `policies` jsonb already parsed above; we emit only the
+    // values that are present so unfinished editorial entries still
+    // validate cleanly.
+    ...(policies.checkIn !== null ? { checkinTime: policies.checkIn.from } : {}),
+    ...(policies.checkOut !== null ? { checkoutTime: policies.checkOut.until } : {}),
+    // `petsAllowed` is a boolean: explicit `false` is informative for
+    // travellers + Google, so we forward whatever the policy says.
+    ...(policies.pets !== null ? { petsAllowed: policies.pets.allowed } : {}),
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
       : {}),

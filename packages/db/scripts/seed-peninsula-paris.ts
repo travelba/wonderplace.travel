@@ -765,6 +765,11 @@ const HOTEL_RECORD = {
     'Palace parisien 5★ avenue Kléber : 200 chambres et suites, restaurant 2★ Michelin (L’Oiseau Blanc), Spa 1 800 m², à 5 min de l’Arc de Triomphe.',
   meta_desc_en:
     '5-star Parisian palace on Avenue Kléber: 200 rooms and suites, 2★ Michelin restaurant (L’Oiseau Blanc), 1,800 m² spa, 5 min from the Arc de Triomphe.',
+  // Editorial inventory counts (Phase 10.8 / CDC §2.15). 200 keys total,
+  // 87 of which are suites — figures published by the property on its
+  // own factsheet and corroborated by Atout France's palace registry.
+  number_of_rooms: 200 as number,
+  number_of_suites: 87 as number,
   // No verified Google Place data — set null rather than guess. The page
   // already handles `google_rating IS NULL` by hiding the aggregateRating
   // JSON-LD block.
@@ -815,6 +820,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       restaurant_info, spa_info,
       points_of_interest, transports, policies, awards,
       hero_image, gallery_images,
+      number_of_rooms, number_of_suites,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count
     )
@@ -836,6 +842,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(AWARDS))},
       ${heroPublicId},
       ${sql.json(toJson(galleryPhotos))},
+      ${HOTEL_RECORD.number_of_rooms}, ${HOTEL_RECORD.number_of_suites},
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
       ${HOTEL_RECORD.meta_desc_fr}, ${HOTEL_RECORD.meta_desc_en},
       ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count}
@@ -870,6 +877,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       awards = excluded.awards,
       hero_image = excluded.hero_image,
       gallery_images = excluded.gallery_images,
+      number_of_rooms = excluded.number_of_rooms,
+      number_of_suites = excluded.number_of_suites,
       meta_title_fr = excluded.meta_title_fr,
       meta_title_en = excluded.meta_title_en,
       meta_desc_fr = excluded.meta_desc_fr,

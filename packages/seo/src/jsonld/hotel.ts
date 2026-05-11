@@ -42,6 +42,26 @@ export interface HotelJsonLdInput {
    * `Distinction Palace` marker when `isPalace` is also `true`.
    */
   readonly awards?: readonly string[];
+  /**
+   * Number of bookable units (Schema.org `Hotel.numberOfRooms`). Integer,
+   * positive. When provided we surface it both as the rich-result property
+   * and let LLMs ground "How many rooms does X have?" queries.
+   */
+  readonly numberOfRooms?: number;
+  /**
+   * Time-of-day strings in 24h `HH:MM` form. We do NOT coerce or validate
+   * here — the page-level reader already ran them through a Zod regex.
+   * Schema.org accepts either bare `Time` or a full `DateTime`; the former
+   * is enough for Google's Hotel rich-result test.
+   */
+  readonly checkinTime?: string;
+  readonly checkoutTime?: string;
+  /**
+   * `true` when pets are accepted (any policy). `false` when explicitly
+   * refused. `undefined` leaves the field unset — Google treats absence
+   * as "unknown" rather than "no".
+   */
+  readonly petsAllowed?: boolean;
 }
 
 const PALACE_AWARD = 'Distinction Palace — Atout France';
@@ -64,7 +84,11 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
     out.description = input.description;
   }
   if (input.starRating !== undefined) {
-    out.starRating = { '@type': 'Rating', ratingValue: input.starRating };
+    // `bestRating: 5` is recommended by Google's hotel rich-result
+    // documentation even though `ratingValue` is already capped at 5
+    // by our discriminated input type. Emitting it explicitly removes
+    // any ambiguity for indexers that don't infer the scale.
+    out.starRating = { '@type': 'Rating', ratingValue: input.starRating, bestRating: 5 };
   }
   // `award` may carry the regulated Palace distinction and/or editorial
   // recognitions. Schema.org allows multiple values, expressed as a string
@@ -125,6 +149,18 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   }
   if (input.offer !== undefined) {
     out.makesOffer = offerJsonLd(input.offer);
+  }
+  if (input.numberOfRooms !== undefined && input.numberOfRooms > 0) {
+    out.numberOfRooms = input.numberOfRooms;
+  }
+  if (input.checkinTime !== undefined && input.checkinTime.length > 0) {
+    out.checkinTime = input.checkinTime;
+  }
+  if (input.checkoutTime !== undefined && input.checkoutTime.length > 0) {
+    out.checkoutTime = input.checkoutTime;
+  }
+  if (input.petsAllowed !== undefined) {
+    out.petsAllowed = input.petsAllowed;
   }
 
   return out;

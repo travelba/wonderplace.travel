@@ -65,6 +65,18 @@ export const HotelDetailRowSchema = z.object({
   awards: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
+  number_of_rooms: z
+    .number()
+    .int()
+    .positive()
+    .nullish()
+    .transform((v) => v ?? null),
+  number_of_suites: z
+    .number()
+    .int()
+    .min(0)
+    .nullish()
+    .transform((v) => v ?? null),
   meta_title_fr: stringOrEmpty,
   meta_title_en: stringOrEmpty,
   meta_desc_fr: stringOrEmpty,
@@ -86,7 +98,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /**
  * Loose postal-code validation — accepts French 5-digit codes plus DOM-TOM
@@ -105,6 +117,34 @@ export function readPostalCode(row: HotelDetailRow): string | null {
   const trimmed = row.postal_code.trim();
   if (trimmed.length === 0) return null;
   return POSTAL_CODE_REGEX.test(trimmed) ? trimmed : null;
+}
+
+/**
+ * Inventory counts (Schema.org `Hotel.numberOfRooms` + editorial suite count).
+ *
+ * Both fields are typed `number | null` in the row schema already — this
+ * tiny indirection exists so the caller can spread `{ ...readInventoryCounts(row) }`
+ * onto a JSON-LD input without rewriting the conditional. We pin
+ * `totalRooms` to a positive integer (drops 0/NaN defensively even though
+ * the DB CHECK forbids them) and pin `suites` to non-negative.
+ */
+export interface HotelInventoryCounts {
+  readonly totalRooms: number | null;
+  readonly suites: number | null;
+}
+
+export function readInventoryCounts(row: HotelDetailRow): HotelInventoryCounts {
+  const totalRooms =
+    row.number_of_rooms !== null && Number.isInteger(row.number_of_rooms) && row.number_of_rooms > 0
+      ? row.number_of_rooms
+      : null;
+  const suites =
+    row.number_of_suites !== null &&
+    Number.isInteger(row.number_of_suites) &&
+    row.number_of_suites >= 0
+      ? row.number_of_suites
+      : null;
+  return { totalRooms, suites };
 }
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
