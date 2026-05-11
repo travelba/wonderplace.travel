@@ -36,6 +36,12 @@ export interface HotelJsonLdInput {
   readonly amenityFeatures?: readonly string[];
   readonly aggregateRating?: AggregateRatingInput;
   readonly offer?: OfferInput;
+  /**
+   * Optional list of recognitions/awards. Each entry is a free-form text such
+   * as `"Forbes Travel Guide 5 Stars — 2024"`. Concatenated with the regulated
+   * `Distinction Palace` marker when `isPalace` is also `true`.
+   */
+  readonly awards?: readonly string[];
 }
 
 const PALACE_AWARD = 'Distinction Palace — Atout France';
@@ -60,8 +66,24 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   if (input.starRating !== undefined) {
     out.starRating = { '@type': 'Rating', ratingValue: input.starRating };
   }
+  // `award` may carry the regulated Palace distinction and/or editorial
+  // recognitions. Schema.org allows multiple values, expressed as a string
+  // array when the count is > 1.
+  const awardEntries: string[] = [];
   if (input.isPalace === true) {
-    out.award = PALACE_AWARD;
+    awardEntries.push(PALACE_AWARD);
+  }
+  if (input.awards !== undefined) {
+    for (const award of input.awards) {
+      const trimmed = award.trim();
+      if (trimmed.length > 0) awardEntries.push(trimmed);
+    }
+  }
+  const firstAward = awardEntries[0];
+  if (awardEntries.length === 1 && firstAward !== undefined) {
+    out.award = firstAward;
+  } else if (awardEntries.length > 1) {
+    out.award = awardEntries;
   }
   if (input.images !== undefined && input.images.length > 0) {
     out.image = [...input.images];

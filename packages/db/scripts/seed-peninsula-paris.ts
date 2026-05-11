@@ -384,6 +384,54 @@ const POINTS_OF_INTEREST = [
   },
 ];
 
+/**
+ * Awards & distinctions — CDC §2 bloc 11.
+ *
+ * Each entry is publicly verifiable (issuer + year cite official sources).
+ * The `Distinction Palace` is *also* emitted by the JSON-LD builder via
+ * `isPalace: true` so we keep it here too for the front-end render which
+ * uses the localized `name_*` directly.
+ *
+ * Sources:
+ *   - Distinction Palace: https://www.atout-france.fr (registre 2016)
+ *   - Forbes Travel Guide 5★: https://www.forbestravelguide.com/hotels/paris/the-peninsula-paris
+ *   - L'Oiseau Blanc 2★ Michelin: https://guide.michelin.com (gain 2022)
+ *   - Travel + Leisure World's Best: https://www.travelandleisure.com
+ *   - Condé Nast Readers' Choice: https://www.cntraveler.com
+ */
+const AWARDS = [
+  {
+    name_fr: 'Distinction Palace',
+    name_en: 'Palace distinction',
+    issuer: 'Atout France',
+    year: 2016,
+  },
+  {
+    name_fr: 'Forbes Travel Guide — 5 étoiles',
+    name_en: 'Forbes Travel Guide — Five-Star Hotel',
+    issuer: 'Forbes Travel Guide',
+    year: 2025,
+  },
+  {
+    name_fr: "L'Oiseau Blanc — 2 étoiles Michelin",
+    name_en: "L'Oiseau Blanc — 2 Michelin Stars",
+    issuer: 'Guide Michelin',
+    year: 2022,
+  },
+  {
+    name_fr: "Travel + Leisure — World's Best Hotels (Paris)",
+    name_en: "Travel + Leisure — World's Best Hotels (Paris)",
+    issuer: 'Travel + Leisure',
+    year: 2024,
+  },
+  {
+    name_fr: "Condé Nast Traveler — Readers' Choice Awards (Top Paris)",
+    name_en: "Condé Nast Traveler — Readers' Choice Awards (Top Paris)",
+    issuer: 'Condé Nast Traveler',
+    year: 2023,
+  },
+];
+
 const POLICIES = {
   check_in: {
     // Peninsula Time programme allows check-in from 6:00 AM (subject to
@@ -764,7 +812,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       description_fr, description_en,
       highlights, amenities, faq_content,
       restaurant_info, spa_info,
-      points_of_interest, transports, policies,
+      points_of_interest, transports, policies, awards,
       hero_image, gallery_images,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count
@@ -784,6 +832,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(POINTS_OF_INTEREST))},
       ${sql.json(toJson(TRANSPORTS))},
       ${sql.json(toJson(POLICIES))},
+      ${sql.json(toJson(AWARDS))},
       ${heroPublicId},
       ${sql.json(toJson(galleryPhotos))},
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
@@ -816,6 +865,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       points_of_interest = excluded.points_of_interest,
       transports = excluded.transports,
       policies = excluded.policies,
+      awards = excluded.awards,
       hero_image = excluded.hero_image,
       gallery_images = excluded.gallery_images,
       meta_title_fr = excluded.meta_title_fr,

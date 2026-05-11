@@ -53,6 +53,7 @@ export const HotelDetailRowSchema = z.object({
   points_of_interest: z.unknown().nullable().optional(),
   transports: z.unknown().nullable().optional(),
   policies: z.unknown().nullable().optional(),
+  awards: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
   meta_title_fr: stringOrEmpty,
@@ -76,7 +77,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
 export const FaqItemSchema = z.object({
@@ -586,6 +587,74 @@ export function hasAnyPolicy(p: LocalisedPolicies): boolean {
     p.children !== null ||
     p.payment !== null
   );
+}
+
+// ---------------------------------------------------------------------------
+// awards (jsonb)
+// ---------------------------------------------------------------------------
+
+/**
+ * URL whitelist: https only (no http, no javascript:, no relative).
+ * Bounded length prevents stuffed seo-spam URLs from leaking into JSON-LD.
+ */
+const AwardUrlSchema = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((u) => u.startsWith('https://'), { message: 'award url must be https' });
+
+const AwardSchema = z.object({
+  name_fr: z.string().min(1),
+  name_en: z.string().min(1),
+  issuer: z.string().min(1),
+  year: z
+    .number()
+    .int()
+    .min(1900)
+    .max(new Date().getFullYear() + 1)
+    .optional(),
+  url: AwardUrlSchema.optional(),
+  image: CloudinaryPublicIdSchema.optional(),
+});
+
+const AwardsSchema = z.array(AwardSchema);
+
+export interface LocalisedAward {
+  readonly name: string;
+  readonly issuer: string;
+  readonly year: number | null;
+  readonly url: string | null;
+  readonly image: string | null;
+}
+
+/**
+ * Returns the localized awards list, sorted by year descending (most recent
+ * first) with year-less awards last. Empty array is a valid "no awards
+ * recorded" state — callers decide whether to hide the section.
+ */
+export function readAwards(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): readonly LocalisedAward[] {
+  const parsed = AwardsSchema.safeParse(row.awards);
+  if (!parsed.success) return [];
+
+  const localized: LocalisedAward[] = parsed.data.map((a) => ({
+    name: (locale === 'fr' ? a.name_fr : a.name_en).trim(),
+    issuer: a.issuer.trim(),
+    year: a.year ?? null,
+    url: a.url ?? null,
+    image: a.image ?? null,
+  }));
+
+  // Recent-first; entries without a year fall to the bottom while keeping a
+  // stable order amongst themselves (Array#sort is stable since ES2019).
+  return localized.sort((left, right) => {
+    if (left.year === null && right.year === null) return 0;
+    if (left.year === null) return 1;
+    if (right.year === null) return -1;
+    return right.year - left.year;
+  });
 }
 
 export interface HotelRoomRow {

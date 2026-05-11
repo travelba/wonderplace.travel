@@ -6,6 +6,7 @@ import { JsonLd } from '@cct/seo';
 
 import { buildCloudinarySrc } from '@cct/ui';
 
+import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
@@ -26,6 +27,7 @@ import {
   getHotelBySlug,
   listPublishedHotelSlugs,
   readAmenities,
+  readAwards,
   hasAnyPolicy,
   readFaq,
   readGallery,
@@ -240,6 +242,7 @@ async function renderHotelPage(
   const spa = readSpa(row, locale);
   const location = readLocation(row, locale);
   const policies = readPolicies(row, locale);
+  const awards = readAwards(row, locale);
   const faqs = readFaq(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
@@ -272,6 +275,18 @@ async function renderHotelPage(
     jsonLdImages.push(buildCloudinarySrc({ cloudName, publicId: img.publicId }));
   }
 
+  // Award strings for JSON-LD: prefer "Name — Issuer, Year" to give Google /
+  // LLMs a self-contained sentence. The regulated *Palace* distinction is
+  // already emitted by `hotelJsonLd` when `isPalace === true`, so we only
+  // forward the editorial entries here. We also drop the duplicate Palace
+  // entry from the seed array (matched on issuer "Atout France") to avoid
+  // emitting it twice.
+  const jsonLdAwards: string[] = awards
+    .filter((a) => a.issuer.toLowerCase() !== 'atout france')
+    .map((a) =>
+      a.year !== null ? `${a.name} — ${a.issuer}, ${a.year}` : `${a.name} — ${a.issuer}`,
+    );
+
   const hotelInput: JsonLd.HotelJsonLdInput = {
     name,
     url: canonicalUrl,
@@ -282,6 +297,7 @@ async function renderHotelPage(
       : {}),
     ...(jsonLdImages.length > 0 ? { images: jsonLdImages } : {}),
     ...(amenities.length > 0 ? { amenityFeatures: amenities } : {}),
+    ...(jsonLdAwards.length > 0 ? { awards: jsonLdAwards } : {}),
     ...(row.latitude !== null && row.longitude !== null
       ? { geo: { latitude: row.latitude, longitude: row.longitude } }
       : {}),
@@ -643,6 +659,8 @@ async function renderHotelPage(
           <p className="text-muted text-sm">{t('noHighlights')}</p>
         )}
       </section>
+
+      <HotelAwards locale={locale} awards={awards} />
 
       {amadeusCategories.length > 0 ? (
         <section

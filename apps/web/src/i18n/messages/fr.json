@@ -367,7 +367,13 @@
       "spa": "Spa & bien-être",
       "gallery": "Galerie photos",
       "location": "Emplacement & accès",
-      "policies": "Conditions de séjour"
+      "policies": "Conditions de séjour",
+      "awards": "Distinctions & reconnaissances"
+    },
+    "awards": {
+      "intro": "Distinctions et reconnaissances officielles attribuées à l'établissement.",
+      "issuerWithYear": "{issuer} · {year, number}",
+      "viewSource": "Voir la source"
     },
     "gallery": {
       "thumbnailsLabel": "Autres photos de l'établissement"

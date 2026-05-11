@@ -367,7 +367,13 @@
       "spa": "Spa & wellness",
       "gallery": "Photo gallery",
       "location": "Location & access",
-      "policies": "Stay policies"
+      "policies": "Stay policies",
+      "awards": "Awards & recognitions"
+    },
+    "awards": {
+      "intro": "Official distinctions and recognitions awarded to this property.",
+      "issuerWithYear": "{issuer} · {year, number}",
+      "viewSource": "View source"
     },
     "gallery": {
       "thumbnailsLabel": "Additional photos of the property"

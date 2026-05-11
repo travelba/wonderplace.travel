@@ -39,6 +39,30 @@ describe('hotelJsonLd', () => {
     });
   });
 
+  it('exposes multiple awards as an array (Palace + editorial recognitions)', () => {
+    const node = hotelJsonLd({
+      name: 'Le Palace',
+      url: 'https://example.com/p',
+      isPalace: true,
+      awards: ['Forbes Travel Guide 5 Stars — 2024', 'World Travel Awards — 2023'],
+    });
+    expect(Array.isArray(node.award)).toBe(true);
+    if (Array.isArray(node.award)) {
+      expect(node.award).toHaveLength(3);
+      expect(node.award[0]).toContain('Palace');
+      expect(node.award).toContain('Forbes Travel Guide 5 Stars — 2024');
+    }
+  });
+
+  it('omits award when no Palace and empty awards array', () => {
+    const node = hotelJsonLd({
+      name: 'Hôtel Standard',
+      url: 'https://example.com/s',
+      awards: [],
+    });
+    expect(node.award).toBeUndefined();
+  });
+
   it('emits offer + aggregateRating only when provided', () => {
     const node = hotelJsonLd({
       name: 'Hôtel C',
