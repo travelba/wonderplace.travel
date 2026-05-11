@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cursor-ai/mcp-config-schema/main/schema.json",
+  "_comment": [
+    "Project-local MCP server pinning for ConciergeTravel.fr.",
+    "Servers listed here are the ones every contributor (human or agent) should",
+    "have available. User-level config still applies on top — these entries",
+    "merely document the project's expected toolkit.",
+    "",
+    "We DO NOT embed secrets here. Each server reads its credentials from the",
+    "contributor's user-level Cursor config (`~/.cursor/mcp.json`) or from",
+    "environment variables exported in the IDE. Reference docs:",
+    "  https://docs.cursor.com/context/model-context-protocol"
+  ],
+  "mcpServers": {
+    "user-supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref=fsmfozxgujskluxakeoq"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    },
+    "plugin-cloudinary-cloudinary-asset-mgmt": {
+      "command": "npx",
+      "args": ["-y", "@cloudinary/mcp-asset-management@latest"],
+      "env": {
+        "CLOUDINARY_URL": "${CLOUDINARY_URL}"
+      }
+    },
+    "plugin-resend-resend": {
+      "command": "npx",
+      "args": ["-y", "@resend/mcp-server@latest"],
+      "env": {
+        "RESEND_API_KEY": "${RESEND_API_KEY}"
+      }
+    },
+    "plugin-shadcn-shadcn": {
+      "command": "npx",
+      "args": ["-y", "@shadcn/mcp@latest"]
+    },
+    "plugin-tavily-tavily": {
+      "command": "npx",
+      "args": ["-y", "@tavily/mcp@latest"],
+      "env": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      }
+    }
+  },
+  "_documentation": {
+    "rationale": "These five MCP servers are the project's preferred operational surfaces: Supabase (read-only DB introspection + migrations), Cloudinary (media), Resend (transactional email previews), shadcn (component catalogue), Tavily (web research). For Sentry, Vercel, GitHub, Datadog, Opsera, Sanity, and Superhuman, rely on the user-level config (`~/.cursor/mcp.json`).",
+    "secrets": "Never commit secrets here. Every `${VAR}` is interpolated from the contributor's shell environment. Example: export SUPABASE_ACCESS_TOKEN before launching Cursor.",
+    "scope": "Project-level MCP files are a thin contract. The full toolkit (Sentry, Vercel, GitHub, Datadog, ...) stays at the user level so we don't fragment credentials across machines."
+  }
+}

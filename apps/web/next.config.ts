@@ -1,8 +1,16 @@
+import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
+// Bundle analyzer is opt-in (`ANALYZE=true pnpm --filter @cct/web build` or
+// `pnpm --filter @cct/web analyze`). Skill: performance-engineering.
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env['ANALYZE'] === 'true',
+  openAnalyzer: false,
+});
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -115,7 +123,7 @@ const nextConfig: NextConfig = {
  */
 const sentryAuthToken = process.env['SENTRY_AUTH_TOKEN'];
 
-export default withSentryConfig(withNextIntl(nextConfig), {
+export default withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
   org: 'travelba',
   project: 'cct-web',
   ...(sentryAuthToken !== undefined ? { authToken: sentryAuthToken } : {}),

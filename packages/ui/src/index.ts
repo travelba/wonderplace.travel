@@ -5,3 +5,9 @@
  */
 export * from './lib/cn';
 export { Button, type ButtonProps } from './components/button';
+export {
+  HotelImage,
+  buildCloudinarySrc,
+  type HotelImageProps,
+  type HotelImageVariant,
+} from './components/hotel-image';
