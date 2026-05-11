@@ -112,6 +112,9 @@ function buildRooms(): readonly HotelRoomRow[] {
       bed_type: 'King',
       size_sqm: 35,
       amenities: ['Vue jardin', 'Lit king-size', 'Salle de bain marbre'],
+      isSignature: false,
+      indicativePrice: { fromMinor: 95000, toMinor: 130000, currency: 'EUR' },
+      displayOrder: 20,
     },
     {
       id: '33333333-3333-4333-8333-333333333333',
@@ -123,6 +126,9 @@ function buildRooms(): readonly HotelRoomRow[] {
       bed_type: 'King',
       size_sqm: 55,
       amenities: ['Vue Tuileries', 'Salon séparé', 'Bain à remous'],
+      isSignature: true,
+      indicativePrice: { fromMinor: 220000, toMinor: null, currency: 'EUR' },
+      displayOrder: 10,
     },
   ];
 }

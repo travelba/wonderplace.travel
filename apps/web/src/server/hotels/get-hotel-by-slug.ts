@@ -1218,6 +1218,37 @@ export function readFeaturedReviews(
   });
 }
 
+/**
+ * Editorial indicative price range for a room category.
+ *
+ * Stored in jsonb to keep the shape one-sided ("from 1 200 €", no
+ * upper bound) and to carry a currency code per row (later useful when
+ * we wire a multi-currency selector, cf. Phase 11+).
+ *
+ * Amounts are in the currency's **minor unit** (cents for EUR/USD,
+ * pence for GBP) — matches the existing Amadeus offer pricing
+ * convention in `packages/integrations/amadeus`, so the codebase
+ * keeps a single mental model for money.
+ *
+ * Optional `to` — when omitted, the UI renders "À partir de {from}"
+ * rather than a closed range.
+ */
+const IndicativePriceMinorSchema = z
+  .object({
+    from: z.number().int().nonnegative(),
+    to: z.number().int().nonnegative().optional(),
+    currency: z.enum(['EUR', 'USD', 'GBP', 'CHF']),
+  })
+  .refine((p) => p.to === undefined || p.to >= p.from, {
+    message: 'indicative_price_minor.to must be >= from',
+  });
+
+export interface LocalisedIndicativePrice {
+  readonly fromMinor: number;
+  readonly toMinor: number | null;
+  readonly currency: 'EUR' | 'USD' | 'GBP' | 'CHF';
+}
+
 export interface HotelRoomRow {
   readonly id: string;
   readonly slug: string;
@@ -1228,6 +1259,9 @@ export interface HotelRoomRow {
   readonly bed_type: string | null;
   readonly size_sqm: number | null;
   readonly amenities: readonly string[];
+  readonly isSignature: boolean;
+  readonly indicativePrice: LocalisedIndicativePrice | null;
+  readonly displayOrder: number | null;
 }
 
 const HotelRoomDbRowSchema = z.object({
@@ -1242,10 +1276,23 @@ const HotelRoomDbRowSchema = z.object({
   bed_type: stringOrEmpty,
   size_sqm: z.number().int().nullable(),
   amenities: z.unknown().nullable().optional(),
+  is_signature: z.boolean().nullable().optional(),
+  indicative_price_minor: z.unknown().nullable().optional(),
+  display_order: z.number().int().nullable().optional(),
 });
 
 const ROOM_LIST_COLUMNS =
-  'id, slug, room_code, name_fr, name_en, description_fr, description_en, max_occupancy, bed_type, size_sqm, amenities';
+  'id, slug, room_code, name_fr, name_en, description_fr, description_en, max_occupancy, bed_type, size_sqm, amenities, is_signature, indicative_price_minor, display_order';
+
+function readIndicativePrice(raw: unknown): LocalisedIndicativePrice | null {
+  const parsed = IndicativePriceMinorSchema.safeParse(raw);
+  if (!parsed.success) return null;
+  return {
+    fromMinor: parsed.data.from,
+    toMinor: parsed.data.to ?? null,
+    currency: parsed.data.currency,
+  };
+}
 
 /** Slug shape: `^[a-z0-9]+(?:-[a-z0-9]+)*$` (matches `hotels_slug_ck`). */
 export function isValidSlug(candidate: string): boolean {
@@ -1306,10 +1353,20 @@ export async function getHotelBySlug(
     }
     if (!parsed.data.is_published) return null;
 
+    // Order rooms by:
+    //   1. `display_order` (NULLS LAST) — editorial override,
+    //   2. `is_signature DESC` — signature suite always above the
+    //      generic categories when the editor hasn't set an explicit
+    //      order,
+    //   3. `id` — stable tie-breaker so the SSR/ISR output is
+    //      deterministic across renders.
     const roomsRes = await supabase
       .from('hotel_rooms')
       .select(ROOM_LIST_COLUMNS)
-      .eq('hotel_id', parsed.data.id);
+      .eq('hotel_id', parsed.data.id)
+      .order('display_order', { ascending: true, nullsFirst: false })
+      .order('is_signature', { ascending: false, nullsFirst: false })
+      .order('id', { ascending: true });
 
     const rooms: HotelRoomRow[] = [];
     if (!roomsRes.error && Array.isArray(roomsRes.data)) {
@@ -1332,6 +1389,9 @@ export async function getHotelBySlug(
           bed_type: r.data.bed_type,
           size_sqm: r.data.size_sqm,
           amenities: readStringList(r.data.amenities, locale),
+          isSignature: r.data.is_signature === true,
+          indicativePrice: readIndicativePrice(r.data.indicative_price_minor),
+          displayOrder: r.data.display_order ?? null,
         });
       }
     }

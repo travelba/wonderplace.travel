@@ -127,6 +127,38 @@ function pickPositiveInt(value: string | undefined, fallback: number): number {
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
+/**
+ * Render an indicative room-price range as a single human label.
+ *
+ * The price is editorial (not the live Amadeus rate), so we render
+ * "À partir de 1 200 €" for an open-ended range, "1 200 – 2 800 €"
+ * for a closed range, and `null` when no price is set. We always
+ * round to whole units (no decimals) — the indicative price block is
+ * about anchoring expectations, not selling.
+ */
+function formatIndicativePrice(
+  price: {
+    readonly fromMinor: number;
+    readonly toMinor: number | null;
+    readonly currency: 'EUR' | 'USD' | 'GBP' | 'CHF';
+  } | null,
+  locale: Locale,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string | null {
+  if (price === null) return null;
+  const localeTag = locale === 'fr' ? 'fr-FR' : 'en-GB';
+  const fmt = new Intl.NumberFormat(localeTag, {
+    style: 'currency',
+    currency: price.currency,
+    maximumFractionDigits: 0,
+  });
+  const from = fmt.format(price.fromMinor / 100);
+  const to = price.toMinor !== null ? fmt.format(price.toMinor / 100) : null;
+  return to !== null
+    ? t('rooms.indicativePriceRange', { from, to })
+    : t('rooms.indicativePriceFrom', { from });
+}
+
 function lockActionFor(locale: Locale, hotelId: string): string {
   const offerId = `TEST-OFFER-${hotelId}`;
   return locale === 'fr'
@@ -883,14 +915,23 @@ async function renderHotelPage(
           <ul className="flex flex-col gap-4">
             {rooms.map((room) => {
               const roomPath = `/hotel/${slugFr}/chambres/${room.slug}`;
+              const priceLabel = formatIndicativePrice(room.indicativePrice, locale, t);
               return (
                 <li key={room.id}>
                   <article className="border-border bg-bg rounded-lg border p-4 sm:p-5">
                     <header className="flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="text-fg font-serif text-lg">
+                      <h3 className="text-fg flex items-center gap-2 font-serif text-lg">
                         <Link href={roomPath} className="hover:underline">
                           {room.name ?? room.room_code}
                         </Link>
+                        {room.isSignature ? (
+                          <span
+                            className="rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[0.625rem] font-medium uppercase tracking-[0.12em] text-amber-900"
+                            aria-label={t('rooms.signatureAria')}
+                          >
+                            {t('rooms.signatureBadge')}
+                          </span>
+                        ) : null}
                       </h3>
                       <p className="text-muted text-xs">
                         {room.max_occupancy !== null
@@ -919,15 +960,22 @@ async function renderHotelPage(
                         ))}
                       </ul>
                     ) : null}
-                    <p className="mt-3 text-sm">
-                      <Link
-                        href={roomPath}
-                        className="text-fg hover:text-fg/80 inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
-                      >
-                        {t('rooms.viewDetail')}
-                        <span aria-hidden>→</span>
-                      </Link>
-                    </p>
+                    <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-sm">
+                        <Link
+                          href={roomPath}
+                          className="text-fg hover:text-fg/80 inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
+                        >
+                          {t('rooms.viewDetail')}
+                          <span aria-hidden>→</span>
+                        </Link>
+                      </p>
+                      {priceLabel !== null ? (
+                        <p className="text-muted text-xs" data-room-price>
+                          {priceLabel}
+                        </p>
+                      ) : null}
+                    </div>
                   </article>
                 </li>
               );

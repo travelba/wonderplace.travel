@@ -103,7 +103,15 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'roomPage' });
   const hotelName = pickHotelName(detail, locale);
 
-  const title = t('meta.titleFallback', { roomName: detail.room.name, hotelName });
+  // Signature suites get a "— Suite signature" suffix in the meta-title
+  // because they capture the property's hero queries (e.g. "suite vue
+  // Tour Eiffel Peninsula"). Surfacing the editorial flag in the
+  // SERP listing is documented to lift CTR on the long-tail hero
+  // intents that drive room sub-page traffic.
+  const baseTitle = t('meta.titleFallback', { roomName: detail.room.name, hotelName });
+  const title = detail.room.isSignature
+    ? t('meta.signatureSuffix', { base: baseTitle })
+    : baseTitle;
   const desc =
     detail.room.shortDescription !== null && detail.room.shortDescription.length > 0
       ? truncate(detail.room.shortDescription, 160)

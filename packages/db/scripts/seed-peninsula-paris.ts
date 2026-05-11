@@ -82,6 +82,12 @@ interface CloudinaryImage {
   readonly category: string;
 }
 
+interface IndicativePriceMinor {
+  readonly from: number;
+  readonly to?: number;
+  readonly currency: 'EUR' | 'USD' | 'GBP' | 'CHF';
+}
+
 interface RoomSeed {
   readonly slug: string;
   readonly room_code: string;
@@ -97,6 +103,9 @@ interface RoomSeed {
   readonly amenities: readonly LocalisedAmenity[];
   readonly hero_image: string | null;
   readonly images: readonly CloudinaryImage[];
+  readonly is_signature: boolean;
+  readonly indicative_price_minor: IndicativePriceMinor;
+  readonly display_order: number;
 }
 
 const HIGHLIGHTS: readonly LocalisedHighlight[] = [
@@ -917,6 +926,13 @@ const ROOMS: readonly RoomSeed[] = [
     ],
     hero_image: 'cct/test/peninsula-paris/exterior-2',
     images: [],
+    is_signature: false,
+    // 2026 base rate for a Deluxe Room at The Peninsula Paris hovers
+    // around 1,400–2,000 € depending on season and view. We seed the
+    // shoulder-season anchor so the public list card does not look
+    // aspirationally low.
+    indicative_price_minor: { from: 140000, to: 200000, currency: 'EUR' },
+    display_order: 30,
   },
   {
     slug: 'chambre-premier',
@@ -959,6 +975,9 @@ const ROOMS: readonly RoomSeed[] = [
     ],
     hero_image: 'cct/test/peninsula-paris/exterior-3',
     images: [],
+    is_signature: false,
+    indicative_price_minor: { from: 180000, to: 240000, currency: 'EUR' },
+    display_order: 20,
   },
   {
     slug: 'suite-tour-eiffel',
@@ -1018,6 +1037,12 @@ const ROOMS: readonly RoomSeed[] = [
         category: 'suite',
       },
     ],
+    is_signature: true,
+    // Eiffel Tower Suite: 2026 anchor circa 7,200 €+ per night peak,
+    // open-ended because availability and view drive the upper bound
+    // far higher (e.g. New Year's Eve packages).
+    indicative_price_minor: { from: 720000, currency: 'EUR' },
+    display_order: 10,
   },
 ];
 
@@ -1200,7 +1225,8 @@ async function resetAndInsertRooms(sql: postgres.TransactionSql, hotelId: string
         description_fr, description_en,
         long_description_fr, long_description_en,
         max_occupancy, bed_type, size_sqm,
-        amenities, images, hero_image
+        amenities, images, hero_image,
+        is_signature, indicative_price_minor, display_order
       )
       values (
         ${hotelId}, ${room.slug}, ${room.room_code},
@@ -1210,7 +1236,10 @@ async function resetAndInsertRooms(sql: postgres.TransactionSql, hotelId: string
         ${room.max_occupancy}, ${room.bed_type}, ${room.size_sqm},
         ${sql.json(toJson(room.amenities))},
         ${sql.json(toJson(room.images))},
-        ${room.hero_image}
+        ${room.hero_image},
+        ${room.is_signature},
+        ${sql.json(toJson(room.indicative_price_minor))},
+        ${room.display_order}
       )
     `;
     console.info(

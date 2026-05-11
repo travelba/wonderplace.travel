@@ -488,7 +488,11 @@
       "occupancy": "{count, plural, one {# voyageur} other {# voyageurs}}",
       "size": "{count} m²",
       "amenities": "Équipements",
-      "viewDetail": "Voir la chambre"
+      "viewDetail": "Voir la chambre",
+      "signatureBadge": "Signature",
+      "signatureAria": "Suite signature de l’hôtel",
+      "indicativePriceFrom": "À partir de {from} / nuit",
+      "indicativePriceRange": "{from} – {to} / nuit"
     },
     "aeo": {
       "question": "Comment réserver {name} via ConciergeTravel ?",
@@ -598,6 +602,7 @@
   "roomPage": {
     "meta": {
       "titleFallback": "{roomName} — {hotelName} | ConciergeTravel",
+      "signatureSuffix": "{base} · Suite signature",
       "descriptionFallback": "{roomName} à {hotelName}, {city}. Détails, équipements et photos. Réservez en direct avec ConciergeTravel, agence IATA."
     },
     "breadcrumb": {

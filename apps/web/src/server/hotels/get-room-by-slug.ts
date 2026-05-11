@@ -46,6 +46,16 @@ const RoomImageSchema = z.object({
 
 const RoomImagesSchema = z.array(RoomImageSchema);
 
+const IndicativePriceMinorDetailSchema = z
+  .object({
+    from: z.number().int().nonnegative(),
+    to: z.number().int().nonnegative().optional(),
+    currency: z.enum(['EUR', 'USD', 'GBP', 'CHF']),
+  })
+  .refine((p) => p.to === undefined || p.to >= p.from, {
+    message: 'indicative_price_minor.to must be >= from',
+  });
+
 const HotelRoomDetailDbRowSchema = z.object({
   id: z.string().uuid(),
   slug: z.string(),
@@ -62,15 +72,23 @@ const HotelRoomDetailDbRowSchema = z.object({
   amenities: z.unknown().nullable().optional(),
   images: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
+  is_signature: z.boolean().nullable().optional(),
+  indicative_price_minor: z.unknown().nullable().optional(),
 });
 
 const ROOM_DETAIL_COLUMNS =
-  'id, slug, room_code, name_fr, name_en, description_fr, description_en, long_description_fr, long_description_en, max_occupancy, bed_type, size_sqm, amenities, images, hero_image';
+  'id, slug, room_code, name_fr, name_en, description_fr, description_en, long_description_fr, long_description_en, max_occupancy, bed_type, size_sqm, amenities, images, hero_image, is_signature, indicative_price_minor';
 
 export interface LocalisedRoomImage {
   readonly publicId: string;
   readonly alt: string;
   readonly category: string | null;
+}
+
+export interface RoomDetailIndicativePrice {
+  readonly fromMinor: number;
+  readonly toMinor: number | null;
+  readonly currency: 'EUR' | 'USD' | 'GBP' | 'CHF';
 }
 
 export interface HotelRoomDetailRow {
@@ -86,6 +104,8 @@ export interface HotelRoomDetailRow {
   readonly amenities: readonly string[];
   readonly heroImage: string | null;
   readonly images: readonly LocalisedRoomImage[];
+  readonly isSignature: boolean;
+  readonly indicativePrice: RoomDetailIndicativePrice | null;
 }
 
 export interface HotelRoomDetail {
@@ -162,6 +182,16 @@ function pickLongDescription(
     : (row.long_description_en ?? row.long_description_fr);
 }
 
+function readIndicativePriceDetail(raw: unknown): RoomDetailIndicativePrice | null {
+  const parsed = IndicativePriceMinorDetailSchema.safeParse(raw);
+  if (!parsed.success) return null;
+  return {
+    fromMinor: parsed.data.from,
+    toMinor: parsed.data.to ?? null,
+    currency: parsed.data.currency,
+  };
+}
+
 function rowToDetail(
   raw: z.infer<typeof HotelRoomDetailDbRowSchema>,
   locale: SupportedLocale,
@@ -180,6 +210,8 @@ function rowToDetail(
     amenities: readAmenityList(raw.amenities, locale),
     heroImage: raw.hero_image,
     images: localizeImages(raw.images, locale, name),
+    isSignature: raw.is_signature === true,
+    indicativePrice: readIndicativePriceDetail(raw.indicative_price_minor),
   };
 }
 
