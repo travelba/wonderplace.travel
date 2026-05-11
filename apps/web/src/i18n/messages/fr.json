@@ -370,12 +370,19 @@
       "policies": "Conditions de séjour",
       "awards": "Distinctions & reconnaissances",
       "reassurance": "Pourquoi réserver avec nous",
-      "concierge": "Réservation par concierge"
+      "concierge": "Réservation par concierge",
+      "signatureExperiences": "Expériences signature"
     },
     "awards": {
       "intro": "Distinctions et reconnaissances officielles attribuées à l'établissement.",
       "issuerWithYear": "{issuer} · {year, number}",
       "viewSource": "Voir la source"
+    },
+    "signatureExperiences": {
+      "intro": "Des programmes exclusifs qui font la singularité de cet établissement, au-delà de la nuitée.",
+      "listAria": "Liste des expériences signature de l'établissement",
+      "bookingRequired": "Sur réservation",
+      "includedInStay": "Inclus dans le séjour"
     },
     "amenityCategories": {
       "wellness": "Bien-être",

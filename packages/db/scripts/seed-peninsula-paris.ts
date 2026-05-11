@@ -541,6 +541,97 @@ const AWARDS = [
   },
 ];
 
+/**
+ * Signature experiences rendered by `<HotelSignatureExperiences>` (CDC §2.12).
+ *
+ * Five entries chosen for their **distinctive character** (each one
+ * is either Peninsula-group-exclusive or property-specific) rather
+ * than for completeness. We deliberately avoid duplicating items
+ * that already appear elsewhere on the page:
+ *   - Amenities list (gym, hammam, sauna) → in the amenities block.
+ *   - Spa treatments → in the spa block.
+ *   - Restaurant venues → in the restaurants block.
+ *
+ * Each card carries a short, scannable description (≤2 sentences)
+ * and explicitly states whether the experience is included in the
+ * room rate or requires a separate booking — that single signal is
+ * what travellers want to know upfront.
+ *
+ * Image public_ids reuse the existing Cloudinary uploads from the
+ * gallery to avoid the licensing exposure of duplicating photos.
+ *
+ * Sources:
+ *   - "Peninsula Time" programme: peninsula.com/peninsula-time
+ *   - Rolls-Royce Phantom fleet: peninsula.com/paris (Services)
+ *   - Art in Resonance: peninsula.com/art-in-resonance
+ *   - Peninsula Academy: peninsula.com/peninsula-academy
+ *   - L'Oiseau Blanc rooftop: oiseauboeuf.com (sic — guide.michelin.com)
+ */
+const SIGNATURE_EXPERIENCES = [
+  {
+    key: 'peninsula-time',
+    title_fr: 'Peninsula Time',
+    title_en: 'Peninsula Time',
+    description_fr:
+      "Check-in dès 6 h du matin et check-out jusqu'à 22 h, sans supplément, sous réserve de disponibilité. Un programme signature partagé par tous les Peninsula du monde.",
+    description_en:
+      'Check-in from 6 am and check-out until 10 pm — at no extra charge, subject to availability. A signature programme shared by every Peninsula hotel worldwide.',
+    badge_fr: 'Exclusivité Peninsula',
+    badge_en: 'Peninsula exclusive',
+    booking_required: false,
+  },
+  {
+    key: 'rolls-royce-phantom',
+    title_fr: 'Transfert Rolls-Royce Phantom',
+    title_en: 'Rolls-Royce Phantom transfer',
+    description_fr:
+      'Deux Rolls-Royce Phantom EWB livrées en bleu Peninsula assurent les transferts depuis Paris-CDG ou Orly. Service de chauffeur privé, eau infusée et Wi-Fi à bord.',
+    description_en:
+      'Two Peninsula-blue Rolls-Royce Phantom EWB cars handle airport transfers from Paris-CDG and Orly. Private chauffeur, infused water, and onboard Wi-Fi.',
+    badge_fr: 'Sur devis',
+    badge_en: 'On request',
+    booking_required: true,
+    image_public_id: 'cct/test/peninsula-paris/service-rolls-1',
+  },
+  {
+    key: 'oiseau-blanc-rooftop',
+    title_fr: "Diner étoilé à L'Oiseau Blanc",
+    title_en: "Starred dinner at L'Oiseau Blanc",
+    description_fr:
+      "Cuisine française contemporaine, 2 étoiles Michelin, sur le toit du palace. Vue à 360° sur la Tour Eiffel, l'Arc de Triomphe et les Invalides depuis le bar et la terrasse.",
+    description_en:
+      'Two-Michelin-starred contemporary French cuisine on the palace rooftop. 360° views of the Eiffel Tower, Arc de Triomphe, and Les Invalides from the bar and terrace.',
+    badge_fr: '2 étoiles Michelin',
+    badge_en: '2 Michelin stars',
+    booking_required: true,
+    image_public_id: 'cct/test/peninsula-paris/restaurant-oiseau-blanc-1',
+  },
+  {
+    key: 'art-in-resonance',
+    title_fr: 'Art in Resonance',
+    title_en: 'Art in Resonance',
+    description_fr:
+      "Programme d'art contemporain du groupe : œuvres rotatives, installations sonores et résidences d'artistes (Janet Echelman, Gimhongsok). Parcours libre dans les espaces communs.",
+    description_en:
+      "The group's contemporary-art programme: rotating works, sound installations, and artist residencies (Janet Echelman, Gimhongsok). Self-guided walk through the public spaces.",
+    badge_fr: 'En libre accès',
+    badge_en: 'Self-guided',
+    booking_required: false,
+  },
+  {
+    key: 'peninsula-academy',
+    title_fr: 'The Peninsula Academy',
+    title_en: 'The Peninsula Academy',
+    description_fr:
+      'Expériences sur mesure : pâtisserie avec un chef Michelin, visite privée du Louvre, balade historique avec guide-conférencier, atelier parfum sur la rive gauche. Programme variable selon la saison.',
+    description_en:
+      'Bespoke experiences: patisserie with a Michelin chef, private Louvre tour, historical walk with a credentialled guide, perfume workshop on the Left Bank. Programme rotates seasonally.',
+    badge_fr: 'Sur réservation',
+    badge_en: 'By reservation',
+    booking_required: true,
+  },
+];
+
 const POLICIES = {
   check_in: {
     // Peninsula Time programme allows check-in from 6:00 AM (subject to
@@ -927,7 +1018,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       description_fr, description_en,
       highlights, amenities, faq_content,
       restaurant_info, spa_info,
-      points_of_interest, transports, policies, awards,
+      points_of_interest, transports, policies, awards, signature_experiences,
       hero_image, gallery_images,
       long_description_sections,
       number_of_rooms, number_of_suites,
@@ -950,6 +1041,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${sql.json(toJson(TRANSPORTS))},
       ${sql.json(toJson(POLICIES))},
       ${sql.json(toJson(AWARDS))},
+      ${sql.json(toJson(SIGNATURE_EXPERIENCES))},
       ${heroPublicId},
       ${sql.json(toJson(galleryPhotos))},
       ${sql.json(toJson(LONG_DESCRIPTION_SECTIONS))},
@@ -986,6 +1078,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       transports = excluded.transports,
       policies = excluded.policies,
       awards = excluded.awards,
+      signature_experiences = excluded.signature_experiences,
       hero_image = excluded.hero_image,
       gallery_images = excluded.gallery_images,
       long_description_sections = excluded.long_description_sections,

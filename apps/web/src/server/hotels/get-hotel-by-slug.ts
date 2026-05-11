@@ -63,6 +63,7 @@ export const HotelDetailRowSchema = z.object({
   transports: z.unknown().nullable().optional(),
   policies: z.unknown().nullable().optional(),
   awards: z.unknown().nullable().optional(),
+  signature_experiences: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
   long_description_sections: z.unknown().nullable().optional(),
@@ -99,7 +100,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /**
  * Loose postal-code validation — accepts French 5-digit codes plus DOM-TOM
@@ -969,6 +970,74 @@ export function readAwards(
     if (right.year === null) return -1;
     return right.year - left.year;
   });
+}
+
+// ---------------------------------------------------------------------------
+// signature_experiences (jsonb) — CDC §2.12
+// ---------------------------------------------------------------------------
+
+/**
+ * Stable identifier grammar for a signature experience: lowercase
+ * kebab-case, 2-48 chars. Used both as React key and as URL anchor
+ * if the editorial team links to a specific card.
+ */
+const EXPERIENCE_KEY_REGEX = /^[a-z][a-z0-9-]{1,47}$/;
+
+const SignatureExperienceSchema = z.object({
+  key: z.string().regex(EXPERIENCE_KEY_REGEX, {
+    message: 'expected lowercase kebab key (2-48 chars)',
+  }),
+  title_fr: z.string().min(1),
+  title_en: z.string().min(1),
+  description_fr: z.string().min(1).max(500),
+  description_en: z.string().min(1).max(500),
+  badge_fr: z.string().min(1).max(48).optional(),
+  badge_en: z.string().min(1).max(48).optional(),
+  /**
+   * Whether the experience requires an explicit booking on top of the
+   * stay. Drives the wording of the CTA / footer line ("Sur réservation"
+   * vs "Inclus dans le séjour").
+   */
+  booking_required: z.boolean(),
+  image_public_id: CloudinaryPublicIdSchema.optional(),
+});
+
+const SignatureExperiencesSchema = z.array(SignatureExperienceSchema);
+
+export interface LocalisedSignatureExperience {
+  readonly key: string;
+  readonly title: string;
+  readonly description: string;
+  readonly badge: string | null;
+  readonly bookingRequired: boolean;
+  readonly imagePublicId: string | null;
+}
+
+/**
+ * Returns the property's signature experiences, localized. Falls back
+ * to the other locale per-field when one side is missing — but since
+ * `title_*` and `description_*` are both required by the schema, the
+ * fallback only matters if editorial inserts an under-typed payload
+ * via a future Payload migration.
+ *
+ * Empty array is a valid "no signature experiences declared" state;
+ * the UI component self-elides in that case.
+ */
+export function readSignatureExperiences(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): readonly LocalisedSignatureExperience[] {
+  const parsed = SignatureExperiencesSchema.safeParse(row.signature_experiences);
+  if (!parsed.success) return [];
+
+  return parsed.data.map((e) => ({
+    key: e.key,
+    title: locale === 'fr' ? e.title_fr : e.title_en,
+    description: locale === 'fr' ? e.description_fr : e.description_en,
+    badge: (locale === 'fr' ? (e.badge_fr ?? e.badge_en) : (e.badge_en ?? e.badge_fr)) ?? null,
+    bookingRequired: e.booking_required,
+    imagePublicId: e.image_public_id ?? null,
+  }));
 }
 
 export interface HotelRoomRow {

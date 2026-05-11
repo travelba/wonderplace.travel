@@ -16,6 +16,7 @@ import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
 import { HotelReassurance } from '@/components/hotel/hotel-reassurance';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
+import { HotelSignatureExperiences } from '@/components/hotel/hotel-signature-experiences';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { HotelStory } from '@/components/hotel/hotel-story';
 import { PriceComparator } from '@/components/price-comparator';
@@ -47,6 +48,7 @@ import {
   readPolicies,
   readPostalCode,
   readRestaurants,
+  readSignatureExperiences,
   readSpa,
   type HotelDetail,
   type HotelDetailRow,
@@ -258,6 +260,7 @@ async function renderHotelPage(
   const postalCode = readPostalCode(row);
   const inventory = readInventoryCounts(row);
   const storySections = readHotelStory(row, locale);
+  const signatureExperiences = readSignatureExperiences(row, locale);
   const faqs = readFaq(row, locale);
   const faqGroups = readFaqByCategory(row, locale);
   const heroPublicId = readHeroImage(row);
@@ -685,6 +688,12 @@ async function renderHotelPage(
                 .filter((p) => p.length > 0)
             : null
         }
+      />
+
+      <HotelSignatureExperiences
+        locale={locale}
+        cloudName={cloudName}
+        experiences={signatureExperiences}
       />
 
       <section aria-labelledby="highlights-title" className="mb-12">

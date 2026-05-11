@@ -370,12 +370,19 @@
       "policies": "Stay policies",
       "awards": "Awards & recognitions",
       "reassurance": "Why book with us",
-      "concierge": "Concierge booking"
+      "concierge": "Concierge booking",
+      "signatureExperiences": "Signature experiences"
     },
     "awards": {
       "intro": "Official distinctions and recognitions awarded to this property.",
       "issuerWithYear": "{issuer} · {year, number}",
       "viewSource": "View source"
+    },
+    "signatureExperiences": {
+      "intro": "Exclusive on-site programmes that define this property's character, beyond the room key.",
+      "listAria": "List of the property's signature experiences",
+      "bookingRequired": "Reservation required",
+      "includedInStay": "Included in your stay"
     },
     "amenityCategories": {
       "wellness": "Wellness",
