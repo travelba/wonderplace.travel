@@ -362,7 +362,9 @@
       "rooms": "Chambres & suites",
       "faq": "Questions fréquentes",
       "booking": "Vérifier les disponibilités",
-      "reviewBreakdown": "Ce que disent les voyageurs"
+      "reviewBreakdown": "Ce que disent les voyageurs",
+      "restaurants": "Restaurants & bars",
+      "spa": "Spa & bien-être"
     },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
@@ -393,6 +395,23 @@
     "noAmenities": "Détail des services à venir.",
     "noHighlights": "Détail des essentiels à venir.",
     "noRooms": "Catalogue des chambres à venir.",
+    "restaurants": {
+      "summary": "{count, plural, one {# adresse} other {# adresses}} de restauration sur place.",
+      "summaryWithStars": "{count, plural, one {# adresse} other {# adresses}} de restauration sur place, dont {stars, plural, one {# étoile Michelin} other {# étoiles Michelin}}.",
+      "michelinBadge": "{count, plural, one {# étoile Michelin} other {# étoiles Michelin}}",
+      "chef": "Chef : {name}",
+      "pastryChef": "Chef pâtissier : {name}",
+      "sommelier": "Sommelier : {name}",
+      "since": "Ouvert depuis {year}",
+      "michelinSince": "Étoilé depuis {year}",
+      "hours": "Horaires : {value}",
+      "featuresLabel": "Caractéristiques"
+    },
+    "spa": {
+      "surface": "{value} m²",
+      "treatmentRooms": "{count, plural, one {# salle de soins} other {# salles de soins}}",
+      "featuresLabel": "Équipements & soins"
+    },
     "booking": {
       "intro": "Sélectionnez vos dates et le nombre de voyageurs pour vérifier la disponibilité.",
       "checkIn": "Arrivée",

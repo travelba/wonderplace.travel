@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
 
+import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
+import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { PriceComparator } from '@/components/price-comparator';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
@@ -21,6 +23,8 @@ import {
   readAmenities,
   readFaq,
   readHighlights,
+  readRestaurants,
+  readSpa,
   type HotelDetail,
   type HotelDetailRow,
   type SupportedLocale,
@@ -222,6 +226,8 @@ async function renderHotelPage(
   const description = pickDescription(row, locale);
   const highlights = readHighlights(row, locale);
   const amenities = readAmenities(row, locale);
+  const restaurants = readRestaurants(row, locale);
+  const spa = readSpa(row, locale);
   const faqs = readFaq(row, locale);
 
   const defaults = defaultStay();
@@ -658,6 +664,12 @@ async function renderHotelPage(
           <p className="text-muted text-sm">{t('noAmenities')}</p>
         )}
       </section>
+
+      {restaurants !== null && restaurants.venues.length > 0 ? (
+        <HotelRestaurants locale={locale} restaurants={restaurants} />
+      ) : null}
+
+      {spa !== null ? <HotelSpa locale={locale} spa={spa} /> : null}
 
       <section aria-labelledby="rooms-title" className="mb-12">
         <h2 id="rooms-title" className="text-fg mb-4 font-serif text-2xl">

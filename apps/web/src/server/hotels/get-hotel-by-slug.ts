@@ -48,6 +48,8 @@ export const HotelDetailRowSchema = z.object({
   highlights: z.unknown().nullable().optional(),
   amenities: z.unknown().nullable().optional(),
   faq_content: z.unknown().nullable().optional(),
+  restaurant_info: z.unknown().nullable().optional(),
+  spa_info: z.unknown().nullable().optional(),
   meta_title_fr: stringOrEmpty,
   meta_title_en: stringOrEmpty,
   meta_desc_fr: stringOrEmpty,
@@ -69,7 +71,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
 export const FaqItemSchema = z.object({
@@ -138,6 +140,109 @@ export function readFaq(row: HotelDetailRow, locale: SupportedLocale): readonly 
     }
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------
+// restaurant_info — F&B venues (hotels.restaurant_info jsonb)
+// ---------------------------------------------------------------------------
+
+const RestaurantVenueSchema = z.object({
+  name: z.string().min(1),
+  type_fr: z.string().min(1).optional(),
+  type_en: z.string().min(1).optional(),
+  michelin_stars: z.number().int().min(0).max(3).optional(),
+  chef: z.string().min(1).optional(),
+  pastry_chef: z.string().min(1).optional(),
+  sommelier: z.string().min(1).optional(),
+  since: z.number().int().optional(),
+  michelin_since: z.number().int().optional(),
+  features: z.array(z.string().min(1)).optional(),
+  hours_fr: z.string().min(1).optional(),
+  hours_en: z.string().min(1).optional(),
+});
+
+const RestaurantInfoSchema = z.object({
+  count: z.number().int().min(0).optional(),
+  michelin_stars: z.number().int().min(0).optional(),
+  venues: z.array(RestaurantVenueSchema).min(1),
+});
+
+export interface LocalisedRestaurantVenue {
+  readonly name: string;
+  readonly type: string | null;
+  readonly michelinStars: number | null;
+  readonly chef: string | null;
+  readonly pastryChef: string | null;
+  readonly sommelier: string | null;
+  readonly since: number | null;
+  readonly michelinSince: number | null;
+  readonly features: readonly string[];
+  readonly hours: string | null;
+}
+
+export interface LocalisedRestaurants {
+  readonly count: number | null;
+  readonly michelinStars: number | null;
+  readonly venues: readonly LocalisedRestaurantVenue[];
+}
+
+export function readRestaurants(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): LocalisedRestaurants | null {
+  const parsed = RestaurantInfoSchema.safeParse(row.restaurant_info);
+  if (!parsed.success) return null;
+  const venues: LocalisedRestaurantVenue[] = parsed.data.venues.map((v) => ({
+    name: v.name,
+    type: (locale === 'fr' ? (v.type_fr ?? v.type_en) : (v.type_en ?? v.type_fr)) ?? null,
+    michelinStars: v.michelin_stars ?? null,
+    chef: v.chef ?? null,
+    pastryChef: v.pastry_chef ?? null,
+    sommelier: v.sommelier ?? null,
+    since: v.since ?? null,
+    michelinSince: v.michelin_since ?? null,
+    features: v.features ?? [],
+    hours: (locale === 'fr' ? (v.hours_fr ?? v.hours_en) : (v.hours_en ?? v.hours_fr)) ?? null,
+  }));
+  return {
+    count: parsed.data.count ?? null,
+    michelinStars: parsed.data.michelin_stars ?? null,
+    venues,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// spa_info — Spa/wellness venue (hotels.spa_info jsonb)
+// ---------------------------------------------------------------------------
+
+const SpaInfoSchema = z.object({
+  name: z.string().min(1),
+  surface_sqm: z.number().int().positive().optional(),
+  treatment_rooms: z.number().int().positive().optional(),
+  features_fr: z.array(z.string().min(1)).optional(),
+  features_en: z.array(z.string().min(1)).optional(),
+});
+
+export interface LocalisedSpa {
+  readonly name: string;
+  readonly surfaceSqm: number | null;
+  readonly treatmentRooms: number | null;
+  readonly features: readonly string[];
+}
+
+export function readSpa(row: HotelDetailRow, locale: SupportedLocale): LocalisedSpa | null {
+  const parsed = SpaInfoSchema.safeParse(row.spa_info);
+  if (!parsed.success) return null;
+  const localizedFeatures =
+    locale === 'fr'
+      ? (parsed.data.features_fr ?? parsed.data.features_en ?? [])
+      : (parsed.data.features_en ?? parsed.data.features_fr ?? []);
+  return {
+    name: parsed.data.name,
+    surfaceSqm: parsed.data.surface_sqm ?? null,
+    treatmentRooms: parsed.data.treatment_rooms ?? null,
+    features: localizedFeatures,
+  };
 }
 
 export interface HotelRoomRow {

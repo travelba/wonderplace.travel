@@ -362,7 +362,9 @@
       "rooms": "Rooms & suites",
       "faq": "Frequently asked questions",
       "booking": "Check availability",
-      "reviewBreakdown": "What guests are saying"
+      "reviewBreakdown": "What guests are saying",
+      "restaurants": "Restaurants & bars",
+      "spa": "Spa & wellness"
     },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
@@ -393,6 +395,23 @@
     "noAmenities": "Detailed services coming soon.",
     "noHighlights": "Highlights coming soon.",
     "noRooms": "Room catalog coming soon.",
+    "restaurants": {
+      "summary": "{count, plural, one {# on-site dining venue} other {# on-site dining venues}}.",
+      "summaryWithStars": "{count, plural, one {# on-site dining venue} other {# on-site dining venues}}, including {stars, plural, one {# Michelin star} other {# Michelin stars}}.",
+      "michelinBadge": "{count, plural, one {# Michelin star} other {# Michelin stars}}",
+      "chef": "Chef: {name}",
+      "pastryChef": "Pastry chef: {name}",
+      "sommelier": "Sommelier: {name}",
+      "since": "Open since {year}",
+      "michelinSince": "Michelin-starred since {year}",
+      "hours": "Hours: {value}",
+      "featuresLabel": "Highlights"
+    },
+    "spa": {
+      "surface": "{value} sqm",
+      "treatmentRooms": "{count, plural, one {# treatment room} other {# treatment rooms}}",
+      "featuresLabel": "Facilities & treatments"
+    },
     "booking": {
       "intro": "Pick your dates and number of guests to check availability.",
       "checkIn": "Check-in",
