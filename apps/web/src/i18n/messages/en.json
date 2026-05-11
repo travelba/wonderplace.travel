@@ -387,6 +387,26 @@
       "sustainability": "Sustainability",
       "other": "Other amenities"
     },
+    "factSheet": {
+      "title": "{name} factsheet",
+      "addressLabel": "Address",
+      "districtLabel": "District",
+      "categoryLabel": "Category",
+      "categoryPalace": "5-star Palace (Atout France distinction)",
+      "categoryStars": "{count, plural, one {# star} other {# stars}}",
+      "roomsLabel": "Capacity",
+      "roomsOnly": "{rooms} rooms",
+      "roomsWithSuites": "{rooms} rooms including {suites} suites",
+      "checkInOutLabel": "Check-in / Check-out",
+      "checkInOut": "Check-in from {in} · Check-out until {out}",
+      "checkInOnly": "Check-in from {in}",
+      "checkOutOnly": "Check-out until {out}",
+      "petsLabel": "Pets",
+      "petsYes": "Welcome",
+      "petsNo": "Not allowed",
+      "geoLabel": "Coordinates",
+      "updatedAt": "Information last updated on {date}."
+    },
     "reassurance": {
       "title": "Why book with ConciergeTravel?",
       "listAria": "ConciergeTravel guarantees and commitments",

@@ -387,6 +387,26 @@
       "sustainability": "Engagement responsable",
       "other": "Autres équipements"
     },
+    "factSheet": {
+      "title": "Fiche d'identité {name}",
+      "addressLabel": "Adresse",
+      "districtLabel": "Quartier",
+      "categoryLabel": "Catégorie",
+      "categoryPalace": "Palace 5 étoiles (distinction Atout France)",
+      "categoryStars": "{count, plural, one {# étoile} other {# étoiles}}",
+      "roomsLabel": "Capacité",
+      "roomsOnly": "{rooms} chambres",
+      "roomsWithSuites": "{rooms} chambres dont {suites} suites",
+      "checkInOutLabel": "Arrivée / Départ",
+      "checkInOut": "Arrivée dès {in} · Départ jusqu'à {out}",
+      "checkInOnly": "Arrivée dès {in}",
+      "checkOutOnly": "Départ jusqu'à {out}",
+      "petsLabel": "Animaux",
+      "petsYes": "Acceptés",
+      "petsNo": "Non acceptés",
+      "geoLabel": "Coordonnées",
+      "updatedAt": "Informations mises à jour le {date}."
+    },
     "reassurance": {
       "title": "Pourquoi réserver avec ConciergeTravel ?",
       "listAria": "Garanties et engagements ConciergeTravel",

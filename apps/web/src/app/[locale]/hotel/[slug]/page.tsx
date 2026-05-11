@@ -8,6 +8,7 @@ import { buildCloudinarySrc } from '@cct/ui';
 
 import { HotelAmenities } from '@/components/hotel/hotel-amenities';
 import { HotelAwards } from '@/components/hotel/hotel-awards';
+import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
@@ -523,6 +524,25 @@ async function renderHotelPage(
         cloudName={cloudName}
         hero={heroDescriptor}
         images={galleryImages}
+      />
+
+      <HotelFactSheet
+        locale={locale}
+        hotelName={name}
+        address={row.address}
+        postalCode={postalCode}
+        city={row.city}
+        district={row.district}
+        stars={row.stars as 1 | 2 | 3 | 4 | 5}
+        isPalace={row.is_palace}
+        latitude={row.latitude}
+        longitude={row.longitude}
+        totalRooms={inventory.totalRooms}
+        suites={inventory.suites}
+        checkInFrom={policies.checkIn !== null ? policies.checkIn.from : null}
+        checkOutUntil={policies.checkOut !== null ? policies.checkOut.until : null}
+        petsAllowed={policies.pets !== null ? policies.pets.allowed : null}
+        lastUpdatedLabel={lastUpdated}
       />
 
       <section
