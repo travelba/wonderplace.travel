@@ -304,24 +304,42 @@ async function renderHotelPage(
     ]),
   );
 
-  const faqJsonLd =
-    faqs.length > 0
-      ? JsonLd.withSchemaOrgContext(
-          JsonLd.faqPageJsonLd(faqs.map((f) => ({ question: f.question, answer: f.answer }))),
-        )
-      : null;
-
   const localeFmt = locale === 'en' ? 'en-GB' : 'fr-FR';
   const lastUpdated =
     row.updated_at !== null && row.updated_at !== ''
       ? new Intl.DateTimeFormat(localeFmt, { dateStyle: 'long' }).format(new Date(row.updated_at))
       : null;
+  const aeoFreshness =
+    lastUpdated ??
+    new Intl.DateTimeFormat(localeFmt, {
+      dateStyle: 'long',
+    }).format(new Date());
+
+  // AEO block (skill: geo-llm-optimization). The leading question we
+  // surface is "How do I book {name}?" — the answer is a 40-80 word
+  // verbatim chunk that LLMs can quote without paraphrasing. We collapse
+  // it into the same FAQPage payload as the editorial FAQ so we ship a
+  // single rich-results signal per page.
+  const aeoQuestion = t('aeo.question', { name });
+  const aeoAnswerKey =
+    sp.checkIn !== undefined && sp.checkOut !== undefined ? 'aeo.answer' : 'aeo.answerNoStay';
+  const aeoAnswer = t(aeoAnswerKey, {
+    city: row.city,
+    region: row.region,
+    date: aeoFreshness,
+  });
+
+  const faqPayload: Array<{ question: string; answer: string }> = [
+    { question: aeoQuestion, answer: aeoAnswer },
+    ...faqs.map((f) => ({ question: f.question, answer: f.answer })),
+  ];
+  const faqJsonLd = JsonLd.withSchemaOrgContext(JsonLd.faqPageJsonLd(faqPayload));
 
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
       <JsonLdScript data={hotelJsonLd} />
       <JsonLdScript data={breadcrumbJsonLd} />
-      {faqJsonLd !== null ? <JsonLdScript data={faqJsonLd} /> : null}
+      <JsonLdScript data={faqJsonLd} />
 
       <nav aria-label={t('breadcrumb.hotels')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">
@@ -418,6 +436,17 @@ async function renderHotelPage(
           </p>
         ) : null}
       </header>
+
+      <section
+        data-aeo
+        aria-labelledby="hotel-aeo-title"
+        className="border-border bg-bg mb-10 rounded-lg border p-5"
+      >
+        <h2 id="hotel-aeo-title" className="text-fg font-serif text-lg">
+          {aeoQuestion}
+        </h2>
+        <p className="text-muted mt-2 text-sm">{aeoAnswer}</p>
+      </section>
 
       <section
         id="booking"

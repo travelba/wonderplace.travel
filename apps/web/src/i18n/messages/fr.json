@@ -25,6 +25,10 @@
       "iata": "Agence accréditée IATA",
       "aspst": "Membre ASPST",
       "amadeus": "Paiement sécurisé Amadeus"
+    },
+    "aeo": {
+      "question": "Pourquoi réserver un hôtel 5 étoiles ou un Palace via ConciergeTravel ?",
+      "answer": "ConciergeTravel est une agence de voyage IATA spécialisée dans les hôtels 5 étoiles et Palaces en France. Vous bénéficiez des tarifs nets GDS Amadeus, d'un paiement sécurisé certifié PCI-DSS, d'un comparatif de prix non affilié pour chaque hôtel et du programme de fidélité ConciergeTravel dès la première nuit. Aucun supplément n'est ajouté par notre agence."
     }
   },
   "searchPage": {
@@ -379,6 +383,11 @@
       "occupancy": "{count, plural, one {# voyageur} other {# voyageurs}}",
       "size": "{count} m²",
       "amenities": "Équipements"
+    },
+    "aeo": {
+      "question": "Comment réserver {name} via ConciergeTravel ?",
+      "answer": "ConciergeTravel est l'agence IATA partenaire de cet hôtel à {city} ({region}). Sélectionnez vos dates et le nombre de voyageurs pour obtenir le tarif net GDS, verrouillé 10 minutes, payable en ligne via Amadeus Payments (PCI-DSS, 3-D Secure). Aucun supplément agence, comparatif de prix transparent, programme de fidélité applicable dès la première nuit. Mise à jour {date}.",
+      "answerNoStay": "ConciergeTravel est l'agence IATA partenaire de cet hôtel à {city} ({region}). Notre tarif est le tarif net GDS Amadeus, sans supplément agence, avec verrouillage 10 minutes, paiement sécurisé Amadeus Payments (PCI-DSS, 3-D Secure), comparatif de prix non affilié et programme de fidélité applicable dès la première nuit. Mise à jour {date}."
     },
     "noFaq": "Aucune question pour cet établissement pour le moment.",
     "noAmenities": "Détail des services à venir.",

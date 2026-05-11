@@ -26,9 +26,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     }),
   );
 
+  // AEO block (skill: geo-llm-optimization). Short, quotable answer paired
+  // with a FAQPage JSON-LD payload so AI Overviews / ChatGPT Search can
+  // surface the value-prop verbatim without paraphrasing.
+  const aeoQuestion = t('aeo.question');
+  const aeoAnswer = t('aeo.answer');
+  const homeFaqJsonLd = JsonLd.withSchemaOrgContext(
+    JsonLd.faqPageJsonLd([{ question: aeoQuestion, answer: aeoAnswer }]),
+  );
+
   return (
     <main className="max-w-editorial container mx-auto flex min-h-[60vh] flex-col items-start justify-center gap-6 px-4 py-16 sm:py-24">
       <JsonLdScript data={agencyJsonLd} />
+      <JsonLdScript data={homeFaqJsonLd} />
       <p className="text-muted text-xs uppercase tracking-[0.18em]">
         {tCommon('siteName')} — France
       </p>
@@ -44,6 +54,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {t('trust.amadeus')}
         </span>
       </div>
+
+      <section
+        data-aeo
+        aria-labelledby="home-aeo-title"
+        className="border-border bg-bg mt-10 max-w-prose rounded-lg border p-5"
+      >
+        <h2 id="home-aeo-title" className="text-fg font-serif text-lg">
+          {aeoQuestion}
+        </h2>
+        <p className="text-muted mt-2 text-sm">{aeoAnswer}</p>
+      </section>
 
       <p className="text-muted mt-12 text-sm">{t('comingSoon')}</p>
     </main>

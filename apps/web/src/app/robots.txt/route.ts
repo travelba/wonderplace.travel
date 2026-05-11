@@ -10,6 +10,16 @@ export const revalidate = 86400;
 export function GET(request: Request) {
   const origin = new URL(request.url).origin;
 
+  // LLM crawler tokens use the official robots.txt user-agent strings as of 2026:
+  //   - `Google-Extended`     — Google's AI training opt-out (no hyphen "bot")
+  //   - `GPTBot`              — OpenAI training crawler
+  //   - `OAI-SearchBot`       — OpenAI's ChatGPT Search index
+  //   - `ChatGPT-User`        — when ChatGPT browses live for a user query
+  //   - `PerplexityBot`       — Perplexity search index
+  //   - `Perplexity-User`     — Perplexity live browse
+  //   - `ClaudeBot`           — Anthropic crawler
+  //   - `anthropic-ai`        — legacy Anthropic crawler (kept for back-compat)
+  //   - `Applebot-Extended`   — Apple AI training opt-out
   const lines: string[] = [
     '# ConciergeTravel.fr — robots.txt',
     '# Authorize Google + OpenAI + Perplexity + Anthropic + Apple LLM crawlers (cf. CDC §6.5)',
@@ -24,14 +34,24 @@ export function GET(request: Request) {
     'Disallow: /en/compte/',
     'Disallow: /fr/auth/',
     'Disallow: /en/auth/',
+    'Disallow: /monitoring',
     '',
-    'User-agent: Googlebot-Extended',
+    'User-agent: Google-Extended',
     'Allow: /',
     '',
     'User-agent: GPTBot',
     'Allow: /',
     '',
+    'User-agent: OAI-SearchBot',
+    'Allow: /',
+    '',
+    'User-agent: ChatGPT-User',
+    'Allow: /',
+    '',
     'User-agent: PerplexityBot',
+    'Allow: /',
+    '',
+    'User-agent: Perplexity-User',
     'Allow: /',
     '',
     'User-agent: ClaudeBot',

@@ -25,6 +25,10 @@
       "iata": "IATA-accredited agency",
       "aspst": "ASPST member",
       "amadeus": "Secure Amadeus payment"
+    },
+    "aeo": {
+      "question": "Why book a 5-star hotel or Palace through ConciergeTravel?",
+      "answer": "ConciergeTravel is an IATA-accredited travel agency specialised in 5-star hotels and Palaces in France. Every stay is priced at the Amadeus GDS net rate, paid through Amadeus Payments (PCI-DSS-certified, 3-D Secure), with a non-affiliated price comparator on every hotel page and ConciergeTravel loyalty benefits applied from the first night. No agency markup is added to the published rate."
     }
   },
   "searchPage": {
@@ -379,6 +383,11 @@
       "occupancy": "{count, plural, one {# guest} other {# guests}}",
       "size": "{count} sqm",
       "amenities": "Amenities"
+    },
+    "aeo": {
+      "question": "How do I book {name} through ConciergeTravel?",
+      "answer": "ConciergeTravel is the IATA-accredited agency partnered with this hotel in {city} ({region}). Pick your dates and guest count to receive the Amadeus GDS net rate, locked for 10 minutes, then pay online through Amadeus Payments (PCI-DSS, 3-D Secure). No agency markup, transparent price comparator, ConciergeTravel loyalty benefits applied from the first night. Updated {date}.",
+      "answerNoStay": "ConciergeTravel is the IATA-accredited agency partnered with this hotel in {city} ({region}). Our rate is the Amadeus GDS net rate — no agency markup, 10-minute price lock, secure payment through Amadeus Payments (PCI-DSS, 3-D Secure), non-affiliated price comparator and ConciergeTravel loyalty benefits applied from the first night. Updated {date}."
     },
     "noFaq": "No questions yet for this property.",
     "noAmenities": "Detailed services coming soon.",

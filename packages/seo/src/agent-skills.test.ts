@@ -15,4 +15,30 @@ describe('agent-skills', () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it('exposes the post-Phase-2 catalog of LLM-actionable skills', () => {
+    const skillNames = DEFAULT_AGENT_SKILLS.skills.map((skill) => skill.name);
+    expect(skillNames).toEqual(
+      expect.arrayContaining([
+        'search',
+        'list-cities',
+        'get-hotel',
+        'filter',
+        'compare-prices',
+        'booking',
+        'request-quote',
+        'loyalty',
+      ]),
+    );
+  });
+
+  it('every skill that declares an inputSchema lists its required keys among its properties', () => {
+    for (const skill of DEFAULT_AGENT_SKILLS.skills) {
+      if (!skill.inputSchema) continue;
+      const properties = Object.keys(skill.inputSchema.properties);
+      for (const requiredKey of skill.inputSchema.required ?? []) {
+        expect(properties).toContain(requiredKey);
+      }
+    }
+  });
 });

@@ -25,26 +25,50 @@ export function GET(request: Request): NextResponse {
         title: 'Pages stratégiques',
         items: [
           {
-            url: `${origin}/hotels/france/`,
-            description: 'Pilier France : tous les hôtels 5★ et Palaces référencés.',
-          },
-          {
-            url: `${origin}/selection/`,
+            url: `${origin}/fr`,
             description:
-              'Sélections éditoriales par expérience (romantique, famille, gastronomie, vignobles).',
+              'Page d’accueil — agence IATA, sélection d’hôtels 5★ et Palaces en France.',
           },
           {
-            url: `${origin}/guides/`,
+            url: `${origin}/fr/destination`,
             description:
-              'Guides pratiques (réserver un palace, comprendre le classement, hors saison).',
+              'Annuaire des destinations : Paris, Côte d’Azur, Bordelais, Alpes, Provence…',
           },
           {
-            url: `${origin}/programme-fidelite/`,
-            description: 'Programme de fidélité ConciergeTravel Essentiel et Prestige.',
+            url: `${origin}/fr/recherche`,
+            description:
+              'Recherche temps réel par ville et dates (tarifs nets GDS, paiement Amadeus).',
+          },
+        ],
+      },
+      {
+        title: 'Mentions légales & confiance',
+        items: [
+          {
+            url: `${origin}/fr/mentions-legales`,
+            description: 'Identité de l’éditeur, IATA, APST, RC professionnelle.',
           },
           {
-            url: `${origin}/agence/`,
-            description: "L'agence IATA, ASPST, garantie financière APST.",
+            url: `${origin}/fr/cgv`,
+            description: 'Conditions générales de vente, annulation, droit de rétractation.',
+          },
+          {
+            url: `${origin}/fr/confidentialite`,
+            description: 'Politique RGPD, finalités, base légale, droits des personnes.',
+          },
+          {
+            url: `${origin}/fr/cookies`,
+            description: 'Politique cookies — consentement opt-in pour analytics tiers.',
+          },
+        ],
+      },
+      {
+        title: 'API LLM-actionnables',
+        items: [
+          {
+            url: `${origin}/.well-known/agent-skills.json`,
+            description:
+              'Catalogue machine-readable des actions disponibles (search, get-hotel, request-quote…).',
           },
         ],
       },

@@ -41,29 +41,96 @@ export const DEFAULT_AGENT_SKILLS: AgentSkillsDocument = {
   skills: [
     {
       name: 'search',
-      description: 'Rechercher des hôtels par destination et dates de séjour.',
+      description:
+        'Rechercher des hôtels 5★ et Palaces en France par destination et dates de séjour. Renvoie une liste paginée triée par pertinence.',
       inputSchema: {
         type: 'object',
         properties: {
-          destination: { type: 'string', description: 'Ville ou région en France' },
-          checkin: { type: 'string', format: 'date' },
-          checkout: { type: 'string', format: 'date' },
+          destination: {
+            type: 'string',
+            description: 'Ville, région ou slug normalisé (ex. "paris", "cote-d-azur").',
+          },
+          checkin: { type: 'string', format: 'date', description: 'Date d’arrivée YYYY-MM-DD.' },
+          checkout: { type: 'string', format: 'date', description: 'Date de départ YYYY-MM-DD.' },
           adults: { type: 'integer', minimum: 1, maximum: 6 },
+          children: { type: 'integer', minimum: 0, maximum: 4 },
         },
         required: ['destination'],
       },
     },
     {
+      name: 'list-cities',
+      description:
+        'Lister toutes les destinations couvertes (villes & régions). Pas de paramètre — réponse cache 24h.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+      },
+    },
+    {
+      name: 'get-hotel',
+      description:
+        'Récupérer la fiche détaillée d’un hôtel par son slug (description, équipements, FAQ, rating Amadeus, JSON-LD).',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          slug: {
+            type: 'string',
+            description: 'Slug kebab-case de la fiche (ex. "ritz-paris", "hotel-du-cap-eden-roc").',
+          },
+        },
+        required: ['slug'],
+      },
+    },
+    {
       name: 'filter',
-      description: 'Filtrer le catalogue par type, équipements, étoiles, région.',
+      description:
+        'Filtrer le catalogue par type d’hébergement, équipements, classement étoiles, région.',
+    },
+    {
+      name: 'compare-prices',
+      description:
+        'Obtenir un comparatif de tarifs non-affilié (Booking, Hotels.com, Expedia, etc.) pour un hôtel et des dates précises. Affichage texte sobre, sans logo ni lien, conforme aux règles légales du comparateur.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          hotelSlug: { type: 'string', description: 'Slug de l’hôtel à comparer.' },
+          checkin: { type: 'string', format: 'date' },
+          checkout: { type: 'string', format: 'date' },
+          adults: { type: 'integer', minimum: 1, maximum: 6 },
+        },
+        required: ['hotelSlug', 'checkin', 'checkout'],
+      },
     },
     {
       name: 'booking',
-      description: 'Lancer une réservation avec dates et voyageurs (paiement sécurisé Amadeus).',
+      description:
+        'Lancer une réservation avec dates et voyageurs (paiement sécurisé Amadeus). Nécessite une session utilisateur.',
+    },
+    {
+      name: 'request-quote',
+      description:
+        'Soumettre une demande de devis en mode email lorsque l’hôtel n’est pas connecté GDS (réponse humaine sous 24 h ouvrées).',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          hotelSlug: { type: 'string', description: 'Slug de l’hôtel ciblé.' },
+          checkin: { type: 'string', format: 'date' },
+          checkout: { type: 'string', format: 'date' },
+          adults: { type: 'integer', minimum: 1, maximum: 6 },
+          message: {
+            type: 'string',
+            description: 'Demande libre du voyageur (préférences chambre, occasion, etc.).',
+          },
+          email: { type: 'string', format: 'email' },
+        },
+        required: ['hotelSlug', 'checkin', 'checkout', 'email'],
+      },
     },
     {
       name: 'loyalty',
-      description: 'Consulter les avantages du programme de fidélité ConciergeTravel.',
+      description:
+        'Consulter les avantages du programme de fidélité ConciergeTravel (tier FREE auto pour les hôtels Little Hotelier, tier PREMIUM payant).',
     },
   ],
 };
