@@ -365,7 +365,8 @@
       "reviewBreakdown": "Ce que disent les voyageurs",
       "restaurants": "Restaurants & bars",
       "spa": "Spa & bien-être",
-      "gallery": "Galerie photos"
+      "gallery": "Galerie photos",
+      "location": "Emplacement & accès"
     },
     "gallery": {
       "thumbnailsLabel": "Autres photos de l'établissement"
@@ -416,6 +417,25 @@
       "surface": "{value} m²",
       "treatmentRooms": "{count, plural, one {# salle de soins} other {# salles de soins}}",
       "featuresLabel": "Équipements & soins"
+    },
+    "location": {
+      "addressLabel": "Adresse :",
+      "cityLabel": "Ville :",
+      "viewMap": "Voir sur la carte",
+      "mapAria": "Voir {hotelName} sur la carte",
+      "poisTitle": "À proximité",
+      "transportsTitle": "Transports",
+      "distanceMeters": "{meters, plural, =0 {sur place} other {{meters} m}}",
+      "walkMinutes": "{count, plural, one {# min à pied} other {# min à pied}}",
+      "transportMode": {
+        "metro": "Métro",
+        "rer": "RER",
+        "tram": "Tram",
+        "bus": "Bus",
+        "train": "Train",
+        "taxi": "Taxi",
+        "airport_shuttle": "Navette aéroport"
+      }
     },
     "booking": {
       "intro": "Sélectionnez vos dates et le nombre de voyageurs pour vérifier la disponibilité.",

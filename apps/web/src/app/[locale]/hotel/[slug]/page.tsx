@@ -7,6 +7,7 @@ import { JsonLd } from '@cct/seo';
 import { buildCloudinarySrc } from '@cct/ui';
 
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
+import { HotelLocation } from '@/components/hotel/hotel-location';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { PriceComparator } from '@/components/price-comparator';
@@ -28,6 +29,7 @@ import {
   readGallery,
   readHeroImage,
   readHighlights,
+  readLocation,
   readRestaurants,
   readSpa,
   type HotelDetail,
@@ -233,6 +235,7 @@ async function renderHotelPage(
   const amenities = readAmenities(row, locale);
   const restaurants = readRestaurants(row, locale);
   const spa = readSpa(row, locale);
+  const location = readLocation(row, locale);
   const faqs = readFaq(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
@@ -452,7 +455,9 @@ async function renderHotelPage(
           </p>
         ) : null}
 
-        {row.latitude !== null && row.longitude !== null ? (
+        {row.latitude !== null &&
+        row.longitude !== null &&
+        location.pointsOfInterest.length === 0 ? (
           <p className="mt-3 text-sm">
             <a
               href={`https://www.openstreetmap.org/?mlat=${row.latitude}&mlon=${row.longitude}&zoom=15`}
@@ -698,6 +703,16 @@ async function renderHotelPage(
       ) : null}
 
       {spa !== null ? <HotelSpa locale={locale} spa={spa} /> : null}
+
+      <HotelLocation
+        locale={locale}
+        hotelName={name}
+        city={row.city}
+        address={row.address}
+        latitude={row.latitude}
+        longitude={row.longitude}
+        location={location}
+      />
 
       <section aria-labelledby="rooms-title" className="mb-12">
         <h2 id="rooms-title" className="text-fg mb-4 font-serif text-2xl">

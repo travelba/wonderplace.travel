@@ -50,6 +50,8 @@ export const HotelDetailRowSchema = z.object({
   faq_content: z.unknown().nullable().optional(),
   restaurant_info: z.unknown().nullable().optional(),
   spa_info: z.unknown().nullable().optional(),
+  points_of_interest: z.unknown().nullable().optional(),
+  transports: z.unknown().nullable().optional(),
   hero_image: stringOrEmpty,
   gallery_images: z.unknown().nullable().optional(),
   meta_title_fr: stringOrEmpty,
@@ -73,7 +75,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, hero_image, gallery_images, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
 
 /** A FAQ item that may appear under `hotels.faq_content`. */
 export const FaqItemSchema = z.object({
@@ -299,6 +301,112 @@ export function readGallery(
       (locale === 'fr' ? (img.alt_fr ?? img.alt_en) : (img.alt_en ?? img.alt_fr)) ?? fallbackName,
     category: img.category ?? null,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Location enrichment — points_of_interest (jsonb) + transports (jsonb)
+// ---------------------------------------------------------------------------
+
+const PointOfInterestSchema = z.object({
+  name: z.string().min(1),
+  name_en: z.string().min(1).optional(),
+  type: z.string().min(1),
+  category_fr: z.string().min(1).optional(),
+  category_en: z.string().min(1).optional(),
+  distance_meters: z.number().int().nonnegative(),
+  walk_minutes: z.number().int().nonnegative().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+});
+
+const PointsOfInterestSchema = z.array(PointOfInterestSchema);
+
+const TransportModeSchema = z.enum([
+  'metro',
+  'rer',
+  'tram',
+  'bus',
+  'train',
+  'taxi',
+  'airport_shuttle',
+]);
+
+const TransportSchema = z.object({
+  mode: TransportModeSchema,
+  line: z.string().min(1).optional(),
+  station: z.string().min(1),
+  station_en: z.string().min(1).optional(),
+  distance_meters: z.number().int().nonnegative(),
+  walk_minutes: z.number().int().nonnegative().optional(),
+  notes_fr: z.string().min(1).optional(),
+  notes_en: z.string().min(1).optional(),
+});
+
+const TransportsSchema = z.array(TransportSchema);
+
+export type TransportMode = z.infer<typeof TransportModeSchema>;
+
+export interface LocalisedPointOfInterest {
+  readonly name: string;
+  readonly type: string;
+  readonly category: string | null;
+  readonly distanceMeters: number;
+  readonly walkMinutes: number | null;
+  readonly latitude: number | null;
+  readonly longitude: number | null;
+}
+
+export interface LocalisedTransport {
+  readonly mode: TransportMode;
+  readonly line: string | null;
+  readonly station: string;
+  readonly distanceMeters: number;
+  readonly walkMinutes: number | null;
+  readonly notes: string | null;
+}
+
+export interface LocalisedLocation {
+  readonly pointsOfInterest: readonly LocalisedPointOfInterest[];
+  readonly transports: readonly LocalisedTransport[];
+}
+
+/**
+ * Returns the localized POI + transport snapshot for the hotel.
+ *
+ * Caller decides whether the fiche shows the section: an empty
+ * `{ pointsOfInterest: [], transports: [] }` is a valid "no enriched
+ * location yet" state.
+ */
+export function readLocation(row: HotelDetailRow, locale: SupportedLocale): LocalisedLocation {
+  const poisRaw = PointsOfInterestSchema.safeParse(row.points_of_interest);
+  const transportsRaw = TransportsSchema.safeParse(row.transports);
+
+  const pointsOfInterest: LocalisedPointOfInterest[] = poisRaw.success
+    ? poisRaw.data.map((p) => ({
+        name: (locale === 'fr' ? p.name : (p.name_en ?? p.name)).trim(),
+        type: p.type,
+        category:
+          (locale === 'fr' ? (p.category_fr ?? p.category_en) : (p.category_en ?? p.category_fr)) ??
+          null,
+        distanceMeters: p.distance_meters,
+        walkMinutes: p.walk_minutes ?? null,
+        latitude: p.latitude ?? null,
+        longitude: p.longitude ?? null,
+      }))
+    : [];
+
+  const transports: LocalisedTransport[] = transportsRaw.success
+    ? transportsRaw.data.map((t) => ({
+        mode: t.mode,
+        line: t.line ?? null,
+        station: (locale === 'fr' ? t.station : (t.station_en ?? t.station)).trim(),
+        distanceMeters: t.distance_meters,
+        walkMinutes: t.walk_minutes ?? null,
+        notes: (locale === 'fr' ? (t.notes_fr ?? t.notes_en) : (t.notes_en ?? t.notes_fr)) ?? null,
+      }))
+    : [];
+
+  return { pointsOfInterest, transports };
 }
 
 export interface HotelRoomRow {
