@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
+import { AmenityCategoryIcon } from '@/components/hotel/amenity-category-icon';
 import type { LocalisedAmenityGroup } from '@/server/hotels/get-hotel-by-slug';
 
 interface HotelAmenitiesProps {
@@ -62,8 +63,12 @@ export async function HotelAmenities({
       <div className="grid gap-5 md:grid-cols-2">
         {groups.map((group) => (
           <div key={group.category} className="flex flex-col gap-2">
-            <h3 className="text-muted text-xs font-medium uppercase tracking-[0.12em]">
-              {t(`amenityCategories.${group.category}`)}
+            <h3 className="text-muted flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em]">
+              <AmenityCategoryIcon
+                category={group.category}
+                className="text-accent h-3.5 w-3.5 shrink-0"
+              />
+              <span>{t(`amenityCategories.${group.category}`)}</span>
             </h3>
             <ul className="flex flex-wrap gap-1.5">
               {group.entries.map((entry) => (
