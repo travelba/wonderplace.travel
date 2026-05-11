@@ -123,6 +123,13 @@ test.describe('hotel detail page', () => {
         hreflangDefault: getHref('link[rel="alternate"][hreflang="x-default"]'),
         ogTitle: get('meta[property="og:title"]'),
         ogLocale: get('meta[property="og:locale"]'),
+        ogUrl: get('meta[property="og:url"]'),
+        ogImage: get('meta[property="og:image"]'),
+        ogImageWidth: get('meta[property="og:image:width"]'),
+        ogImageHeight: get('meta[property="og:image:height"]'),
+        ogImageAlt: get('meta[property="og:image:alt"]'),
+        twitterCard: get('meta[name="twitter:card"]'),
+        twitterImage: get('meta[name="twitter:image"]'),
       };
     });
 
@@ -134,6 +141,22 @@ test.describe('hotel detail page', () => {
     expect(meta.hreflangDefault).toContain('/hotel/hotel-de-test-e2e');
     expect(meta.ogTitle).toMatch(/Hôtel de Test/i);
     expect(meta.ogLocale).toBe('fr_FR');
+    expect(meta.ogUrl).toContain('/hotel/hotel-de-test-e2e');
+    // The Twitter card type must be the large image variant for hotel
+    // pages — small thumbnails crop hero shots in unflattering ways
+    // and we want share previews to dominate timelines.
+    expect(meta.twitterCard).toBe('summary_large_image');
+    // The E2E seed defines a Cloudinary hero, so og:image + twitter:image
+    // must be emitted with the dimensions Facebook/LinkedIn expect (1.91:1).
+    if (meta.ogImage !== null) {
+      expect(meta.ogImage).toMatch(/cloudinary\.com\/.+\/image\/upload\//);
+      expect(meta.ogImage).toContain('w_1200');
+      expect(meta.ogImage).toContain('h_630');
+      expect(meta.ogImageWidth).toBe('1200');
+      expect(meta.ogImageHeight).toBe('630');
+      expect(meta.ogImageAlt?.toLowerCase()).toContain('hôtel de test');
+      expect(meta.twitterImage).toBe(meta.ogImage);
+    }
 
     // Sanity: canonical must be absolute (Next 15 emits the full URL
     // when `metadataBase` is configured).

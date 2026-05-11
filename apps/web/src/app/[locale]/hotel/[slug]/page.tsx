@@ -185,6 +185,42 @@ export async function generateMetadata({
   const slugFr = row.slug;
   const slugEn = row.slug_en !== null && row.slug_en !== '' ? row.slug_en : row.slug;
   const canonical = locale === 'fr' ? `/hotel/${slugFr}` : `/en/hotel/${slugEn}`;
+  const origin = siteOrigin();
+  const absoluteUrl = `${origin}${canonical}`;
+
+  // Open Graph / Twitter Card image:
+  //   - Use the hotel hero (Cloudinary) when present, served at the
+  //     OG-recommended 1200×630 (1.91:1).
+  //   - We force `c_fill,g_auto` to keep the focal point centred and
+  //     `f_jpg,q_auto` because some social parsers (notably older
+  //     LinkedIn crawlers) still choke on WebP — JPEG is the safest
+  //     interchange format for share previews.
+  //   - Cap the URL string at the documented Facebook limit (no
+  //     practical risk with our public_id grammar, but we encode
+  //     defensively via `buildCloudinarySrc`).
+  //   - Fall back to undefined when no hero is set; Next.js drops the
+  //     `og:image` tag rather than emitting an empty one.
+  const heroPublicId = readHeroImage(row);
+  const ogImageUrl =
+    heroPublicId !== null
+      ? buildCloudinarySrc({
+          cloudName: env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+          publicId: heroPublicId,
+          transforms: 'f_jpg,q_auto,c_fill,g_auto,w_1200,h_630',
+        })
+      : undefined;
+  const ogImages =
+    ogImageUrl !== undefined
+      ? [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: name,
+            type: 'image/jpeg' as const,
+          },
+        ]
+      : undefined;
 
   return {
     title,
@@ -203,6 +239,16 @@ export async function generateMetadata({
       description: desc,
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       siteName: 'ConciergeTravel',
+      url: absoluteUrl,
+      ...(ogImages !== undefined ? { images: ogImages } : {}),
+    },
+    twitter: {
+      // `summary_large_image` is the only card type Twitter still
+      // honours that gives a true hero treatment in DMs and timelines.
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      ...(ogImageUrl !== undefined ? { images: [ogImageUrl] } : {}),
     },
   };
 }
