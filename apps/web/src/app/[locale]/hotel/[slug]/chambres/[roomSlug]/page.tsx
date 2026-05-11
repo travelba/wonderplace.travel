@@ -9,6 +9,7 @@ import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
 import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
+import { formatIndicativePriceParts } from '@/lib/format-indicative-price';
 import {
   getRoomBySlug,
   listPublishedRoomSlugs,
@@ -130,6 +131,35 @@ export async function generateMetadata({
   const canonicalFr = `/hotel/${slugFr}/chambres/${detail.room.slug}`;
   const canonicalEn = `/en/hotel/${slugEn}/chambres/${detail.room.slug}`;
   const canonical = locale === 'fr' ? canonicalFr : canonicalEn;
+  const absoluteUrl = `${siteOrigin()}${canonical}`;
+
+  // Open Graph / Twitter Card image — mirrors the hotel page treatment
+  // (Phase 10.18) so room sub-pages share visibly when posted to social
+  // platforms. We pick the room hero image (or the first gallery image)
+  // and ship a 1200×630 JPEG via Cloudinary's named transforms — the
+  // canonical OG card size that LinkedIn, Twitter, Facebook, Slack and
+  // WhatsApp all crop predictably.
+  const ogPublicId = detail.room.heroImage ?? detail.room.images[0]?.publicId ?? null;
+  const ogImageUrl =
+    ogPublicId !== null
+      ? buildCloudinarySrc({
+          cloudName: env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+          publicId: ogPublicId,
+          transforms: 'f_jpg,q_auto,c_fill,g_auto,w_1200,h_630',
+        })
+      : undefined;
+  const ogImages =
+    ogImageUrl !== undefined
+      ? [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: detail.room.images[0]?.alt ?? detail.room.name,
+            type: 'image/jpeg' as const,
+          },
+        ]
+      : undefined;
 
   return {
     title,
@@ -148,6 +178,14 @@ export async function generateMetadata({
       description: desc,
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       siteName: 'ConciergeTravel',
+      url: absoluteUrl,
+      ...(ogImages !== undefined ? { images: ogImages } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      ...(ogImageUrl !== undefined ? { images: [ogImageUrl] } : {}),
     },
   };
 }
@@ -266,7 +304,32 @@ async function renderRoomPage(
         <p className="text-muted text-xs uppercase tracking-[0.18em]">
           {t('eyebrow', { hotelName })}
         </p>
-        <h1 className="text-fg mt-2 font-serif text-3xl sm:text-4xl md:text-5xl">{room.name}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <h1 className="text-fg font-serif text-3xl sm:text-4xl md:text-5xl">{room.name}</h1>
+          {room.isSignature ? (
+            <span
+              data-room-signature
+              className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-amber-900"
+              aria-label={t('facts.signatureAria')}
+            >
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                viewBox="0 0 16 16"
+                width={10}
+                height={10}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.4}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M8 1.5l1.85 4.1 4.4.5-3.3 3 .95 4.4L8 11.4l-3.9 2.1.95-4.4-3.3-3 4.4-.5L8 1.5Z" />
+              </svg>
+              {t('facts.signatureBadge')}
+            </span>
+          ) : null}
+        </div>
 
         <dl className="text-fg mt-4 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-sm">
           {room.sizeSqm !== null ? (
@@ -289,6 +352,21 @@ async function renderRoomPage(
               <dd className="font-medium">{room.bedType}</dd>
             </div>
           ) : null}
+          {room.indicativePrice !== null
+            ? (() => {
+                const parts = formatIndicativePriceParts(room.indicativePrice, locale);
+                const value =
+                  parts.to !== null
+                    ? t('facts.indicativePriceRange', { from: parts.from, to: parts.to })
+                    : t('facts.indicativePriceFrom', { from: parts.from });
+                return (
+                  <div className="flex items-baseline gap-1" data-room-price>
+                    <dt className="text-muted">{t('facts.price')}</dt>
+                    <dd className="font-medium">{value}</dd>
+                  </div>
+                );
+              })()
+            : null}
         </dl>
       </header>
 

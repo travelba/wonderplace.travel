@@ -1,0 +1,55 @@
+import type { Locale } from '@/i18n/routing';
+
+/**
+ * Minor-unit currency tuple as stored in the
+ * `hotel_rooms.indicative_price_minor` JSONB column.
+ *
+ * Amounts are integers expressed in the smallest unit of the
+ * currency (cents for EUR / USD / GBP / CHF, where the minor unit
+ * has 2 decimals — none of the supported currencies are zero-
+ * decimal). `toMinor` is null for an open-ended "from" price.
+ */
+export interface IndicativePriceMinor {
+  readonly fromMinor: number;
+  readonly toMinor: number | null;
+  readonly currency: 'EUR' | 'USD' | 'GBP' | 'CHF';
+}
+
+export interface IndicativePriceParts {
+  readonly from: string;
+  readonly to: string | null;
+}
+
+/**
+ * Format an indicative price into locale-aware currency strings.
+ *
+ * Why a shared helper rather than per-page formatting:
+ *   - Hotel detail page renders the price on the room list cards.
+ *   - Room sub-page renders the price in its own facts row.
+ *   - Tooltip / share / future widgets may need the same parts.
+ * Centralising the `Intl.NumberFormat` call keeps the formatting
+ * consistent (fr-FR vs en-GB, currency symbol position, no
+ * decimals) across surfaces — divergence here would surface as
+ * inconsistent SERP / hreflang signals.
+ *
+ * The caller still owns the i18n template (`from {from}` vs
+ * `from {from} to {to}`) because the right phrasing depends on
+ * the surface — the room list says "À partir de 950 €", the room
+ * fact dl says "950 €", the share popup may say something else.
+ * Returning {from, to} keeps the helper template-free.
+ */
+export function formatIndicativePriceParts(
+  price: IndicativePriceMinor,
+  locale: Locale,
+): IndicativePriceParts {
+  const localeTag = locale === 'fr' ? 'fr-FR' : 'en-GB';
+  const fmt = new Intl.NumberFormat(localeTag, {
+    style: 'currency',
+    currency: price.currency,
+    maximumFractionDigits: 0,
+  });
+  return {
+    from: fmt.format(price.fromMinor / 100),
+    to: price.toMinor !== null ? fmt.format(price.toMinor / 100) : null,
+  };
+}

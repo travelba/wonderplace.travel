@@ -26,6 +26,7 @@ import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
 import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
+import { formatIndicativePriceParts } from '@/lib/format-indicative-price';
 import { isFakeOffersEnabled } from '@/server/booking/dev-fake-offer';
 import { citySlug } from '@/server/destinations/cities';
 import {
@@ -146,17 +147,10 @@ function formatIndicativePrice(
   t: (key: string, values?: Record<string, string | number>) => string,
 ): string | null {
   if (price === null) return null;
-  const localeTag = locale === 'fr' ? 'fr-FR' : 'en-GB';
-  const fmt = new Intl.NumberFormat(localeTag, {
-    style: 'currency',
-    currency: price.currency,
-    maximumFractionDigits: 0,
-  });
-  const from = fmt.format(price.fromMinor / 100);
-  const to = price.toMinor !== null ? fmt.format(price.toMinor / 100) : null;
-  return to !== null
-    ? t('rooms.indicativePriceRange', { from, to })
-    : t('rooms.indicativePriceFrom', { from });
+  const parts = formatIndicativePriceParts(price, locale);
+  return parts.to !== null
+    ? t('rooms.indicativePriceRange', { from: parts.from, to: parts.to })
+    : t('rooms.indicativePriceFrom', { from: parts.from });
 }
 
 function lockActionFor(locale: Locale, hotelId: string): string {

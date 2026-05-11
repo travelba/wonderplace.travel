@@ -616,7 +616,12 @@
       "sizeValue": "{count} m²",
       "occupancy": "Capacité :",
       "occupancyValue": "{count, plural, one {# voyageur} other {# voyageurs}}",
-      "bed": "Literie :"
+      "bed": "Literie :",
+      "price": "Tarif indicatif :",
+      "indicativePriceFrom": "à partir de {from} / nuit",
+      "indicativePriceRange": "{from} – {to} / nuit",
+      "signatureBadge": "Suite signature",
+      "signatureAria": "Chambre signature de l'hôtel"
     },
     "sections": {
       "description": "Présentation",

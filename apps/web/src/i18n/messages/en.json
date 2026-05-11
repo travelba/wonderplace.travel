@@ -616,7 +616,12 @@
       "sizeValue": "{count} sqm",
       "occupancy": "Occupancy:",
       "occupancyValue": "{count, plural, one {# guest} other {# guests}}",
-      "bed": "Bedding:"
+      "bed": "Bedding:",
+      "price": "Indicative rate:",
+      "indicativePriceFrom": "from {from} / night",
+      "indicativePriceRange": "{from} – {to} / night",
+      "signatureBadge": "Signature suite",
+      "signatureAria": "Hotel signature room"
     },
     "sections": {
       "description": "Overview",
