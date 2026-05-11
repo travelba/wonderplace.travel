@@ -9,9 +9,12 @@
     "start": "next start --port 3000",
     "lint": "next lint --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:unit": "vitest run",
-    "test:e2e": "playwright test"
+    "test": "vitest run --passWithNoTests",
+    "test:unit": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@cct/config": "workspace:*",
@@ -26,9 +29,11 @@
     "@sentry/nextjs": "catalog:",
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
+    "@t3-oss/env-nextjs": "^0.11.1",
     "@upstash/ratelimit": "catalog:",
     "@upstash/redis": "catalog:",
-    "@t3-oss/env-nextjs": "^0.11.1",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "algoliasearch": "^5.20.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

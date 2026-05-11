@@ -1,25 +1,24 @@
 import { NextResponse } from 'next/server';
 
+import { buildSitemapIndexXml } from '@cct/seo';
+
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 /**
- * Sitemap index. Sub-sitemaps generated per content type in Phase 9
- * (cf. seo-technical skill). For now we expose a minimal index pointing at
- * placeholder sub-sitemaps.
+ * Sitemap index (skill: seo-technical). Sub-sitemaps are emitted by
+ * `/sitemaps/{hotels,hubs,editorial,guides}.xml`. Each starts empty until
+ * Phase 8 wires Payload data, but always returns a valid `urlset`.
  */
-export function GET(request: Request) {
+export function GET(request: Request): NextResponse {
   const origin = new URL(request.url).origin;
   const now = new Date().toISOString();
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap><loc>${origin}/sitemaps/hotels.xml</loc><lastmod>${now}</lastmod></sitemap>
-  <sitemap><loc>${origin}/sitemaps/hubs.xml</loc><lastmod>${now}</lastmod></sitemap>
-  <sitemap><loc>${origin}/sitemaps/editorial.xml</loc><lastmod>${now}</lastmod></sitemap>
-  <sitemap><loc>${origin}/sitemaps/guides.xml</loc><lastmod>${now}</lastmod></sitemap>
-</sitemapindex>`;
-
+  const xml = buildSitemapIndexXml([
+    { loc: `${origin}/sitemaps/hotels.xml`, lastmod: now },
+    { loc: `${origin}/sitemaps/hubs.xml`, lastmod: now },
+    { loc: `${origin}/sitemaps/editorial.xml`, lastmod: now },
+    { loc: `${origin}/sitemaps/guides.xml`, lastmod: now },
+  ]);
   return new NextResponse(xml, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',

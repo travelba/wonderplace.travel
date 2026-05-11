@@ -1,0 +1,308 @@
+import 'server-only';
+
+import { z } from 'zod';
+
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getFakeHotelDetailBySlug } from '@/server/hotels/dev-fake-hotel-detail';
+
+/** Locale alias used for slug selection (slug_en vs slug). */
+export type SupportedLocale = 'fr' | 'en';
+
+const BookingModeSchema = z.enum(['amadeus', 'little', 'email', 'display_only']);
+const PrioritySchema = z.enum(['P0', 'P1', 'P2']);
+
+const stringOrEmpty = z
+  .string()
+  .nullish()
+  .transform((v) => (typeof v === 'string' ? v : null));
+
+const numberOrNull = z
+  .union([z.number(), z.string()])
+  .nullish()
+  .transform((v) => {
+    if (v === null || v === undefined) return null;
+    if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  });
+
+/** Hotel row consumed by the public detail page. */
+export const HotelDetailRowSchema = z.object({
+  id: z.string().uuid(),
+  slug: z.string(),
+  slug_en: stringOrEmpty,
+  name: z.string(),
+  name_en: stringOrEmpty,
+  stars: z.number().int().min(1).max(5),
+  is_palace: z.boolean(),
+  region: z.string(),
+  department: stringOrEmpty,
+  city: z.string(),
+  district: stringOrEmpty,
+  address: stringOrEmpty,
+  latitude: numberOrNull,
+  longitude: numberOrNull,
+  description_fr: stringOrEmpty,
+  description_en: stringOrEmpty,
+  highlights: z.unknown().nullable().optional(),
+  amenities: z.unknown().nullable().optional(),
+  faq_content: z.unknown().nullable().optional(),
+  meta_title_fr: stringOrEmpty,
+  meta_title_en: stringOrEmpty,
+  meta_desc_fr: stringOrEmpty,
+  meta_desc_en: stringOrEmpty,
+  booking_mode: BookingModeSchema,
+  /** 8-char Amadeus property code when `booking_mode = 'amadeus'` (or stored anyway for hotels with sentiment-only enrichment). */
+  amadeus_hotel_id: stringOrEmpty,
+  priority: PrioritySchema,
+  google_rating: numberOrNull,
+  google_reviews_count: z
+    .number()
+    .int()
+    .nullish()
+    .transform((v) => v ?? null),
+  is_published: z.boolean(),
+  updated_at: stringOrEmpty,
+});
+
+export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
+
+const HOTEL_COLUMNS =
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, is_published, updated_at';
+
+/** A FAQ item that may appear under `hotels.faq_content`. */
+export const FaqItemSchema = z.object({
+  question_fr: z.string().min(1).optional(),
+  question_en: z.string().min(1).optional(),
+  answer_fr: z.string().min(1).optional(),
+  answer_en: z.string().min(1).optional(),
+});
+export type FaqItem = z.infer<typeof FaqItemSchema>;
+
+const FaqContentSchema = z.array(FaqItemSchema);
+
+export interface LocalisedFaq {
+  readonly question: string;
+  readonly answer: string;
+}
+
+/** Extracts a list of strings from a jsonb field that may be a string[] or object[]. */
+function readStringList(raw: unknown, locale: SupportedLocale): readonly string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const entry of raw) {
+    if (typeof entry === 'string' && entry.trim().length > 0) {
+      out.push(entry.trim());
+      continue;
+    }
+    if (entry !== null && typeof entry === 'object') {
+      const e = entry as Record<string, unknown>;
+      const candidates =
+        locale === 'fr'
+          ? ['label_fr', 'name_fr', 'label', 'name']
+          : ['label_en', 'name_en', 'label', 'name'];
+      for (const k of candidates) {
+        const v = e[k];
+        if (typeof v === 'string' && v.trim().length > 0) {
+          out.push(v.trim());
+          break;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+export function readHighlights(row: HotelDetailRow, locale: SupportedLocale): readonly string[] {
+  return readStringList(row.highlights, locale);
+}
+
+export function readAmenities(row: HotelDetailRow, locale: SupportedLocale): readonly string[] {
+  return readStringList(row.amenities, locale);
+}
+
+export function readFaq(row: HotelDetailRow, locale: SupportedLocale): readonly LocalisedFaq[] {
+  const parsed = FaqContentSchema.safeParse(row.faq_content);
+  if (!parsed.success) return [];
+  const out: LocalisedFaq[] = [];
+  for (const item of parsed.data) {
+    const q =
+      locale === 'fr'
+        ? (item.question_fr ?? item.question_en)
+        : (item.question_en ?? item.question_fr);
+    const a =
+      locale === 'fr' ? (item.answer_fr ?? item.answer_en) : (item.answer_en ?? item.answer_fr);
+    if (q !== undefined && a !== undefined) {
+      out.push({ question: q, answer: a });
+    }
+  }
+  return out;
+}
+
+export interface HotelRoomRow {
+  readonly id: string;
+  readonly room_code: string;
+  readonly name: string | null;
+  readonly description: string | null;
+  readonly max_occupancy: number | null;
+  readonly bed_type: string | null;
+  readonly size_sqm: number | null;
+  readonly amenities: readonly string[];
+}
+
+const HotelRoomDbRowSchema = z.object({
+  id: z.string().uuid(),
+  room_code: z.string(),
+  name_fr: stringOrEmpty,
+  name_en: stringOrEmpty,
+  description_fr: stringOrEmpty,
+  description_en: stringOrEmpty,
+  max_occupancy: z.number().int().nullable(),
+  bed_type: stringOrEmpty,
+  size_sqm: z.number().int().nullable(),
+  amenities: z.unknown().nullable().optional(),
+});
+
+/** Slug shape: `^[a-z0-9]+(?:-[a-z0-9]+)*$` (matches `hotels_slug_ck`). */
+export function isValidSlug(candidate: string): boolean {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(candidate);
+}
+
+export interface HotelDetail {
+  readonly row: HotelDetailRow;
+  readonly rooms: readonly HotelRoomRow[];
+}
+
+/**
+ * Public read of a hotel by slug. Anon client → RLS policy
+ * `hotels_select_published` filters out unpublished rows automatically.
+ *
+ * Tries the locale-matching slug column first; falls back to the other.
+ */
+export async function getHotelBySlug(
+  slug: string,
+  locale: SupportedLocale,
+): Promise<HotelDetail | null> {
+  if (!isValidSlug(slug)) return null;
+
+  // E2E / dev seam — short-circuit before touching Supabase. Activated
+  // exclusively via `CCT_E2E_FAKE_HOTEL_ID`; see
+  // `dev-fake-hotel-detail.ts` for the synthetic row.
+  const fake = getFakeHotelDetailBySlug(slug, locale);
+  if (fake !== null) return fake;
+
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const primaryColumn = locale === 'en' ? 'slug_en' : 'slug';
+    const fallbackColumn = locale === 'en' ? 'slug' : 'slug_en';
+
+    let row = await supabase
+      .from('hotels')
+      .select(HOTEL_COLUMNS)
+      .eq(primaryColumn, slug)
+      .maybeSingle();
+
+    if (!row.data) {
+      row = await supabase
+        .from('hotels')
+        .select(HOTEL_COLUMNS)
+        .eq(fallbackColumn, slug)
+        .maybeSingle();
+    }
+
+    if (row.error || !row.data) return null;
+
+    const parsed = HotelDetailRowSchema.safeParse(row.data);
+    if (!parsed.success) {
+      if (process.env['NODE_ENV'] !== 'production') {
+        console.warn('[getHotelBySlug] parse error', parsed.error.flatten());
+      }
+      return null;
+    }
+    if (!parsed.data.is_published) return null;
+
+    const roomsRes = await supabase
+      .from('hotel_rooms')
+      .select(
+        'id, room_code, name_fr, name_en, description_fr, description_en, max_occupancy, bed_type, size_sqm, amenities',
+      )
+      .eq('hotel_id', parsed.data.id);
+
+    const rooms: HotelRoomRow[] = [];
+    if (!roomsRes.error && Array.isArray(roomsRes.data)) {
+      for (const raw of roomsRes.data) {
+        const r = HotelRoomDbRowSchema.safeParse(raw);
+        if (!r.success) continue;
+        rooms.push({
+          id: r.data.id,
+          room_code: r.data.room_code,
+          name:
+            locale === 'fr'
+              ? (r.data.name_fr ?? r.data.name_en)
+              : (r.data.name_en ?? r.data.name_fr),
+          description:
+            locale === 'fr'
+              ? (r.data.description_fr ?? r.data.description_en)
+              : (r.data.description_en ?? r.data.description_fr),
+          max_occupancy: r.data.max_occupancy,
+          bed_type: r.data.bed_type,
+          size_sqm: r.data.size_sqm,
+          amenities: readStringList(r.data.amenities, locale),
+        });
+      }
+    }
+
+    return { row: parsed.data, rooms };
+  } catch (e) {
+    // Degraded env (CI smoke, preview without Supabase) — render 404
+    // instead of crashing the route.
+    if (process.env['NODE_ENV'] !== 'production') {
+      console.warn('[getHotelBySlug] failed:', e);
+    }
+    return null;
+  }
+}
+
+/** Pre-renderable list of slugs (FR + EN), for `generateStaticParams`. */
+export interface PublishedHotelSlug {
+  readonly slugFr: string;
+  readonly slugEn: string | null;
+}
+
+/**
+ * Service-role read for build-time (`generateStaticParams`) and `force-static`
+ * route handlers (sitemap). No request cookies needed; we re-apply the same
+ * `is_published = true` filter that the RLS policy `hotels_select_published`
+ * enforces for anon reads.
+ */
+export async function listPublishedHotelSlugs(): Promise<readonly PublishedHotelSlug[]> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from('hotels')
+      .select('slug, slug_en')
+      .eq('is_published', true)
+      .order('priority', { ascending: true })
+      .limit(500);
+    if (error || !Array.isArray(data)) return [];
+    const out: PublishedHotelSlug[] = [];
+    for (const raw of data) {
+      const slug = (raw as { slug?: unknown }).slug;
+      const slugEn = (raw as { slug_en?: unknown }).slug_en;
+      if (typeof slug === 'string' && isValidSlug(slug)) {
+        out.push({
+          slugFr: slug,
+          slugEn: typeof slugEn === 'string' && isValidSlug(slugEn) ? slugEn : null,
+        });
+      }
+    }
+    return out;
+  } catch {
+    // No Supabase env (CI smoke, preview) — prerender no slug at build
+    // time. The dynamic page still resolves at request time via the
+    // seam or the regular Supabase path.
+    return [];
+  }
+}

@@ -10,7 +10,27 @@ const nextConfig: NextConfig = {
     typedRoutes: true,
     optimizePackageImports: ['lucide-react', '@cct/ui'],
   },
-  transpilePackages: ['@cct/ui', '@cct/seo', '@cct/domain', '@cct/emails'],
+  transpilePackages: [
+    '@cct/ui',
+    '@cct/seo',
+    '@cct/domain',
+    '@cct/emails',
+    '@cct/db',
+    '@cct/integrations',
+  ],
+  // Allow NodeNext-style `.js` import specifiers in TS sources from
+  // workspace packages (e.g. `export * from './client.js'`). Webpack
+  // doesn't do the TS→JS extension swap by default; this teaches it to
+  // try `.ts` / `.tsx` first when it sees a `.js` request.
+  webpack: (config) => {
+    config.resolve = config.resolve ?? {};
+    config.resolve.extensionAlias = {
+      '.js': ['.ts', '.tsx', '.js'],
+      '.mjs': ['.mts', '.mjs'],
+      '.cjs': ['.cts', '.cjs'],
+    };
+    return config;
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -44,8 +64,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Tunnel + account: noindex
+        // Tunnel + account: noindex (prefixed locales: /en/reservation, /en/compte, /en/auth).
         source: '/:locale(fr|en)/(reservation|compte|auth)/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
+        // FR is served without a locale prefix (next-intl as-needed mode), so
+        // cover the bare paths too — otherwise the tunnel would be indexable
+        // on the canonical FR URLs.
+        source: '/(reservation|compte|auth)/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
     ];

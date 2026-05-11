@@ -27,11 +27,639 @@
       "amadeus": "Secure Amadeus payment"
     }
   },
+  "searchPage": {
+    "meta": {
+      "title": "Search for a hotel",
+      "description": "Browse ConciergeTravel’s editorial selection with instant search."
+    },
+    "title": "Search for a hotel",
+    "subtitle": "Enter a name, city, or keyword to explore the selection.",
+    "form": {
+      "label": "Your query",
+      "placeholder": "Hotel name, city…",
+      "submit": "Search"
+    },
+    "stay": {
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "adults": "Adults",
+      "children": "Children"
+    },
+    "results": {
+      "emptyPrompt": "Enter a search to see matching hotels.",
+      "noneForQuery": "No hotels match your search.",
+      "count": "{count, plural, one {# result} other {# results}}",
+      "reserveTest": "Reserve (test mode)",
+      "reserveTestHint": "Synthesises a fake offer and walks the full tunnel — no Amadeus call."
+    },
+    "badges": {
+      "palace": "Palace",
+      "stars": "{count}★"
+    },
+    "errors": {
+      "lockFailed": "Could not lock the offer ({kind}). Please check your dates and try again."
+    }
+  },
+  "header": {
+    "brand": "ConciergeTravel",
+    "skipToContent": "Skip to main content",
+    "primaryNav": {
+      "label": "Primary navigation",
+      "destinations": "Destinations",
+      "search": "Search",
+      "hotels": "Hotels"
+    },
+    "account": {
+      "signIn": "Sign in",
+      "signUp": "Create account",
+      "myAccount": "My account"
+    },
+    "menu": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "label": "Mobile menu"
+    },
+    "locale": {
+      "label": "Choose language",
+      "switchTo": "Français",
+      "current": "English"
+    }
+  },
+  "consent": {
+    "title": "Your cookie preferences",
+    "intro": "We use cookies to make this site work (login, booking cart, security). With your consent we also measure usage anonymously to improve it. You can accept, refuse or customise at any time.",
+    "summaryLabel": "Categories",
+    "categories": {
+      "essential": {
+        "name": "Essential cookies",
+        "description": "Strictly necessary for the site to function (session, security, booking cart). Always on, cannot be disabled."
+      },
+      "analytics": {
+        "name": "Audience measurement",
+        "description": "Anonymised statistics (Vercel Analytics, Web Vitals) to understand how the site is used. No advertising profile."
+      }
+    },
+    "actions": {
+      "acceptAll": "Accept all",
+      "rejectAll": "Reject all",
+      "customize": "Customise",
+      "savePreferences": "Save my choices",
+      "back": "Back",
+      "manage": "Manage cookies"
+    },
+    "footerLink": "Manage cookies",
+    "links": {
+      "policy": "Cookie policy",
+      "privacy": "Privacy"
+    },
+    "dialog": {
+      "label": "Cookie preferences banner"
+    }
+  },
+  "footer": {
+    "company": "ConciergeTravel",
+    "rights": "© {year} ConciergeTravel. All rights reserved.",
+    "tagline": "Curated 5-star and Palace hotels in France — booking made simple.",
+    "headings": {
+      "explore": "Explore",
+      "info": "Information",
+      "legal": "Legal"
+    },
+    "links": {
+      "destinations": "Destinations",
+      "search": "Search",
+      "guides": "Guides",
+      "selection": "Selection",
+      "account": "My account",
+      "contact": "Contact",
+      "legalNotice": "Legal notice",
+      "privacy": "Privacy policy",
+      "terms": "Terms of sale",
+      "cookies": "Cookie policy"
+    }
+  },
+  "legal": {
+    "lastUpdated": "Last updated: {date}",
+    "noticePage": {
+      "title": "Legal notice",
+      "metaDescription": "ConciergeTravel legal notice — publisher, hosting, intellectual property, travel agency licences.",
+      "sections": {
+        "editor": {
+          "title": "Publisher",
+          "body": "The conciergetravel.fr website is published by ConciergeTravel, a French SAS with share capital of €10,000, registered with the Paris Trade Register under number RCS XXX XXX XXX, whose registered office is in Paris, France. EU VAT number: FR XX XXXXXXXXX. Publication director: ConciergeTravel management."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Email: contact@conciergetravel.fr. Phone: +33 1 XX XX XX XX. Any enquiry about the site, content or bookings may be sent to this address."
+        },
+        "hosting": {
+          "title": "Hosting",
+          "body": "The site is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Databases are operated by Supabase Inc. inside the European Union (eu-central-1 region)."
+        },
+        "license": {
+          "title": "Travel agency licence",
+          "body": "ConciergeTravel operates as a travel agent registered with Atout France under number IM XXXXXXXXX. Financial guarantee: Groupama Assurance-Crédit, 8-10 rue d'Astorg, 75008 Paris. Professional civil liability: HISCOX Europe Underwriting Ltd, 19 rue Louis Le Grand, 75002 Paris."
+        },
+        "ip": {
+          "title": "Intellectual property",
+          "body": "All site content (texts, photographs, logos, trademarks, databases, design) is protected by copyright and trademark law. Any reproduction, representation, modification or use, in whole or in part, without prior written authorisation is prohibited."
+        }
+      }
+    },
+    "privacyPage": {
+      "title": "Privacy policy",
+      "metaDescription": "ConciergeTravel privacy policy — personal data, purposes, retention, GDPR rights, DPO contact.",
+      "sections": {
+        "intro": {
+          "title": "Preamble",
+          "body": "ConciergeTravel takes the protection of personal data seriously. This policy describes the data processing carried out as part of the use of the site and the booking services. It complies with EU Regulation 2016/679 (GDPR) and French data protection law."
+        },
+        "controller": {
+          "title": "Data controller",
+          "body": "ConciergeTravel SAS, located in Paris, France. Data Protection Officer (DPO): dpo@conciergetravel.fr."
+        },
+        "purposes": {
+          "title": "Purposes and legal bases",
+          "items": [
+            "Booking management (contract performance): identity, contact, stay, payment.",
+            "Loyalty tracking (legitimate interest): number of stays, Free/Premium tier.",
+            "Transactional communications (contract performance): confirmations, reminders, post-stay.",
+            "Commercial communications (consent): news and selections, opt-in.",
+            "Security and fraud prevention (legitimate interest): logs, anti-bot, idempotency.",
+            "Anonymised audience measurement (consent): Vercel Analytics, Web Vitals."
+          ]
+        },
+        "retention": {
+          "title": "Retention periods",
+          "items": [
+            "Account data: throughout the life of the account, deleted within 30 days after closure.",
+            "Booking data: 10 years (accounting and tax obligations).",
+            "Connection and security logs: 12 months maximum.",
+            "Consent cookies: 13 months maximum (CNIL guideline)."
+          ]
+        },
+        "recipients": {
+          "title": "Recipients",
+          "body": "Your data is accessible to ConciergeTravel operational teams and to our strictly necessary sub-processors: Supabase (database hosting), Vercel (application hosting), Amadeus (booking and payment), Brevo (email), Algolia (search), Upstash (cache). No data is sold or rented to third parties for commercial purposes."
+        },
+        "transfers": {
+          "title": "International transfers",
+          "body": "Some sub-processors may process data from the United States. These transfers are governed by the Standard Contractual Clauses adopted by the European Commission and, where required, by additional safeguards."
+        },
+        "rights": {
+          "title": "Your rights",
+          "body": "Under the GDPR you have the right to access, rectify, erase, restrict, object, port and to define post-mortem instructions. To exercise your rights: dpo@conciergetravel.fr. You may also lodge a complaint with the CNIL (www.cnil.fr)."
+        },
+        "cookies": {
+          "title": "Cookies",
+          "body": "Cookie usage is detailed in our Cookie policy. You can change your choices at any time via the \"Manage cookies\" link in the footer."
+        }
+      }
+    },
+    "termsPage": {
+      "title": "Terms of sale",
+      "metaDescription": "ConciergeTravel terms of sale — hotel reservation, payment, cancellation, jurisdiction.",
+      "sections": {
+        "scope": {
+          "title": "Scope",
+          "body": "These Terms of Sale govern bookings made by any customer (\"the Customer\") via conciergetravel.fr with ConciergeTravel (\"the Agency\"). Any booking implies full and unreserved acceptance of these Terms."
+        },
+        "reservation": {
+          "title": "Booking process",
+          "body": "A booking is concluded upon the written confirmation sent by the Agency (confirmation email bearing the reference CT-…). Before this confirmation, the displayed offer is indicative and may vary until the rate is locked."
+        },
+        "price": {
+          "title": "Prices and payment",
+          "body": "Prices are quoted in euros, taxes included (TTC). Payment is processed via the secure Amadeus Payments solution (PCI DSS, 3-D Secure). The Agency does not have access to the Customer's card data."
+        },
+        "cancellation": {
+          "title": "Cancellation and changes",
+          "body": "Cancellation and modification conditions are those displayed at booking time and specific to each offer. Article L221-28 12° of the French Consumer Code explicitly excludes accommodation services from the right of withdrawal. Cancellation requests must be sent by email to reservations@conciergetravel.fr."
+        },
+        "liability": {
+          "title": "Liability",
+          "body": "The Agency acts as an intermediary between the Customer and the hotel. Its liability cannot be engaged for breaches attributable to the hotel, force majeure or the Customer's own act. Professional civil liability is covered by HISCOX Europe Underwriting Ltd."
+        },
+        "loyalty": {
+          "title": "Loyalty programme",
+          "body": "Loyalty programme benefits (Free, Premium) are described on the site and apply subject to the property's eligibility. Benefits are non-transferable and non-redeemable for cash."
+        },
+        "law": {
+          "title": "Governing law and jurisdiction",
+          "body": "These Terms are governed by French law. Failing an amicable settlement and after recourse to a consumer mediator, any dispute will fall within the jurisdiction of the courts of Paris."
+        }
+      }
+    },
+    "cookiesPage": {
+      "title": "Cookie policy",
+      "metaDescription": "ConciergeTravel cookie policy — categories, purposes, retention, preference management.",
+      "sections": {
+        "intro": {
+          "title": "What is a cookie?",
+          "body": "A cookie is a small file placed on your device when you visit a site. It stores useful information (preferences, authentication, audience measurement). The conciergetravel.fr site uses only cookies strictly necessary for its operation, plus anonymised audience-measurement cookies that we place only with your consent."
+        },
+        "categories": {
+          "title": "Categories used",
+          "intro": "You can accept or refuse each category from the consent banner. Your choices are kept for a maximum of 13 months in line with the CNIL recommendation.",
+          "essential": "Essential cookies (always on): session, security, booking cart, storage of consent preferences.",
+          "analytics": "Audience measurement (with consent): anonymised visit statistics (Vercel Analytics, Web Vitals)."
+        },
+        "manage": {
+          "title": "Manage your preferences",
+          "body": "You can change your choices at any time via the \"Manage cookies\" link in the footer, or through your browser settings. Refusing essential cookies is not technically possible: they are required to deliver the service."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "For any question about this policy: dpo@conciergetravel.fr."
+        }
+      },
+      "manageButton": "Manage my cookies"
+    }
+  },
+  "priceComparator": {
+    "title": "Price comparison",
+    "subtitle": "Prices observed on other platforms for this stay, for information only.",
+    "loading": "Loading prices…",
+    "providerLabel": {
+      "booking_com": "Booking.com",
+      "expedia": "Expedia",
+      "hotels_com": "Hotels.com",
+      "official_site": "Official site"
+    },
+    "scenario": {
+      "cheaper": "Best price observed for this stay.",
+      "equalWithBenefits": "Matching price — loyalty perks included.",
+      "moreExpensive": "Competitor prices, for information only.",
+      "unavailable": "Competitor prices observed, for information only."
+    },
+    "legal": "Prices observed for informational purposes only, subject to change. All rates are shown taxes included.",
+    "cachedNotice": "Cached values (latest refresh unavailable).",
+    "tableHeader": {
+      "provider": "Platform",
+      "price": "Total price incl. tax"
+    }
+  },
+  "destinationPage": {
+    "meta": {
+      "title": "5★ hotels & Palaces in {city}",
+      "description": "ConciergeTravel's curated selection of 5★ hotels and Palaces in {city} ({region}). Net GDS rates, secure payment, loyalty rewards from the first night."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "hotels": "Hotels"
+    },
+    "eyebrow": "Destination",
+    "title": "5★ hotels and Palaces in {city}",
+    "subtitle": "{count, plural, one {Our curated selection of # property in {city}} other {Our curated selection of # properties in {city}}} — {region}.",
+    "empty": "No published hotel for this destination yet.",
+    "aeo": {
+      "question": "How many 5★ hotels and Palaces do you offer in {city}?",
+      "answerSingular": "ConciergeTravel currently lists 1 property in {city} ({region}): 5★ hotels and Palaces curated for location, service and Atout France distinction. Direct booking, net GDS rates, secure payment, loyalty rewards from the first night. Updated {date}.",
+      "answerPlural": "ConciergeTravel currently lists {count} properties in {city} ({region}): 5★ hotels and Palaces curated for location, service and Atout France distinction. Direct booking, net GDS rates, secure payment, loyalty rewards from the first night. Updated {date}."
+    },
+    "card": {
+      "palace": "Palace",
+      "stars": "{count}★",
+      "viewHotel": "View property",
+      "ratingScore": "{value} / {best}",
+      "ratingReviews": "{count, plural, one {# review} other {# reviews}}",
+      "ratingAria": "Average rating of {value} out of {best}, based on {count, plural, one {# verified review} other {# verified reviews}}"
+    },
+    "directory": {
+      "title": "All destinations",
+      "subtitle": "{count, plural, one {# destination available} other {# destinations available}}.",
+      "count": "{count, plural, one {# hotel} other {# hotels}}"
+    }
+  },
+  "hotelPage": {
+    "meta": {
+      "titleFallback": "{name} — {city}",
+      "descriptionFallback": "{name}, 5★ hotel in {city}. Book direct with ConciergeTravel, IATA agency specialised in French palaces and 5★ hotels."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "hotels": "Hotels"
+    },
+    "hero": {
+      "palace": "Palace Distinction",
+      "stars": "{count}★",
+      "districtSeparator": "·",
+      "viewMap": "View on the map"
+    },
+    "rating": {
+      "scoreOf": "{value} / {best}",
+      "scoreAria": "Average rating of {value} out of {best}",
+      "reviewCount": "{count, plural, one {# verified review} other {# verified reviews}}"
+    },
+    "sections": {
+      "about": "About",
+      "highlights": "Highlights",
+      "amenities": "Services & amenities",
+      "rooms": "Rooms & suites",
+      "faq": "Frequently asked questions",
+      "booking": "Check availability",
+      "reviewBreakdown": "What guests are saying"
+    },
+    "reviewCategories": {
+      "scoreOf": "{score} / 100",
+      "scoreAria": "{category}: {score} out of 100",
+      "source": "Aggregated from verified guest reviews via Amadeus. Updated daily.",
+      "sleepQuality": "Sleep quality",
+      "service": "Service",
+      "facilities": "Facilities",
+      "roomComforts": "Room comforts",
+      "valueForMoney": "Value for money",
+      "catering": "Catering",
+      "location": "Location",
+      "pointsOfInterest": "Points of interest",
+      "staff": "Staff",
+      "internet": "Wi-Fi"
+    },
+    "rooms": {
+      "occupancy": "{count, plural, one {# guest} other {# guests}}",
+      "size": "{count} sqm",
+      "amenities": "Amenities"
+    },
+    "noFaq": "No questions yet for this property.",
+    "noAmenities": "Detailed services coming soon.",
+    "noHighlights": "Highlights coming soon.",
+    "noRooms": "Room catalog coming soon.",
+    "booking": {
+      "intro": "Pick your dates and number of guests to check availability.",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "adults": "Adults",
+      "children": "Children",
+      "submit": "Reserve",
+      "submitTest": "Reserve (test mode)",
+      "submitTestHint": "Development mode — no Amadeus call, a synthetic offer drives the funnel end-to-end.",
+      "noOnline": "This property is not bookable online. Send a request to our concierge desk.",
+      "requestEmail": "Booking request"
+    },
+    "loyaltyHint": "Loyalty rewards from the first night for Little catalog hotels.",
+    "lastUpdated": "Page updated on {date}"
+  },
+  "account": {
+    "meta": {
+      "dashboardTitle": "My account",
+      "dashboardDescription": "Find your ConciergeTravel bookings and requests in one place.",
+      "signInTitle": "Sign in",
+      "signUpTitle": "Create an account",
+      "forgotTitle": "Forgot password",
+      "resetTitle": "New password"
+    },
+    "shared": {
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "displayName": "Display name (optional)",
+      "newsletter": "Send me curated editorial selections",
+      "passwordHint": "8 characters minimum.",
+      "honeypotLabel": "Website (do not fill)",
+      "submitting": "Submitting…"
+    },
+    "signIn": {
+      "eyebrow": "Traveller area",
+      "title": "Sign in",
+      "subtitle": "Access your bookings and pending requests.",
+      "submit": "Sign in",
+      "createCta": "Create an account",
+      "forgotCta": "Forgot password?",
+      "pendingBanner": "Account created. Please confirm your email address, then return here to sign in."
+    },
+    "signUp": {
+      "eyebrow": "New traveller",
+      "title": "Create an account",
+      "subtitle": "Track your bookings, receive curated selections, earn loyalty rewards from the first night.",
+      "submit": "Create my account",
+      "haveAccount": "I already have an account",
+      "disclaimer": "By creating an account, you accept our terms and privacy policy."
+    },
+    "forgot": {
+      "eyebrow": "Reset",
+      "title": "Forgot password",
+      "subtitle": "Enter your email address. If an account exists, a reset link will be sent.",
+      "submit": "Send the link",
+      "sentBanner": "If an account exists for this address, a reset email has been sent. Check your inbox (and spam).",
+      "backToSignIn": "Back to sign in"
+    },
+    "reset": {
+      "eyebrow": "Security",
+      "title": "New password",
+      "subtitle": "Set a new password for your account.",
+      "submit": "Update"
+    },
+    "dashboard": {
+      "eyebrow": "Traveller area",
+      "title": "Hello {name}",
+      "subtitle": "Your confirmed bookings and pending requests.",
+      "signOut": "Sign out",
+      "resetBanner": "Your password has been updated.",
+      "sections": {
+        "bookings": "Confirmed bookings",
+        "requests": "Pending requests"
+      },
+      "bookings": {
+        "empty": "You have no confirmed bookings yet.",
+        "ref": "Reference",
+        "stay": "From {checkIn} to {checkOut}",
+        "nights": "{count, plural, one {# night} other {# nights}}",
+        "guests": "{adults, plural, one {# adult} other {# adults}}{children, plural, =0 {} one {, # child} other {, # children}}",
+        "total": "Total {amount}",
+        "status": "Status: {value}"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "cancelled": "Cancelled",
+        "no_show": "No show",
+        "completed": "Stay completed"
+      },
+      "requests": {
+        "empty": "No pending requests.",
+        "ref": "Request",
+        "stay": "From {checkIn} to {checkOut}",
+        "submittedAt": "Sent on {date}",
+        "status": "Status: {value}"
+      },
+      "requestStatuses": {
+        "new": "Received",
+        "in_progress": "Under review",
+        "quoted": "Quote sent",
+        "booked": "Booked",
+        "declined": "Declined"
+      }
+    },
+    "errors": {
+      "invalid_input": "Some fields are invalid. Please check your input and try again.",
+      "invalid_credentials": "Incorrect email or password.",
+      "password_mismatch": "The two passwords do not match.",
+      "email_taken": "An account already exists for this email address.",
+      "email_not_confirmed": "Your email has not been confirmed yet. Check your inbox.",
+      "rate_limited": "Too many attempts. Please wait a few minutes and try again.",
+      "upstream": "Something went wrong. Please try again.",
+      "session_missing": "Your session has expired. Please sign in again to continue."
+    }
+  },
   "errors": {
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The requested page does not exist or has been moved.",
     "errorTitle": "Something went wrong",
     "errorDescription": "Our team has been notified. Please try again shortly.",
     "tryAgain": "Try again"
+  },
+  "reservationStart": {
+    "meta": {
+      "title": "Booking enquiry",
+      "description": "Send your enquiry to our concierge team for this off-network hotel."
+    },
+    "eyebrow": "Booking enquiry",
+    "missing": {
+      "title": "Missing parameters",
+      "description": "This page is reached from a hotel listing. Please select a property and dates first."
+    },
+    "unbookable": {
+      "title": "Hotel unavailable",
+      "description": "This property no longer accepts enquiries through the site. Our concierge team can still help — please reach out directly."
+    },
+    "summary": {
+      "title": "Your stay",
+      "stay": "Stay",
+      "guests": "Guests",
+      "guestsValue": "{adults, plural, one {# adult} other {# adults}}{children, plural, =0 {} one {, # child} other {, # children}}"
+    },
+    "form": {
+      "legend": "Your details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "roomPreference": "Room preference (optional)",
+      "message": "Message to the concierge (optional)",
+      "submit": "Send enquiry"
+    },
+    "disclaimer": "This hotel is off the GDS network. No payment is requested: our concierge team will reply within one business day with a proposal.",
+    "errors": {
+      "validation": "Some fields are invalid. Please correct them and try again.",
+      "hotelNotBookable": "This hotel no longer accepts email enquiries.",
+      "database": "We could not record your enquiry. Please try again shortly.",
+      "rateLimited": "Too many requests recently ({scope, select, ip {from your connection} other {for this email address}}). Please try again in {minutes, plural, one {# minute} other {# minutes}}.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "reservationInvite": {
+    "meta": {
+      "title": "Your details",
+      "description": "Enter the lead traveller's details to finalise the booking."
+    },
+    "eyebrow": "Step 2 of 4 — Traveller",
+    "expired": {
+      "title": "Your booking session has expired",
+      "description": "Offers are locked for 10 minutes. Please start a new search to get an up-to-date price."
+    },
+    "summary": {
+      "title": "Your stay",
+      "stay": "Stay",
+      "guests": "Guests",
+      "guestsValue": "{adults, plural, one {# adult} other {# adults}}{children, plural, =0 {} one {, # child} other {, # children}}",
+      "lockNote": "Your offer is locked at this price for 10 minutes."
+    },
+    "form": {
+      "legend": "Lead traveller",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "phone": "Phone",
+      "submit": "Continue"
+    },
+    "errors": {
+      "validation": "Some fields are invalid. Please review and try again.",
+      "invalidState": "Step unavailable — your offer expired. Please start a new search.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "reservationRecap": {
+    "meta": {
+      "title": "Booking summary",
+      "description": "Review your booking details before secure payment."
+    },
+    "eyebrow": "Step 3 of 4 — Summary",
+    "title": "Review your booking",
+    "expired": {
+      "title": "Session expired",
+      "description": "Your offer is no longer available. Please start a new search for an up-to-date price."
+    },
+    "summary": {
+      "stay": "Stay",
+      "guests": "Guests",
+      "guestsValue": "{adults, plural, one {# adult} other {# adults}}{children, plural, =0 {} one {, # child} other {, # children}}",
+      "lead": "Lead traveller",
+      "total": "Total incl. tax"
+    },
+    "cancellation": {
+      "title": "Cancellation policy",
+      "verbatimNote": "Text provided by the hotelier — it applies as written."
+    },
+    "continueToPayment": "Continue to payment",
+    "paymentDisclaimer": "You will be redirected to the secure Amadeus payment module. No card data is stored by ConciergeTravel."
+  },
+  "reservationPayment": {
+    "meta": {
+      "title": "Secure payment",
+      "description": "Amadeus payment — fill in your details inside the secure iframe."
+    },
+    "eyebrow": "Step 4 of 4 — Payment",
+    "title": "Amadeus secure payment",
+    "expired": {
+      "title": "Payment session unavailable",
+      "description": "Your offer is no longer valid. Please start a new search to resume the booking."
+    },
+    "summary": "Booking for {hotel} — Total {total} incl. tax.",
+    "stub": {
+      "title": "Test mode — simulated payment",
+      "description": "Amadeus payment credentials are not yet provisioned. Clicking below simulates a successful payment and triggers booking creation, confirmation email and database persistence — the full tunnel mechanics without any live external call.",
+      "confirmCta": "Confirm (test mode)"
+    },
+    "iframe": {
+      "title": "Amadeus payment iframe",
+      "description": "For PCI DSS compliance the payment form is hosted by Amadeus Payments.",
+      "todo": "Payment integration in progress — the Amadeus iframe will be hosted in this section in the next iteration."
+    },
+    "errors": {
+      "declined": "The payment was declined. Please try again or use another payment method.",
+      "bookingUpstream": "The booking could not be created with our provider. No charge has been made.",
+      "database": "We could not record the booking. Our team has been notified.",
+      "unknown": "Something went wrong during payment. Please try again."
+    },
+    "pciNote": "ConciergeTravel never receives or stores card data. Payment is processed directly by Amadeus Payments (PCI DSS Level 1)."
+  },
+  "reservationConfirmation": {
+    "meta": {
+      "title": "Booking confirmed",
+      "description": "Confirmation of your booking or enquiry."
+    },
+    "eyebrow": "Confirmation",
+    "title": "Your enquiry was received",
+    "greeting": "Hello {name}, thank you for reaching out.",
+    "summary": {
+      "body": "We forwarded your interest in {hotel} for the period {checkIn} → {checkOut} to our concierge team.",
+      "bodyNoHotel": "We recorded your enquiry for the period {checkIn} → {checkOut}."
+    },
+    "reference": {
+      "label": "Your enquiry reference"
+    },
+    "paid": {
+      "eyebrow": "Booking confirmed",
+      "title": "Your booking is confirmed",
+      "summary": {
+        "body": "Your stay at {hotel} from {checkIn} to {checkOut} is confirmed.",
+        "bodyNoHotel": "Your stay from {checkIn} to {checkOut} is confirmed."
+      },
+      "totalLabel": "Total charged",
+      "reference": {
+        "label": "Booking reference"
+      }
+    },
+    "emailSentTo": "A copy of this confirmation was sent to {email}."
   }
 }

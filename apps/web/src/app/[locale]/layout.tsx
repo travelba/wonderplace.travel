@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
-import { NextIntlClientProvider, hasLocale } from 'next-intl';
+import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Inter, Playfair_Display } from 'next/font/google';
-import { routing } from '@/i18n/routing';
+import { ConditionalAnalytics } from '@/components/analytics';
+import { ConsentBanner } from '@/components/consent';
+import { SiteFooter } from '@/components/layout/site-footer';
+import { SiteHeader } from '@/components/layout/site-header';
+import { isRoutingLocale, routing } from '@/i18n/routing';
 import '@/styles/globals.css';
 
 const sans = Inter({
@@ -55,15 +59,35 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
+  if (!isRoutingLocale(locale)) notFound();
 
   setRequestLocale(locale);
   const messages = await getMessages();
 
   return (
     <html lang={locale} className={`${sans.variable} ${serif.variable}`}>
-      <body>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+      <body className="flex min-h-dvh flex-col">
+        <NextIntlClientProvider messages={messages}>
+          <SiteHeader />
+          {/*
+            `#main` is the skip-link target. Mark it as `role="main"` /
+            `<main>`-equivalent landmark via the `id` and `tabIndex={-1}`
+            so screen readers and keyboard users can jump straight from
+            the header skip-link to the page content.
+          */}
+          <div id="main" tabIndex={-1} className="flex-1 outline-none">
+            {children}
+          </div>
+          <SiteFooter />
+          <ConsentBanner />
+          {/*
+            Consent-gated analytics — Vercel Analytics + Speed Insights
+            only mount when `analytics === true` in the cookie. See
+            `/components/analytics/conditional-analytics.tsx` and the
+            cookie policy (`/cookies`).
+          */}
+          <ConditionalAnalytics />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

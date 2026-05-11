@@ -1,32 +1,55 @@
 import { NextResponse } from 'next/server';
 
+import { buildLlmsTxt } from '@cct/seo';
+
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 /**
  * /llms.txt — concise index for LLMs (skill: geo-llm-optimization).
- * Final content sourced from Payload `LlmsTxtSource` global in Phase 8.
+ * Phase 8 will source the strategic-pages list + about copy from Payload
+ * `LlmsTxtSource` global; for now we ship a deterministic seed list.
  */
-export function GET(request: Request) {
+export function GET(request: Request): NextResponse {
   const origin = new URL(request.url).origin;
-  const body = `# ConciergeTravel.fr — Agence IATA Hôtels 5★ & Palaces France
-
-ConciergeTravel.fr est l'agence de voyage IATA spécialisée dans les hôtels 5 étoiles et Palaces en France. Tarifs nets GDS, paiement sécurisé Amadeus, programme de fidélité dès la première nuit.
-
-## Pages stratégiques
-
-- ${origin}/hotels/france/ — pilier France : tous les hôtels 5★ et Palaces référencés.
-- ${origin}/selection/ — sélections éditoriales par expérience (romantique, famille, gastronomie, vignobles).
-- ${origin}/guides/ — guides pratiques (réserver un palace, comprendre le classement, voyager hors saison).
-- ${origin}/programme-fidelite/ — programme de fidélité ConciergeTravel Essentiel et Prestige.
-- ${origin}/agence/ — l'agence IATA, ASPST, garantie financière APST.
-
-## À propos
-
-Agence accréditée IATA, membre ASPST, garantie financière APST. Conseillers francophones. Paiement sécurisé Amadeus. Programme de fidélité avec avantages dès la première nuit (petit-déjeuner offert, late check-out, crédit hôtel).
-
-Dernière mise à jour : ${new Date().toISOString().slice(0, 10)}.
-`;
+  const body = buildLlmsTxt({
+    siteName: 'ConciergeTravel.fr',
+    tagline: 'Agence IATA Hôtels 5★ & Palaces France',
+    originUrl: origin,
+    about:
+      "ConciergeTravel.fr est l'agence de voyage IATA spécialisée dans les hôtels 5 étoiles et Palaces en France. " +
+      'Tarifs nets GDS, paiement sécurisé Amadeus, programme de fidélité dès la première nuit.',
+    lastUpdatedDate: new Date().toISOString(),
+    sections: [
+      {
+        title: 'Pages stratégiques',
+        items: [
+          {
+            url: `${origin}/hotels/france/`,
+            description: 'Pilier France : tous les hôtels 5★ et Palaces référencés.',
+          },
+          {
+            url: `${origin}/selection/`,
+            description:
+              'Sélections éditoriales par expérience (romantique, famille, gastronomie, vignobles).',
+          },
+          {
+            url: `${origin}/guides/`,
+            description:
+              'Guides pratiques (réserver un palace, comprendre le classement, hors saison).',
+          },
+          {
+            url: `${origin}/programme-fidelite/`,
+            description: 'Programme de fidélité ConciergeTravel Essentiel et Prestige.',
+          },
+          {
+            url: `${origin}/agence/`,
+            description: "L'agence IATA, ASPST, garantie financière APST.",
+          },
+        ],
+      },
+    ],
+  });
 
   return new NextResponse(body, {
     headers: {
