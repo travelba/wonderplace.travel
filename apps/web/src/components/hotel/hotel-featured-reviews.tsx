@@ -69,7 +69,6 @@ export async function HotelFeaturedReviews({
       <ul
         aria-label={t('featuredReviews.listAria')}
         className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
-        role="list"
       >
         {visible.map((review, idx) => {
           const ratingLabel =

@@ -72,6 +72,14 @@ export async function HotelStaticMap({
         aria-label={t('staticMapAria', { hotelName })}
         className="focus-visible:ring-accent relative block aspect-[20/9] w-full focus:outline-none focus-visible:ring-2"
       >
+        {/*
+          eslint-disable-next-line @next/next/no-img-element --
+          We intentionally avoid `next/image` for Wikimedia map tiles: the
+          loader would force a same-origin proxy through `/_next/image`, which
+          adds 1 RTT and offers no real optimization benefit for a 1024×460
+          PNG we already serve at the requested DPR. The native `<img>` keeps
+          this purely client-rendered after hydration with `loading="lazy"`.
+        */}
         <img
           src={tileUrl}
           alt={t('staticMapAlt', { hotelName })}

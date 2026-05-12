@@ -75,7 +75,6 @@ export async function HotelSignatureExperiences({
       <ul
         aria-label={t('signatureExperiences.listAria')}
         className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
-        role="list"
       >
         {visible.map((exp) => (
           <li key={exp.key} className="flex">

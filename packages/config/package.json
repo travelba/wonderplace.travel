@@ -7,8 +7,8 @@
     "./env": "./src/env.ts",
     "./env/web": "./src/env-web.ts",
     "./env/admin": "./src/env-admin.ts",
-    "./eslint": "./src/eslint/index.cjs",
-    "./eslint/next": "./src/eslint/next.cjs",
+    "./eslint": "./src/eslint/base.js",
+    "./eslint/next": "./src/eslint/next.js",
     "./tsconfig/base.json": "./tsconfig/base.json",
     "./tsconfig/nextjs.json": "./tsconfig/nextjs.json",
     "./tsconfig/node.json": "./tsconfig/node.json",
@@ -16,7 +16,6 @@
     "./tailwind": "./src/tailwind/preset.ts"
   },
   "scripts": {
-    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -24,15 +23,17 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.18.0",
     "@types/node": "^22.10.0",
     "eslint": "^9.18.0",
     "eslint-config-next": "15.1.6",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.20.0",
-    "@typescript-eslint/parser": "^8.20.0",
+    "globals": "^15.14.0",
     "tailwindcss": "^3.4.17",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "typescript-eslint": "8.40.0"
   }
 }

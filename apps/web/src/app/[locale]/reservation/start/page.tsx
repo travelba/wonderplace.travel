@@ -89,7 +89,6 @@ async function fetchHotelHead(
     // Degraded environments (CI smoke, preview without Supabase env) —
     // render the "unbookable" state instead of crashing the route.
     if (process.env['NODE_ENV'] !== 'production') {
-      // eslint-disable-next-line no-console
       console.warn('[reservation/start] fetchHotelHead failed:', e);
     }
     return null;

@@ -818,7 +818,7 @@ async function renderHotelPage(
             checkIn={checkIn}
             checkOut={checkOut}
             adults={adults}
-            children={children}
+            childrenCount={children}
           />
         )}
       </section>

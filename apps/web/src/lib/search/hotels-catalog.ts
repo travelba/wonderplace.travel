@@ -84,7 +84,6 @@ export async function searchHotelsCatalogOnServer(
     return out;
   } catch (e) {
     if (process.env['NODE_ENV'] !== 'production') {
-      // eslint-disable-next-line no-console
       console.warn('[hotels-catalog] search failed:', e);
     }
     return [];
