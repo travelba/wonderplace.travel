@@ -1116,6 +1116,14 @@ const HOTEL_RECORD = {
   // ("1908"); the HotelFactSheet history line renders both years.
   opened_at: '1908-04-01' as string,
   last_renovated_at: '2014-08-01' as string,
+  // No verified public Matterport / Kuula tour exists for The Peninsula
+  // Paris at seed-time (the brand publishes hosted video walkthroughs
+  // on YouTube but those don't qualify for our iframe contract — we
+  // only embed providers with stable, sandbox-safe SPAs). Editorial
+  // can flip this to a curated URL via the admin UI once Hong Kong
+  // publishes the official tour. See migration
+  // `0023_hotel_virtual_tour.sql` for the host allowlist.
+  virtual_tour_url: null as string | null,
 };
 
 /**
@@ -1165,7 +1173,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count,
       phone_e164,
-      opened_at, last_renovated_at
+      opened_at, last_renovated_at,
+      virtual_tour_url
     )
     values (
       ${HOTEL_RECORD.slug}, ${HOTEL_RECORD.slug_en}, ${HOTEL_RECORD.name}, ${HOTEL_RECORD.name_en},
@@ -1193,7 +1202,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${HOTEL_RECORD.meta_desc_fr}, ${HOTEL_RECORD.meta_desc_en},
       ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count},
       ${HOTEL_RECORD.phone_e164},
-      ${HOTEL_RECORD.opened_at}, ${HOTEL_RECORD.last_renovated_at}
+      ${HOTEL_RECORD.opened_at}, ${HOTEL_RECORD.last_renovated_at},
+      ${HOTEL_RECORD.virtual_tour_url}
     )
     on conflict (slug) do update set
       slug_en = excluded.slug_en,
@@ -1240,6 +1250,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       phone_e164 = excluded.phone_e164,
       opened_at = excluded.opened_at,
       last_renovated_at = excluded.last_renovated_at,
+      virtual_tour_url = excluded.virtual_tour_url,
       updated_at = timezone('utc', now())
     returning id, (xmax = 0) as inserted
   `;

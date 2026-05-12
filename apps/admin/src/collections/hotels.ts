@@ -481,6 +481,31 @@ export const Hotels: CollectionConfig = {
             },
           ],
         },
+        {
+          name: 'virtual_tour_url',
+          type: 'text',
+          maxLength: 512,
+          admin: {
+            description:
+              'External immersive 3D / 360° tour URL. Allowed hosts: https://my.matterport.com or https://kuula.co (CSP + DB CHECK enforce this — any other host is rejected at write time).',
+            placeholder: 'https://my.matterport.com/show/?m=…',
+          },
+          validate: (value: unknown): true | string => {
+            if (value === null || value === undefined || value === '') return true;
+            if (typeof value !== 'string') return 'Must be a string.';
+            if (value.length > 512) return 'Maximum 512 characters.';
+            try {
+              const url = new URL(value);
+              if (url.protocol !== 'https:') return 'Must use https://.';
+              if (url.hostname !== 'my.matterport.com' && url.hostname !== 'kuula.co') {
+                return 'Host must be my.matterport.com or kuula.co.';
+              }
+            } catch {
+              return 'Invalid URL.';
+            }
+            return true;
+          },
+        },
       ],
     },
 

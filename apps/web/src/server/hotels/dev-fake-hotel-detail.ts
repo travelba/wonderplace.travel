@@ -91,6 +91,9 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     // asserting on real historical hotels.
     opened_at: '2010-06-01',
     last_renovated_at: null,
+    // No virtual tour for the synthetic E2E hotel — keeps the iframe
+    // off the test page so smoke specs don't have to mock Matterport.
+    virtual_tour_url: null,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
     // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the

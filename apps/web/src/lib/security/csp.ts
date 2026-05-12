@@ -67,6 +67,13 @@ const FRAME_HOSTS = [
   "'self'",
   // Amadeus Hosted Payment Page (iframe).
   'https://*.amadeus.com',
+  // Immersive virtual-tour providers embedded on the hotel detail
+  // page (see `apps/web/src/components/hotel/hotel-virtual-tour.tsx`
+  // and migration `0023_hotel_virtual_tour.sql`). The DB CHECK
+  // constraint forbids any other host so this allowlist mirrors the
+  // exact set of values that can ever reach the iframe.
+  'https://my.matterport.com',
+  'https://kuula.co',
 ] as const;
 
 const MEDIA_HOSTS = ["'self'", 'https://res.cloudinary.com'] as const;

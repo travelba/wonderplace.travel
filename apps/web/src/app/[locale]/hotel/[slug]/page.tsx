@@ -22,6 +22,7 @@ import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSignatureExperiences } from '@/components/hotel/hotel-signature-experiences';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { HotelStory } from '@/components/hotel/hotel-story';
+import { HotelVirtualTour } from '@/components/hotel/hotel-virtual-tour';
 import { PriceComparator } from '@/components/price-comparator';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
@@ -57,6 +58,7 @@ import {
   readRestaurants,
   readSignatureExperiences,
   readSpa,
+  readVirtualTour,
   type HotelDetail,
   type HotelDetailRow,
   type SupportedLocale,
@@ -346,6 +348,7 @@ async function renderHotelPage(
   const faqGroups = readFaqByCategory(row, locale);
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
+  const virtualTour = readVirtualTour(row);
   const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const heroDescriptor =
     heroPublicId !== null ? { publicId: heroPublicId, alt: galleryImages[0]?.alt ?? name } : null;
@@ -455,6 +458,13 @@ async function renderHotelPage(
     // queries. The reader returns `openedYear` only when the DB value
     // parses cleanly within (1500 .. current_year + 1).
     ...(historyDates.openedYear !== null ? { foundingDate: String(historyDates.openedYear) } : {}),
+    // Virtual / 360° tour (Phase 11.4 / CDC §2.15). Surfaced as
+    // Schema.org `LodgingBusiness.tourBookingPage` — the canonical
+    // property Google's hotel rich-result documentation accepts for
+    // "page providing a virtual tour of the place". The reader
+    // already restricts the host to the CSP-whitelisted providers,
+    // so any value reaching this builder is safe to emit verbatim.
+    ...(virtualTour !== null ? { tourBookingPage: virtualTour.url } : {}),
     // Editorial room sub-pages exposed as `Hotel.containsPlace[]`
     // (Phase 10.27 / CDC §2.15). Each entry points at the indexable
     // room sub-page URL so search engines and LLM ingestion pipelines
@@ -715,6 +725,8 @@ async function renderHotelPage(
         hero={heroDescriptor}
         images={galleryImages}
       />
+
+      <HotelVirtualTour locale={locale} hotelName={name} tour={virtualTour} />
 
       <HotelFactSheet
         locale={locale}

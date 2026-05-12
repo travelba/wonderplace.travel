@@ -487,6 +487,17 @@
       "nextImage": "Next photo",
       "closeLightbox": "Close gallery"
     },
+    "virtualTour": {
+      "title": "Virtual tour",
+      "intro": "Step inside {name} in immersive 3D before your stay. Move freely between the signature spaces: lobby, suite, restaurant.",
+      "iframeTitle": "Virtual tour of {name}",
+      "caption": "Immersive tour provided by {provider}.",
+      "openExternal": "Open in fullscreen",
+      "provider": {
+        "matterport": "Matterport",
+        "kuula": "Kuula"
+      }
+    },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
       "scoreAria": "{category}: {score} out of 100",

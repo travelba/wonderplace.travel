@@ -487,6 +487,17 @@
       "nextImage": "Photo suivante",
       "closeLightbox": "Fermer la galerie"
     },
+    "virtualTour": {
+      "title": "Visite virtuelle",
+      "intro": "Explorez {name} en immersion 3D avant votre arrivée. Naviguez librement entre les espaces signature : lobby, suite, restaurant.",
+      "iframeTitle": "Visite virtuelle de {name}",
+      "caption": "Visite immersive fournie par {provider}.",
+      "openExternal": "Ouvrir en plein écran",
+      "provider": {
+        "matterport": "Matterport",
+        "kuula": "Kuula"
+      }
+    },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
       "scoreAria": "{category} : {score} sur 100",

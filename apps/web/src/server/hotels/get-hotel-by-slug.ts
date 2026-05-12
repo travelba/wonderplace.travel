@@ -97,6 +97,7 @@ export const HotelDetailRowSchema = z.object({
   phone_e164: stringOrEmpty,
   opened_at: stringOrEmpty,
   last_renovated_at: stringOrEmpty,
+  virtual_tour_url: stringOrEmpty,
   is_published: z.boolean(),
   updated_at: stringOrEmpty,
 });
@@ -104,7 +105,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, virtual_tour_url, is_published, updated_at';
 
 /**
  * E.164 phone-number format: leading `+`, country code, 4-15 digits, no
@@ -199,6 +200,60 @@ export function readHotelHistoryDates(row: HotelDetailRow): HotelHistoryDates {
     lastRenovatedDate: renovated?.iso ?? null,
     lastRenovatedYear: renovated?.year ?? null,
   };
+}
+
+/**
+ * Virtual / 360° tour URL (Phase 11.4 — CDC §2 bloc 2 polish).
+ *
+ * The DB CHECK constraint in migration `0023_hotel_virtual_tour.sql`
+ * already restricts the host to `my.matterport.com` or `kuula.co` and
+ * enforces a 512-char ceiling. We re-validate at read time as a
+ * belt-and-braces guard against:
+ *
+ *   - rows written before the CHECK constraint existed,
+ *   - rows imported via direct UPSERTs that bypass the trigger (the
+ *     constraint catches those, but defensive parsing keeps the page
+ *     working even when a corrupt row sneaks past),
+ *   - Cypress / E2E fixtures that intentionally inject bad data to
+ *     exercise the fallback path.
+ *
+ * The set of allowed hosts MUST stay in lockstep with the CSP
+ * `frame-src` allowlist in `apps/web/src/lib/security/csp.ts` and the
+ * SQL CHECK regex — three places, one truth: "Matterport + Kuula".
+ *
+ * Returns `null` on any mismatch (rather than throwing) so a single
+ * malformed editorial entry never tanks the route.
+ */
+export type VirtualTourProvider = 'matterport' | 'kuula';
+
+export interface HotelVirtualTour {
+  readonly url: string;
+  readonly provider: VirtualTourProvider;
+}
+
+const ALLOWED_VIRTUAL_TOUR_HOSTS: Readonly<Record<string, VirtualTourProvider>> = {
+  'my.matterport.com': 'matterport',
+  'kuula.co': 'kuula',
+};
+
+export function readVirtualTour(row: HotelDetailRow): HotelVirtualTour | null {
+  if (row.virtual_tour_url === null) return null;
+  const raw = row.virtual_tour_url.trim();
+  if (raw.length === 0 || raw.length > 512) return null;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:') return null;
+  // Disallow user-info or non-default ports — both can be used to
+  // smuggle a malicious endpoint into an otherwise-trusted host.
+  if (url.username.length > 0 || url.password.length > 0) return null;
+  if (url.port.length > 0 && url.port !== '443') return null;
+  const provider = ALLOWED_VIRTUAL_TOUR_HOSTS[url.hostname];
+  if (provider === undefined) return null;
+  return { url: url.toString(), provider };
 }
 
 /**

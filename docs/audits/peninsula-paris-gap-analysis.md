@@ -77,49 +77,52 @@ Score sur **5** par bloc. Notes :
 **Total après nuit du 11 mai 2026 (Phase 10.18 → 10.27)** : 71/75 (~95 %) ✓.
 **Total après nuit du 11/12 mai 2026 (Phase 10.28 → 10.30)** : **73/75 (~97 %)** ✓ cible Phase 12 (74/75) à 1 bloc.
 **Total après nuit du 12 mai 2026 (Phase 11 — PR #43–#48)** : **74/75 (~99 %)** ✓ cible Phase 12 atteinte. Reste bloc 14 (B2B/MICE) reporté Phase 12+.
+**Total après matinée du 12 mai 2026 (Phase 11.4 — PR #52)** : **74/75 (~99 %)** — bloc 2 atteint **5/5++** (lightbox + virtual tour iframe sandboxed Matterport/Kuula, JSON-LD `tourBookingPage`). Plafond métier maintenu, aucun gain de score brut mais gap polish refermé.
 
 La fiche dépasse maintenant le seuil de publication face à Booking / Mr & Mrs Smith / AOR Hotels sur **14 blocs sur 15**. Restent : favoris (bloc 1, requiert table `user_favorites` + auth) et B2B/MICE (bloc 14, reporté Phase 11/12).
 
 ### Chantiers livrés depuis le score initial
 
-| PR / Commit | Phase | Blocs impactés                                                                           | Score      |
-| ----------- | ----- | ---------------------------------------------------------------------------------------- | ---------- |
-| `cfc4beb`   | 9.C   | Galerie média (bloc 2)                                                                   | 0 → 4      |
-| `1b05766`   | 9.B   | Restaurants + spa (bloc 12)                                                              | 1 → 4      |
-| `c8b09fc`   | 10.1  | Sous-pages chambres (bloc 5)                                                             | 2 → 4      |
-| `a842e94`   | 10.2  | Localisation enrichie (bloc 7)                                                           | 1 → 4      |
-| `4d34cce`   | 10.3  | Politiques structurées (bloc 9)                                                          | 0 → 4      |
-| PR #11      | 10.4  | Awards & distinctions (bloc 11)                                                          | 4 → 4 (UI) |
-| PR #12      | 10.5  | Sitemap + llms.txt rooms                                                                 | bloc 15    |
-| PR #13      | 10.6  | Taxonomie aménités (bloc 6)                                                              | 3 → 4      |
-| PR #15      | 10.7  | postal_code + HotelReassurance (blocs 7, 13)                                             | 2 → 4      |
-| PR #16      | 10.8  | JSON-LD enrichment (numberOfRooms, checkinTime, petsAllowed, bestRating) (bloc 15)       | 4 → 5      |
-| PR #17      | 10.9  | HotelFactSheet (bloc 3)                                                                  | 3 → 4      |
-| PR #18      | 10.10 | Long-form story + TOC (bloc 4)                                                           | 3 → 4      |
-| PR #19      | 10.11 | DisplayOnlyBookingCard (bloc 8)                                                          | 4 → 5      |
-| PR #20      | 10.12 | FAQ canoniques + intent grouping (bloc 11)                                               | 4 → 5      |
-| PR #21      | 10.13 | Signature Experiences (bloc 12)                                                          | 4 → 5      |
-| PR #22      | 10.14 | Featured editorial reviews (bloc 10)                                                     | 1 → 4      |
-| PR #23      | 10.15 | Share button (bloc 1)                                                                    | 3 → 4      |
-| PR #24      | 10.16 | JSON-LD dateModified + nearbyAttractions (blocs 7, 15)                                   | 4 → 5      |
-| PR #26      | 10.18 | Per-hotel Open Graph + Twitter Card images (bloc 2)                                      | 4 → 5      |
-| PR #27      | 10.19 | Refined freshness badge (`<time>` + pill) (bloc 3)                                       | 4 → 5      |
-| PR #28      | 10.20 | Fix `seed-dev.ts` jsonb binding via `sql.json()` (correctness, infra)                    | —          |
-| PR #29      | 10.21 | City-tax + Wi-Fi policies in `policies` jsonb + UI (bloc 9)                              | 4 → 5      |
-| PR #30      | 10.22 | Amenity category SVG glyphs (bloc 6)                                                     | 4 → 5      |
-| PR #31      | 10.23 | hotel_rooms: `is_signature` + `indicative_price_minor` + `display_order` (bloc 5)        | 4 → 5      |
-| PR #32      | 10.24 | Reassurance trust glyphs (IATA/APST/payment/GDPR/support) (bloc 13)                      | 4 → 5      |
-| PR #33      | 10.25 | Room sub-page polish: per-room OG image + signature pill + indicative price (bloc 5)     | —          |
-| PR #34      | 10.26 | Hotel JSON-LD `priceRange` derived from rooms (bloc 15)                                  | 5 → 5+     |
-| PR #35      | 10.27 | Hotel JSON-LD `containsPlace[]` → indexable room sub-pages (bloc 15)                     | 5 → 5+     |
-| PR #37      | 10.28 | Static OSM map preview (Wikimedia tiles, SVG marker, CSP-clean) (bloc 7)                 | 5 → 5+     |
-| PR #38      | 10.29 | `hotels.phone_e164` column + Hotel JSON-LD `telephone` field (bloc 15)                   | 5+ → 5++   |
-| PR #39      | 10.30 | 7th long-form section "Service & équipe" — long-form passes 1000-word target (bloc 4)    | 4 → 5      |
-| PR #43      | 11.1  | Auth-gated favorites (table user_favorites, RLS own-only, client island toggle) (bloc 1) | 4 → 5      |
-| PR #45      | 11.1b | /compte/favoris listing page (Server Component force-dynamic + empty-state CTA) (bloc 1) | —          |
-| PR #46      | 11.1c | Hotel gallery lightbox (`<dialog>` native, ←/→ kb-nav, hero LCP preserved) (bloc 2)      | 5 → 5+     |
-| PR #47      | 11.2  | `hotels.opened_at` + `last_renovated_at` → Schema.org `foundingDate` + UI (bloc 3+15)    | 5 → 5+     |
-| PR #48      | 11.3  | Admin Hotels collection synced with public.hotels schema (no UX impact, dev-quality)     | —          |
+| PR / Commit | Phase | Blocs impactés                                                                                     | Score      |
+| ----------- | ----- | -------------------------------------------------------------------------------------------------- | ---------- |
+| `cfc4beb`   | 9.C   | Galerie média (bloc 2)                                                                             | 0 → 4      |
+| `1b05766`   | 9.B   | Restaurants + spa (bloc 12)                                                                        | 1 → 4      |
+| `c8b09fc`   | 10.1  | Sous-pages chambres (bloc 5)                                                                       | 2 → 4      |
+| `a842e94`   | 10.2  | Localisation enrichie (bloc 7)                                                                     | 1 → 4      |
+| `4d34cce`   | 10.3  | Politiques structurées (bloc 9)                                                                    | 0 → 4      |
+| PR #11      | 10.4  | Awards & distinctions (bloc 11)                                                                    | 4 → 4 (UI) |
+| PR #12      | 10.5  | Sitemap + llms.txt rooms                                                                           | bloc 15    |
+| PR #13      | 10.6  | Taxonomie aménités (bloc 6)                                                                        | 3 → 4      |
+| PR #15      | 10.7  | postal_code + HotelReassurance (blocs 7, 13)                                                       | 2 → 4      |
+| PR #16      | 10.8  | JSON-LD enrichment (numberOfRooms, checkinTime, petsAllowed, bestRating) (bloc 15)                 | 4 → 5      |
+| PR #17      | 10.9  | HotelFactSheet (bloc 3)                                                                            | 3 → 4      |
+| PR #18      | 10.10 | Long-form story + TOC (bloc 4)                                                                     | 3 → 4      |
+| PR #19      | 10.11 | DisplayOnlyBookingCard (bloc 8)                                                                    | 4 → 5      |
+| PR #20      | 10.12 | FAQ canoniques + intent grouping (bloc 11)                                                         | 4 → 5      |
+| PR #21      | 10.13 | Signature Experiences (bloc 12)                                                                    | 4 → 5      |
+| PR #22      | 10.14 | Featured editorial reviews (bloc 10)                                                               | 1 → 4      |
+| PR #23      | 10.15 | Share button (bloc 1)                                                                              | 3 → 4      |
+| PR #24      | 10.16 | JSON-LD dateModified + nearbyAttractions (blocs 7, 15)                                             | 4 → 5      |
+| PR #26      | 10.18 | Per-hotel Open Graph + Twitter Card images (bloc 2)                                                | 4 → 5      |
+| PR #27      | 10.19 | Refined freshness badge (`<time>` + pill) (bloc 3)                                                 | 4 → 5      |
+| PR #28      | 10.20 | Fix `seed-dev.ts` jsonb binding via `sql.json()` (correctness, infra)                              | —          |
+| PR #29      | 10.21 | City-tax + Wi-Fi policies in `policies` jsonb + UI (bloc 9)                                        | 4 → 5      |
+| PR #30      | 10.22 | Amenity category SVG glyphs (bloc 6)                                                               | 4 → 5      |
+| PR #31      | 10.23 | hotel_rooms: `is_signature` + `indicative_price_minor` + `display_order` (bloc 5)                  | 4 → 5      |
+| PR #32      | 10.24 | Reassurance trust glyphs (IATA/APST/payment/GDPR/support) (bloc 13)                                | 4 → 5      |
+| PR #33      | 10.25 | Room sub-page polish: per-room OG image + signature pill + indicative price (bloc 5)               | —          |
+| PR #34      | 10.26 | Hotel JSON-LD `priceRange` derived from rooms (bloc 15)                                            | 5 → 5+     |
+| PR #35      | 10.27 | Hotel JSON-LD `containsPlace[]` → indexable room sub-pages (bloc 15)                               | 5 → 5+     |
+| PR #37      | 10.28 | Static OSM map preview (Wikimedia tiles, SVG marker, CSP-clean) (bloc 7)                           | 5 → 5+     |
+| PR #38      | 10.29 | `hotels.phone_e164` column + Hotel JSON-LD `telephone` field (bloc 15)                             | 5+ → 5++   |
+| PR #39      | 10.30 | 7th long-form section "Service & équipe" — long-form passes 1000-word target (bloc 4)              | 4 → 5      |
+| PR #43      | 11.1  | Auth-gated favorites (table user_favorites, RLS own-only, client island toggle) (bloc 1)           | 4 → 5      |
+| PR #45      | 11.1b | /compte/favoris listing page (Server Component force-dynamic + empty-state CTA) (bloc 1)           | —          |
+| PR #46      | 11.1c | Hotel gallery lightbox (`<dialog>` native, ←/→ kb-nav, hero LCP preserved) (bloc 2)                | 5 → 5+     |
+| PR #47      | 11.2  | `hotels.opened_at` + `last_renovated_at` → Schema.org `foundingDate` + UI (bloc 3+15)              | 5 → 5+     |
+| PR #48      | 11.3  | Admin Hotels collection synced with public.hotels schema (no UX impact, dev-quality)               | —          |
+| PR #51      | 11.3b | Inline "remove from favorites" button on /compte/favoris cards (UX polish)                         | —          |
+| PR #52      | 11.4  | `hotels.virtual_tour_url` (Matterport/Kuula) + sandboxed iframe + JSON-LD tourBookingPage (bloc 2) | 5+ → 5++   |
 
 ---
 
@@ -458,28 +461,29 @@ Rolls-Royce Phantom, Art in Residence).
 
 ## 4. JSON-LD livré vs CDC §2.15
 
-| Propriété                                                               | Avant    | Après nuit 10.7-10.16 | Note                                              |
-| ----------------------------------------------------------------------- | -------- | --------------------- | ------------------------------------------------- |
-| `@type: Hotel`                                                          | ✅       | ✅                    | OK                                                |
-| `name`, `url`, `description`                                            | ✅       | ✅                    | description tronquée à 500 chars                  |
-| `starRating.ratingValue`                                                | ✅       | ✅                    | 5                                                 |
-| `starRating.bestRating`                                                 | ❌       | ✅ (10.8)             | Émis explicitement = 5                            |
-| `award`                                                                 | ✅       | ✅                    | "Distinction Palace" + 4 distinctions éditoriales |
-| `address.streetAddress, addressLocality, addressCountry, addressRegion` | ✅       | ✅                    | OK                                                |
-| `address.postalCode`                                                    | ⚠️       | ✅ (10.7)             | "75116" — colonne postal_code seedée              |
-| `geo.latitude/longitude`                                                | ✅       | ✅                    | 48.8702 / 2.2932                                  |
-| `amenityFeature[]`                                                      | ✅       | ✅                    | 15 features, `LocationFeatureSpecification`       |
-| `image[]`                                                               | ✅ (9.C) | ✅                    | hero + 5 gallery URLs Cloudinary absolues         |
-| `numberOfRooms`                                                         | ❌       | ✅ (10.8)             | 200                                               |
-| `petsAllowed`                                                           | ❌       | ✅ (10.8)             | `true` (Peninsula accepte les chiens)             |
-| `checkinTime / checkoutTime`                                            | ❌       | ✅ (10.8)             | 06:00 / 22:00 (Peninsula Time)                    |
-| `priceRange`                                                            | ❌       | ✅ (10.26)            | Dérivé des `indicative_price_minor` des chambres  |
-| `aggregateRating`                                                       | ❌       | ❌                    | Pas de data Amadeus/Google (display_only)         |
-| `foundingDate` (Phase 11.2)                                             | ❌       | ✅ (11.2 #47)         | Bare `YYYY` issu de `opened_at` — Peninsula 1908  |
-| `review[]` (editorial pull-quotes)                                      | ❌       | ✅ (10.14)            | 3 quotes Forbes/Condé Nast/T+L avec ratings + URL |
-| `dateModified`                                                          | ❌       | ✅ (10.16)            | `row.updated_at` ISO-8601                         |
-| `nearbyAttractions[]`                                                   | ❌       | ✅ (10.16)            | 8 POIs (Arc de Triomphe, Louvre, Champs-Élysées…) |
-| `containsPlace[]` (rooms)                                               | ❌       | ✅ (10.27)            | HotelRoom{name,url} cap 20 — pointe sous-pages    |
+| Propriété                                                               | Avant    | Après nuit 10.7-10.16 | Note                                                   |
+| ----------------------------------------------------------------------- | -------- | --------------------- | ------------------------------------------------------ |
+| `@type: Hotel`                                                          | ✅       | ✅                    | OK                                                     |
+| `name`, `url`, `description`                                            | ✅       | ✅                    | description tronquée à 500 chars                       |
+| `starRating.ratingValue`                                                | ✅       | ✅                    | 5                                                      |
+| `starRating.bestRating`                                                 | ❌       | ✅ (10.8)             | Émis explicitement = 5                                 |
+| `award`                                                                 | ✅       | ✅                    | "Distinction Palace" + 4 distinctions éditoriales      |
+| `address.streetAddress, addressLocality, addressCountry, addressRegion` | ✅       | ✅                    | OK                                                     |
+| `address.postalCode`                                                    | ⚠️       | ✅ (10.7)             | "75116" — colonne postal_code seedée                   |
+| `geo.latitude/longitude`                                                | ✅       | ✅                    | 48.8702 / 2.2932                                       |
+| `amenityFeature[]`                                                      | ✅       | ✅                    | 15 features, `LocationFeatureSpecification`            |
+| `image[]`                                                               | ✅ (9.C) | ✅                    | hero + 5 gallery URLs Cloudinary absolues              |
+| `numberOfRooms`                                                         | ❌       | ✅ (10.8)             | 200                                                    |
+| `petsAllowed`                                                           | ❌       | ✅ (10.8)             | `true` (Peninsula accepte les chiens)                  |
+| `checkinTime / checkoutTime`                                            | ❌       | ✅ (10.8)             | 06:00 / 22:00 (Peninsula Time)                         |
+| `priceRange`                                                            | ❌       | ✅ (10.26)            | Dérivé des `indicative_price_minor` des chambres       |
+| `aggregateRating`                                                       | ❌       | ❌                    | Pas de data Amadeus/Google (display_only)              |
+| `foundingDate` (Phase 11.2)                                             | ❌       | ✅ (11.2 #47)         | Bare `YYYY` issu de `opened_at` — Peninsula 1908       |
+| `tourBookingPage` (Phase 11.4)                                          | ❌       | ✅ (11.4 #52)         | Émis si `virtual_tour_url` non null (Matterport/Kuula) |
+| `review[]` (editorial pull-quotes)                                      | ❌       | ✅ (10.14)            | 3 quotes Forbes/Condé Nast/T+L avec ratings + URL      |
+| `dateModified`                                                          | ❌       | ✅ (10.16)            | `row.updated_at` ISO-8601                              |
+| `nearbyAttractions[]`                                                   | ❌       | ✅ (10.16)            | 8 POIs (Arc de Triomphe, Louvre, Champs-Élysées…)      |
+| `containsPlace[]` (rooms)                                               | ❌       | ✅ (10.27)            | HotelRoom{name,url} cap 20 — pointe sous-pages         |
 
 ---
 
@@ -536,7 +540,7 @@ Schema.org `Restaurant` / `HealthClub`.
 | 1    | Page `/compte/favoris` feed read-only                                              | 0.5 s  | P2   | ✓ Phase 11.1b #45     |
 | 1    | Sélecteur devise (EUR/USD/GBP/CHF) — requires multi-currency pricing pipeline      | 1 s    | P3   | ouvert                |
 | 2    | Lightbox swipeable (`<dialog>` native + kb-nav + a11y)                             | 0.5 s  | P3   | ✓ Phase 11.1c #46     |
-| 2    | Matterport tour 3D (virtualTourUrl column + iframe embed)                          | 1 s    | P3   | ouvert                |
+| 2    | Matterport tour 3D (virtualTourUrl column + iframe embed)                          | 1 s    | P3   | ✓ Phase 11.4 #52      |
 | 3    | `data-freshness` UI raffiné (badge "Mise à jour le …")                             | 0.25 s | P3   | ✓ 10.19 #27           |
 | 3    | History line "Ouverture YYYY · Rénové en YYYY" en HotelFactSheet                   | 0.5 s  | P3   | ✓ Phase 11.2 #47      |
 | 4    | Long-form porté à 1000 mots cible (7 sections, ~1 100 mots cumulés)                | 0.5 s  | P3   | ✓ 10.30 #39           |
