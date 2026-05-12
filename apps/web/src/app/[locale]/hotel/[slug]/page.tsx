@@ -12,6 +12,7 @@ import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
 import { HotelFaq } from '@/components/hotel/hotel-faq';
 import { HotelFeaturedReviews } from '@/components/hotel/hotel-featured-reviews';
+import { HotelFavoriteButton } from '@/components/hotel/hotel-favorite-button';
 import { HotelShareButton } from '@/components/hotel/hotel-share-button';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
@@ -634,11 +635,19 @@ async function renderHotelPage(
             <span>{row.region}</span>
           </div>
 
-          <HotelShareButton
-            hotelName={name}
-            shareText={description !== null ? truncate(description, 160) : null}
-            canonicalUrl={canonicalUrl}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <HotelFavoriteButton
+              hotelId={row.id}
+              hotelName={name}
+              locale={locale}
+              returnPath={localePath}
+            />
+            <HotelShareButton
+              hotelName={name}
+              shareText={description !== null ? truncate(description, 160) : null}
+              canonicalUrl={canonicalUrl}
+            />
+          </div>
         </div>
 
         <h1 className="text-fg mt-3 font-serif text-3xl sm:text-4xl md:text-5xl">{name}</h1>

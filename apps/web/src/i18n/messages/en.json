@@ -358,6 +358,14 @@
       "toastFailed": "Copy failed — select the link manually",
       "manualCopyLabel": "Reveal link"
     },
+    "favorites": {
+      "addToFavorites": "Add {name} to my favorites",
+      "removeFromFavorites": "Remove {name} from my favorites",
+      "shortAdd": "Favorites",
+      "shortRemove": "Saved",
+      "confirmAdded": "{name} was added to your favorites",
+      "confirmRemoved": "{name} was removed from your favorites"
+    },
     "rating": {
       "scoreOf": "{value} / {best}",
       "scoreAria": "Average rating of {value} out of {best}",

@@ -358,6 +358,14 @@
       "toastFailed": "Copie impossible — sélectionnez le lien manuellement",
       "manualCopyLabel": "Afficher le lien"
     },
+    "favorites": {
+      "addToFavorites": "Ajouter {name} à mes favoris",
+      "removeFromFavorites": "Retirer {name} de mes favoris",
+      "shortAdd": "Favoris",
+      "shortRemove": "En favoris",
+      "confirmAdded": "{name} a été ajouté à vos favoris",
+      "confirmRemoved": "{name} a été retiré de vos favoris"
+    },
     "rating": {
       "scoreOf": "{value} / {best}",
       "scoreAria": "Note moyenne de {value} sur {best}",
