@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound, redirect } from 'next/navigation';
 import { HotelImage } from '@cct/ui';
 
+import { FavoriteRemoveButton } from '@/components/account/favorite-remove-button';
 import { Link } from '@/i18n/navigation';
 import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
@@ -138,7 +139,8 @@ function FavoriteCard({
 
   return (
     <li>
-      <article className="border-border bg-bg group h-full overflow-hidden rounded-lg border transition-shadow hover:shadow-md">
+      <article className="border-border bg-bg group relative h-full overflow-hidden rounded-lg border transition-shadow hover:shadow-md">
+        <FavoriteRemoveButton hotelId={fav.hotel_id} hotelName={name} />
         <Link href={href} className="block focus-visible:outline-none">
           {heroPublicId !== null ? (
             <div className="relative aspect-[4/3] w-full overflow-hidden">

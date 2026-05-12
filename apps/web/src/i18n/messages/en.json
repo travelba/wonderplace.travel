@@ -769,7 +769,9 @@
       "emptyCta": "Browse our selection",
       "noPhoto": "Photo coming soon",
       "palace": "Palace",
-      "stars": "{count} stars"
+      "stars": "{count} stars",
+      "removeAction": "Remove {name} from my favorites",
+      "removeConfirmation": "{name} has been removed from your favorites."
     }
   },
   "errors": {
