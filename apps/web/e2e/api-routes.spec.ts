@@ -68,7 +68,9 @@ test.describe('public API + well-known', () => {
     expect(body).toMatch(/Agence IATA/i);
 
     // Strategic pages section — references real, in-tree routes only.
-    expect(body).toMatch(/\/fr$/m);
+    // Lines have the format `- {absolute-url} — {description}`, so the
+    // bare `/fr` root is followed by ` — ` (space-em-dash-space).
+    expect(body).toMatch(/\/fr\s+—/);
     expect(body).toMatch(/\/fr\/destination/);
     expect(body).toMatch(/\/fr\/recherche/);
 
@@ -136,26 +138,50 @@ test.describe('public API + well-known', () => {
     expect(link).toContain('rel="agent-skills"');
   });
 
-  test('GET /sitemap.xml returns XML and references the site origin', async ({ request }) => {
+  test('GET /sitemap.xml returns a sitemap index pointing at sub-sitemaps', async ({ request }) => {
     const res = await request.get('/sitemap.xml');
     expect(res.status()).toBe(200);
     expect(res.headers()['content-type']).toMatch(/xml/);
     const body = await res.text();
     expect(body).toMatch(/^<\?xml version=/);
-    expect(body).toMatch(/<urlset/);
+    // `/sitemap.xml` is a `<sitemapindex>` (skill: seo-technical §Sitemaps)
+    // that fans out to per-collection sub-sitemaps. The `<urlset>` shape
+    // is only used by those sub-sitemaps.
+    expect(body).toMatch(/<sitemapindex/);
+    for (const sub of ['hotels', 'rooms', 'hubs', 'editorial', 'guides']) {
+      expect(body).toContain(`/sitemaps/${sub}.xml`);
+    }
   });
 
-  test('CSP nonce is propagated to JSON-LD scripts', async ({ page }) => {
-    await page.goto('/');
-    const nonces = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(
-        (s) => s.getAttribute('nonce') ?? '',
-      ),
+  test('CSP nonce is propagated to JSON-LD scripts', async ({ request }) => {
+    // We MUST inspect raw HTML here. CSP3 (https://w3c.github.io/webappsec-csp/
+    // §"Restrict Access to the Nonce IDL Attribute") requires browsers to
+    // blank the `nonce` attribute on script elements after they've been
+    // processed, so reading `document.querySelector('script').getAttribute('nonce')`
+    // from Playwright's page context always returns "". Fetching the
+    // server-rendered HTML directly bypasses this stripping and lets us
+    // assert that the middleware nonce was actually emitted by SSR.
+    const res = await request.get('/fr');
+    expect(res.status()).toBe(200);
+
+    // The response's CSP header carries the per-request nonce.
+    const csp = res.headers()['content-security-policy'] ?? '';
+    const cspNonceMatch = csp.match(/'nonce-([^']+)'/);
+    expect(cspNonceMatch, 'CSP header should advertise a nonce-...').not.toBeNull();
+    const cspNonce = cspNonceMatch?.[1] ?? '';
+    expect(cspNonce.length).toBeGreaterThan(0);
+
+    // Every JSON-LD <script> in the SSR HTML must carry the *same* nonce so
+    // the browser-enforced CSP doesn't block our structured data.
+    const html = await res.text();
+    const scriptMatches = Array.from(
+      html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>/g),
     );
-    expect(nonces.length).toBeGreaterThanOrEqual(1);
-    // Every JSON-LD script must carry the per-request nonce (non-empty).
-    for (const n of nonces) {
-      expect(n.length, 'JSON-LD script must carry a nonce').toBeGreaterThan(0);
+    expect(scriptMatches.length).toBeGreaterThanOrEqual(1);
+    for (const m of scriptMatches) {
+      const nonceMatch = m[0].match(/nonce="([^"]+)"/);
+      expect(nonceMatch, `script must carry a nonce: ${m[0]}`).not.toBeNull();
+      expect(nonceMatch?.[1]).toBe(cspNonce);
     }
   });
 });

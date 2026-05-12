@@ -2,16 +2,25 @@ import { NextResponse } from 'next/server';
 
 import { buildSitemapIndexXml } from '@cct/seo';
 
+import { env } from '@/lib/env';
+
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
+const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
+
 /**
  * Sitemap index (skill: seo-technical). Sub-sitemaps are emitted by
- * `/sitemaps/{hotels,hubs,editorial,guides}.xml`. Each starts empty until
- * Phase 8 wires Payload data, but always returns a valid `urlset`.
+ * `/sitemaps/{hotels,rooms,hubs,editorial,guides}.xml`.
+ *
+ * IMPORTANT: This route is `force-static`. Reading `new URL(request.url).origin`
+ * here would bake the build-time origin (typically `http://localhost:3000`)
+ * into the deployed file. We instead read the canonical site URL from
+ * validated env so the deployed sitemap always points at the production
+ * domain. Sub-sitemap routes follow the same pattern.
  */
-export function GET(request: Request): NextResponse {
-  const origin = new URL(request.url).origin;
+export function GET(): NextResponse {
+  const origin = (env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/$/, '');
   const now = new Date().toISOString();
   const xml = buildSitemapIndexXml([
     { loc: `${origin}/sitemaps/hotels.xml`, lastmod: now },
