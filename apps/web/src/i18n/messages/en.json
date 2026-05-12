@@ -475,7 +475,13 @@
       "supportDetail": "A French-speaking team replies to your enquiries by email within 24 business hours."
     },
     "gallery": {
-      "thumbnailsLabel": "Additional photos of the property"
+      "thumbnailsLabel": "Additional photos of the property",
+      "openLightbox": "View larger photo",
+      "lightboxLabel": "Hotel gallery",
+      "lightboxCounter": "{current} / {total}",
+      "previousImage": "Previous photo",
+      "nextImage": "Next photo",
+      "closeLightbox": "Close gallery"
     },
     "reviewCategories": {
       "scoreOf": "{score} / 100",

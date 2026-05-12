@@ -475,7 +475,13 @@
       "supportDetail": "Une équipe francophone répond à vos questions par e-mail sous 24 h ouvrées."
     },
     "gallery": {
-      "thumbnailsLabel": "Autres photos de l'établissement"
+      "thumbnailsLabel": "Autres photos de l'établissement",
+      "openLightbox": "Agrandir la photo",
+      "lightboxLabel": "Galerie de l'hôtel",
+      "lightboxCounter": "{current} / {total}",
+      "previousImage": "Photo précédente",
+      "nextImage": "Photo suivante",
+      "closeLightbox": "Fermer la galerie"
     },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
