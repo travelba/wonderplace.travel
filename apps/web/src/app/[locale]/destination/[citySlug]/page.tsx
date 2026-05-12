@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
@@ -12,12 +13,16 @@ import { getDestinationBySlug, listPublishedCities } from '@/server/destinations
 import { getAmadeusAggregateRatingsBatch } from '@/server/hotels/get-amadeus-sentiments-batch';
 
 /**
- * Rendering mode (Sprint 4.1 refactor): the layout no longer reads
- * `cookies()`, so destination hubs are now safe to ISR. We pre-render
- * every published city via `generateStaticParams` and revalidate hourly
- * (matching the SLA for new editorial publications). See ADR-0007.
+ * Rendering mode: the page reads `headers()` to forward the per-request CSP
+ * nonce to its inline JSON-LD scripts (ItemList + BreadcrumbList + FAQPage),
+ * which forces dynamic rendering. The explicit `force-dynamic` directive
+ * locks the contract — re-enabling ISR here would silently strip the nonce
+ * from the cached HTML and `strict-dynamic` CSP would block the structured
+ * data, breaking SEO. Re-introducing ISR requires switching the CSP from
+ * per-request nonces to build-time hashes — out of scope (see
+ * `components/seo/json-ld.tsx`).
  */
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 
@@ -183,11 +188,13 @@ export default async function DestinationHubPage({
     JsonLd.faqPageJsonLd([{ question: aeoQuestion, answer: aeoAnswer }]),
   );
 
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
-      <JsonLdScript data={itemListJsonLd} />
-      <JsonLdScript data={breadcrumbJsonLd} />
-      <JsonLdScript data={faqJsonLd} />
+      <JsonLdScript data={itemListJsonLd} nonce={nonce} />
+      <JsonLdScript data={breadcrumbJsonLd} nonce={nonce} />
+      <JsonLdScript data={faqJsonLd} nonce={nonce} />
 
       <nav aria-label={t('breadcrumb.hotels')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">

@@ -1,19 +1,17 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import { JsonLd } from '@cct/seo';
 
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { env } from '@/lib/env';
 
-// `<JsonLdScript>` calls `headers()` to read the per-request CSP nonce
-// emitted by middleware (skill: security-engineering §CSP). Pages that
-// embed it must render dynamically; combining a `revalidate` directive
-// with `headers()` silently strips the nonce from the cached HTML —
-// the inline JSON-LD scripts would then violate the CSP and be blocked
-// by the browser. We accept the SSR cost on the homepage to keep
-// structured data discoverable. (Long-term: lift `headers()` to the
-// root layout and pass the nonce down via prop drilling so we can
-// re-introduce ISR — tracked in the gap-analysis follow-ups.)
+// The page reads `headers()` to forward the per-request CSP nonce to its
+// inline JSON-LD scripts (skill: security-engineering §CSP). That dynamic
+// API call also marks the page as fully dynamic; the explicit
+// `force-dynamic` keeps the contract grep-able. Re-introducing ISR here
+// would silently strip the nonce and the strict-dynamic CSP would block
+// the structured data — see `components/seo/json-ld.tsx` for the design.
 export const dynamic = 'force-dynamic';
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
@@ -23,6 +21,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale);
   const t = await getTranslations('homepage');
   const tCommon = await getTranslations('common');
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
 
   const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/$/, '');
   const agencyJsonLd = JsonLd.withSchemaOrgContext(
@@ -46,8 +45,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <main className="max-w-editorial container mx-auto flex min-h-[60vh] flex-col items-start justify-center gap-6 px-4 py-16 sm:py-24">
-      <JsonLdScript data={agencyJsonLd} />
-      <JsonLdScript data={homeFaqJsonLd} />
+      <JsonLdScript data={agencyJsonLd} nonce={nonce} />
+      <JsonLdScript data={homeFaqJsonLd} nonce={nonce} />
       <p className="text-muted text-xs uppercase tracking-[0.18em]">
         {tCommon('siteName')} — France
       </p>
