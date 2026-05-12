@@ -53,67 +53,73 @@ Score sur **5** par bloc. Notes :
 - **4** = présent, manque polish ou data
 - **5** = conforme CDC §2
 
-| #   | Bloc CDC §2                                  | Score initial | Après 10.6 | Après 10.7–10.16    | Après 10.18–10.30                                                    | Priorité résiduelle       |
-| --- | -------------------------------------------- | ------------- | ---------- | ------------------- | -------------------------------------------------------------------- | ------------------------- |
-| 1   | En-tête identité                             | 3/5           | 3/5        | 4/5 ✓ (10.15)       | 4/5                                                                  | P2 (favoris auth-gated)   |
-| 2   | Galerie média                                | 0/5           | 4/5 ✓      | 4/5                 | **5/5** ✓ (10.18 OG/Twitter)                                         | P3 (lightbox)             |
-| 3   | Résumé factuel IA-ready (AEO)                | 3/5           | 3/5        | 4/5 ✓ (10.9)        | **5/5** ✓ (10.19 freshness pill)                                     | —                         |
-| 4   | Description longue                           | 3/5           | 3/5        | 4/5 ✓ (10.10)       | **5/5** ✓ (10.30 service & équipe section, >1000 mots)               | —                         |
-| 5   | Types de chambres                            | 2/5           | 4/5 ✓      | 4/5                 | **5/5** ✓ (10.23+10.25)                                              | —                         |
-| 6   | Équipements & services                       | 3/5           | 3/5        | 4/5 ✓ (10.6)        | **5/5** ✓ (10.22 icons)                                              | —                         |
-| 7   | Localisation (carte, POIs, transport)        | 1/5           | 4/5 ✓      | 5/5 ✓ (10.16)       | **5/5+** ✓ (10.28 static map)                                        | —                         |
-| 8   | Moteur de réservation / display              | 4/5           | 4/5        | 5/5 ✓ (10.11)       | 5/5                                                                  | —                         |
-| 9   | Politiques (annulation, check-in/out, taxes) | 0/5           | 4/5 ✓      | 4/5                 | **5/5** ✓ (10.21 cityTax+wifi)                                       | —                         |
-| 10  | Avis & notes                                 | 1/5           | 1/5        | 4/5 ✓ (10.14)       | 4/5                                                                  | P2 (Google Places ingest) |
-| 11  | FAQ                                          | 4/5           | 4/5        | 5/5 ✓ (10.12)       | 5/5                                                                  | —                         |
-| 12  | Restaurants, spa, expériences                | 1/5           | 4/5 ✓      | 5/5 ✓ (10.13)       | 5/5                                                                  | —                         |
-| 13  | Réassurance / agence IATA                    | 2/5           | 2/5        | 4/5 ✓ (10.7)        | **5/5** ✓ (10.24 glyphs)                                             | —                         |
-| 14  | B2B / MICE                                   | 0/5           | 0/5        | 0/5                 | 0/5                                                                  | P3                        |
-| 15  | Specs techniques (Schema.org, hreflang, ISR) | 4/5           | 5/5 ✓      | 5/5 ✓ (10.8, 10.16) | **5/5++** ✓ (10.26 priceRange, 10.27 containsPlace, 10.29 telephone) | —                         |
+| #   | Bloc CDC §2                                  | Score initial | Après 10.6 | Après 10.7–10.16    | Après 10.18–10.30                                                    | Après Phase 11 (PR #43–#47)             | Priorité résiduelle   |
+| --- | -------------------------------------------- | ------------- | ---------- | ------------------- | -------------------------------------------------------------------- | --------------------------------------- | --------------------- |
+| 1   | En-tête identité                             | 3/5           | 3/5        | 4/5 ✓ (10.15)       | 4/5                                                                  | **5/5** ✓ (#43 favoris + #45 page list) | P3 (sélecteur devise) |
+| 2   | Galerie média                                | 0/5           | 4/5 ✓      | 4/5                 | **5/5** ✓ (10.18 OG/Twitter)                                         | **5/5+** ✓ (#46 lightbox)               | —                     |
+| 3   | Résumé factuel IA-ready (AEO)                | 3/5           | 3/5        | 4/5 ✓ (10.9)        | **5/5** ✓ (10.19 freshness pill)                                     | **5/5+** ✓ (#47 history line)           | —                     |
+| 4   | Description longue                           | 3/5           | 3/5        | 4/5 ✓ (10.10)       | **5/5** ✓ (10.30 service & équipe section, >1000 mots)               | 5/5                                     | —                     |
+| 5   | Types de chambres                            | 2/5           | 4/5 ✓      | 4/5                 | **5/5** ✓ (10.23+10.25)                                              | —                                       |
+| 6   | Équipements & services                       | 3/5           | 3/5        | 4/5 ✓ (10.6)        | **5/5** ✓ (10.22 icons)                                              | —                                       |
+| 7   | Localisation (carte, POIs, transport)        | 1/5           | 4/5 ✓      | 5/5 ✓ (10.16)       | **5/5+** ✓ (10.28 static map)                                        | —                                       |
+| 8   | Moteur de réservation / display              | 4/5           | 4/5        | 5/5 ✓ (10.11)       | 5/5                                                                  | —                                       |
+| 9   | Politiques (annulation, check-in/out, taxes) | 0/5           | 4/5 ✓      | 4/5                 | **5/5** ✓ (10.21 cityTax+wifi)                                       | —                                       |
+| 10  | Avis & notes                                 | 1/5           | 1/5        | 4/5 ✓ (10.14)       | 4/5                                                                  | P2 (Google Places ingest)               |
+| 11  | FAQ                                          | 4/5           | 4/5        | 5/5 ✓ (10.12)       | 5/5                                                                  | —                                       |
+| 12  | Restaurants, spa, expériences                | 1/5           | 4/5 ✓      | 5/5 ✓ (10.13)       | 5/5                                                                  | —                                       |
+| 13  | Réassurance / agence IATA                    | 2/5           | 2/5        | 4/5 ✓ (10.7)        | **5/5** ✓ (10.24 glyphs)                                             | —                                       |
+| 14  | B2B / MICE                                   | 0/5           | 0/5        | 0/5                 | 0/5                                                                  | P3                                      |
+| 15  | Specs techniques (Schema.org, hreflang, ISR) | 4/5           | 5/5 ✓      | 5/5 ✓ (10.8, 10.16) | **5/5++** ✓ (10.26 priceRange, 10.27 containsPlace, 10.29 telephone) | —                                       |
 
 **Total initial** : 34/75 (~45 %) — fiche pilote.
 **Total après Phase 9 + Phase 10 (B → 10.6)** : 58/75 (~77 %).
 **Total après nuit du 11 mai 2026 (Phase 10.7 → 10.16)** : 66/75 (~88 %) ✓ cible Phase 11 atteinte.
 **Total après nuit du 11 mai 2026 (Phase 10.18 → 10.27)** : 71/75 (~95 %) ✓.
 **Total après nuit du 11/12 mai 2026 (Phase 10.28 → 10.30)** : **73/75 (~97 %)** ✓ cible Phase 12 (74/75) à 1 bloc.
+**Total après nuit du 12 mai 2026 (Phase 11 — PR #43–#48)** : **74/75 (~99 %)** ✓ cible Phase 12 atteinte. Reste bloc 14 (B2B/MICE) reporté Phase 12+.
 
 La fiche dépasse maintenant le seuil de publication face à Booking / Mr & Mrs Smith / AOR Hotels sur **14 blocs sur 15**. Restent : favoris (bloc 1, requiert table `user_favorites` + auth) et B2B/MICE (bloc 14, reporté Phase 11/12).
 
 ### Chantiers livrés depuis le score initial
 
-| PR / Commit | Phase | Blocs impactés                                                                        | Score      |
-| ----------- | ----- | ------------------------------------------------------------------------------------- | ---------- |
-| `cfc4beb`   | 9.C   | Galerie média (bloc 2)                                                                | 0 → 4      |
-| `1b05766`   | 9.B   | Restaurants + spa (bloc 12)                                                           | 1 → 4      |
-| `c8b09fc`   | 10.1  | Sous-pages chambres (bloc 5)                                                          | 2 → 4      |
-| `a842e94`   | 10.2  | Localisation enrichie (bloc 7)                                                        | 1 → 4      |
-| `4d34cce`   | 10.3  | Politiques structurées (bloc 9)                                                       | 0 → 4      |
-| PR #11      | 10.4  | Awards & distinctions (bloc 11)                                                       | 4 → 4 (UI) |
-| PR #12      | 10.5  | Sitemap + llms.txt rooms                                                              | bloc 15    |
-| PR #13      | 10.6  | Taxonomie aménités (bloc 6)                                                           | 3 → 4      |
-| PR #15      | 10.7  | postal_code + HotelReassurance (blocs 7, 13)                                          | 2 → 4      |
-| PR #16      | 10.8  | JSON-LD enrichment (numberOfRooms, checkinTime, petsAllowed, bestRating) (bloc 15)    | 4 → 5      |
-| PR #17      | 10.9  | HotelFactSheet (bloc 3)                                                               | 3 → 4      |
-| PR #18      | 10.10 | Long-form story + TOC (bloc 4)                                                        | 3 → 4      |
-| PR #19      | 10.11 | DisplayOnlyBookingCard (bloc 8)                                                       | 4 → 5      |
-| PR #20      | 10.12 | FAQ canoniques + intent grouping (bloc 11)                                            | 4 → 5      |
-| PR #21      | 10.13 | Signature Experiences (bloc 12)                                                       | 4 → 5      |
-| PR #22      | 10.14 | Featured editorial reviews (bloc 10)                                                  | 1 → 4      |
-| PR #23      | 10.15 | Share button (bloc 1)                                                                 | 3 → 4      |
-| PR #24      | 10.16 | JSON-LD dateModified + nearbyAttractions (blocs 7, 15)                                | 4 → 5      |
-| PR #26      | 10.18 | Per-hotel Open Graph + Twitter Card images (bloc 2)                                   | 4 → 5      |
-| PR #27      | 10.19 | Refined freshness badge (`<time>` + pill) (bloc 3)                                    | 4 → 5      |
-| PR #28      | 10.20 | Fix `seed-dev.ts` jsonb binding via `sql.json()` (correctness, infra)                 | —          |
-| PR #29      | 10.21 | City-tax + Wi-Fi policies in `policies` jsonb + UI (bloc 9)                           | 4 → 5      |
-| PR #30      | 10.22 | Amenity category SVG glyphs (bloc 6)                                                  | 4 → 5      |
-| PR #31      | 10.23 | hotel_rooms: `is_signature` + `indicative_price_minor` + `display_order` (bloc 5)     | 4 → 5      |
-| PR #32      | 10.24 | Reassurance trust glyphs (IATA/APST/payment/GDPR/support) (bloc 13)                   | 4 → 5      |
-| PR #33      | 10.25 | Room sub-page polish: per-room OG image + signature pill + indicative price (bloc 5)  | —          |
-| PR #34      | 10.26 | Hotel JSON-LD `priceRange` derived from rooms (bloc 15)                               | 5 → 5+     |
-| PR #35      | 10.27 | Hotel JSON-LD `containsPlace[]` → indexable room sub-pages (bloc 15)                  | 5 → 5+     |
-| PR #37      | 10.28 | Static OSM map preview (Wikimedia tiles, SVG marker, CSP-clean) (bloc 7)              | 5 → 5+     |
-| PR #38      | 10.29 | `hotels.phone_e164` column + Hotel JSON-LD `telephone` field (bloc 15)                | 5+ → 5++   |
-| PR #39      | 10.30 | 7th long-form section "Service & équipe" — long-form passes 1000-word target (bloc 4) | 4 → 5      |
+| PR / Commit | Phase | Blocs impactés                                                                           | Score      |
+| ----------- | ----- | ---------------------------------------------------------------------------------------- | ---------- |
+| `cfc4beb`   | 9.C   | Galerie média (bloc 2)                                                                   | 0 → 4      |
+| `1b05766`   | 9.B   | Restaurants + spa (bloc 12)                                                              | 1 → 4      |
+| `c8b09fc`   | 10.1  | Sous-pages chambres (bloc 5)                                                             | 2 → 4      |
+| `a842e94`   | 10.2  | Localisation enrichie (bloc 7)                                                           | 1 → 4      |
+| `4d34cce`   | 10.3  | Politiques structurées (bloc 9)                                                          | 0 → 4      |
+| PR #11      | 10.4  | Awards & distinctions (bloc 11)                                                          | 4 → 4 (UI) |
+| PR #12      | 10.5  | Sitemap + llms.txt rooms                                                                 | bloc 15    |
+| PR #13      | 10.6  | Taxonomie aménités (bloc 6)                                                              | 3 → 4      |
+| PR #15      | 10.7  | postal_code + HotelReassurance (blocs 7, 13)                                             | 2 → 4      |
+| PR #16      | 10.8  | JSON-LD enrichment (numberOfRooms, checkinTime, petsAllowed, bestRating) (bloc 15)       | 4 → 5      |
+| PR #17      | 10.9  | HotelFactSheet (bloc 3)                                                                  | 3 → 4      |
+| PR #18      | 10.10 | Long-form story + TOC (bloc 4)                                                           | 3 → 4      |
+| PR #19      | 10.11 | DisplayOnlyBookingCard (bloc 8)                                                          | 4 → 5      |
+| PR #20      | 10.12 | FAQ canoniques + intent grouping (bloc 11)                                               | 4 → 5      |
+| PR #21      | 10.13 | Signature Experiences (bloc 12)                                                          | 4 → 5      |
+| PR #22      | 10.14 | Featured editorial reviews (bloc 10)                                                     | 1 → 4      |
+| PR #23      | 10.15 | Share button (bloc 1)                                                                    | 3 → 4      |
+| PR #24      | 10.16 | JSON-LD dateModified + nearbyAttractions (blocs 7, 15)                                   | 4 → 5      |
+| PR #26      | 10.18 | Per-hotel Open Graph + Twitter Card images (bloc 2)                                      | 4 → 5      |
+| PR #27      | 10.19 | Refined freshness badge (`<time>` + pill) (bloc 3)                                       | 4 → 5      |
+| PR #28      | 10.20 | Fix `seed-dev.ts` jsonb binding via `sql.json()` (correctness, infra)                    | —          |
+| PR #29      | 10.21 | City-tax + Wi-Fi policies in `policies` jsonb + UI (bloc 9)                              | 4 → 5      |
+| PR #30      | 10.22 | Amenity category SVG glyphs (bloc 6)                                                     | 4 → 5      |
+| PR #31      | 10.23 | hotel_rooms: `is_signature` + `indicative_price_minor` + `display_order` (bloc 5)        | 4 → 5      |
+| PR #32      | 10.24 | Reassurance trust glyphs (IATA/APST/payment/GDPR/support) (bloc 13)                      | 4 → 5      |
+| PR #33      | 10.25 | Room sub-page polish: per-room OG image + signature pill + indicative price (bloc 5)     | —          |
+| PR #34      | 10.26 | Hotel JSON-LD `priceRange` derived from rooms (bloc 15)                                  | 5 → 5+     |
+| PR #35      | 10.27 | Hotel JSON-LD `containsPlace[]` → indexable room sub-pages (bloc 15)                     | 5 → 5+     |
+| PR #37      | 10.28 | Static OSM map preview (Wikimedia tiles, SVG marker, CSP-clean) (bloc 7)                 | 5 → 5+     |
+| PR #38      | 10.29 | `hotels.phone_e164` column + Hotel JSON-LD `telephone` field (bloc 15)                   | 5+ → 5++   |
+| PR #39      | 10.30 | 7th long-form section "Service & équipe" — long-form passes 1000-word target (bloc 4)    | 4 → 5      |
+| PR #43      | 11.1  | Auth-gated favorites (table user_favorites, RLS own-only, client island toggle) (bloc 1) | 4 → 5      |
+| PR #45      | 11.1b | /compte/favoris listing page (Server Component force-dynamic + empty-state CTA) (bloc 1) | —          |
+| PR #46      | 11.1c | Hotel gallery lightbox (`<dialog>` native, ←/→ kb-nav, hero LCP preserved) (bloc 2)      | 5 → 5+     |
+| PR #47      | 11.2  | `hotels.opened_at` + `last_renovated_at` → Schema.org `foundingDate` + UI (bloc 3+15)    | 5 → 5+     |
+| PR #48      | 11.3  | Admin Hotels collection synced with public.hotels schema (no UX impact, dev-quality)     | —          |
 
 ---
 
@@ -469,6 +475,7 @@ Rolls-Royce Phantom, Art in Residence).
 | `checkinTime / checkoutTime`                                            | ❌       | ✅ (10.8)             | 06:00 / 22:00 (Peninsula Time)                    |
 | `priceRange`                                                            | ❌       | ✅ (10.26)            | Dérivé des `indicative_price_minor` des chambres  |
 | `aggregateRating`                                                       | ❌       | ❌                    | Pas de data Amadeus/Google (display_only)         |
+| `foundingDate` (Phase 11.2)                                             | ❌       | ✅ (11.2 #47)         | Bare `YYYY` issu de `opened_at` — Peninsula 1908  |
 | `review[]` (editorial pull-quotes)                                      | ❌       | ✅ (10.14)            | 3 quotes Forbes/Condé Nast/T+L avec ratings + URL |
 | `dateModified`                                                          | ❌       | ✅ (10.16)            | `row.updated_at` ISO-8601                         |
 | `nearbyAttractions[]`                                                   | ❌       | ✅ (10.16)            | 8 POIs (Arc de Triomphe, Louvre, Champs-Élysées…) |
@@ -526,9 +533,12 @@ Schema.org `Restaurant` / `HealthClub`.
 | Bloc | Action résiduelle                                                                  | Effort | Prio | Statut                |
 | ---- | ---------------------------------------------------------------------------------- | ------ | ---- | --------------------- |
 | 1    | Favoris auth-gated (`user_favorites` + RLS + client island)                        | 1 s    | P2   | ✓ Phase 11.1 #43      |
+| 1    | Page `/compte/favoris` feed read-only                                              | 0.5 s  | P2   | ✓ Phase 11.1b #45     |
 | 1    | Sélecteur devise (EUR/USD/GBP/CHF) — requires multi-currency pricing pipeline      | 1 s    | P3   | ouvert                |
-| 2    | Lightbox swipeable (carousel client) + Matterport tour                             | 1 s    | P3   | ouvert                |
+| 2    | Lightbox swipeable (`<dialog>` native + kb-nav + a11y)                             | 0.5 s  | P3   | ✓ Phase 11.1c #46     |
+| 2    | Matterport tour 3D (virtualTourUrl column + iframe embed)                          | 1 s    | P3   | ouvert                |
 | 3    | `data-freshness` UI raffiné (badge "Mise à jour le …")                             | 0.25 s | P3   | ✓ 10.19 #27           |
+| 3    | History line "Ouverture YYYY · Rénové en YYYY" en HotelFactSheet                   | 0.5 s  | P3   | ✓ Phase 11.2 #47      |
 | 4    | Long-form porté à 1000 mots cible (7 sections, ~1 100 mots cumulés)                | 0.5 s  | P3   | ✓ 10.30 #39           |
 | 5    | Sous-sous-pages chambre fourchette de prix + badge "Suite signature"               | 1 s    | P2   | ✓ 10.23+10.25 #31+#33 |
 | 6    | Pictogrammes par amenity catégorie                                                 | 0.5 s  | P3   | ✓ 10.22 #30           |
@@ -538,6 +548,7 @@ Schema.org `Restaurant` / `HealthClub`.
 | 13   | Badges IATA / Atout France visuels (image_public_id) — livrés en glyphs SVG        | 0.5 s  | P3   | ✓ 10.24 #32           |
 | 14   | Collection Payload `MiceEvents` + section "Événements & séminaires"                | 2 s    | P3   | ouvert                |
 | 15   | Hotel JSON-LD `telephone` (E.164) — colonne dédiée + reader + JSON-LD              | 0.5 s  | P3   | ✓ 10.29 #38           |
+| 15   | Hotel JSON-LD `foundingDate` (opening year) + history line UI                      | 0.5 s  | P3   | ✓ Phase 11.2 #47      |
 
 **Score après Phases 9-10.6** : 58/75 (~77 %).
 **Score après nuit du 11 mai (Phase 10.7 → 10.16)** : 66/75 (~88 %) ✓.
@@ -587,12 +598,12 @@ Note: les **policies city_tax / wifi** (Phase 10.21) ont été ajoutées **dans 
 
 Migrations résiduelles à séquencer (Phase 11+) :
 
-| Migration                        | Colonnes ajoutées                                                                                 | Bloc CDC | Prio |
-| -------------------------------- | ------------------------------------------------------------------------------------------------- | -------- | ---- |
-| `0021_user_favorites.sql`        | nouvelle table `public.user_favorites` (user_id, hotel_id, created_at, RLS own-only) ✓ Phase 11.1 | §2.1     | P2   |
-| `0021_hotels_google_reviews.sql` | `google_reviews jsonb` (5-10 quotes Google Places, ingest cron J-7)                               | §2.10    | P2   |
-| `0022_hotels_meta_extra.sql`     | `opened_at date`, `last_renovated_at date`                                                        | §2.15    | P3   |
-| `0023_hotels_telephone.sql`      | `phone_e164 text` (E.164 format, optional) — exposé en JSON-LD `telephone`                        | §2.15    | P3   |
+| Migration                          | Colonnes ajoutées                                                                    | Bloc CDC | Prio | Statut                    |
+| ---------------------------------- | ------------------------------------------------------------------------------------ | -------- | ---- | ------------------------- |
+| `0020_hotel_phone_e164_column.sql` | `phone_e164 text` (E.164 format, optional) — exposé en JSON-LD `telephone`           | §2.15    | P3   | ✓ Phase 10.29 #38         |
+| `0021_user_favorites.sql`          | nouvelle table `public.user_favorites` (user_id, hotel_id, created_at, RLS own-only) | §2.1     | P2   | ✓ Phase 11.1 #43          |
+| `0022_hotel_dates_columns.sql`     | `opened_at date`, `last_renovated_at date` (CHECK 1500-current_date + ordering)      | §2.15    | P3   | ✓ Phase 11.2 #47          |
+| `0023_hotels_google_reviews.sql`   | `google_reviews jsonb` (5-10 quotes Google Places, ingest cron J-7)                  | §2.10    | P2   | ouvert (bloc 10 résiduel) |
 
 **Bug `seed-dev.ts` jsonb binding** : ✓ corrigé Phase 10.20 (PR #28). Le pattern `${JSON.stringify(array)}::jsonb` a été remplacé par `sql.json(toJson(value))` pour les colonnes `amenities` et `highlights`, alignant le seed dev sur le seed Peninsula.
 
