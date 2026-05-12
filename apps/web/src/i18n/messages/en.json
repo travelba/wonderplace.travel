@@ -498,6 +498,50 @@
         "kuula": "Kuula"
       }
     },
+    "mice": {
+      "title": "Events & seminars",
+      "introFallback": "Host your business events at {name}: conferences, seminars, weddings and private receptions in signature spaces.",
+      "headline": {
+        "spaces": "Event spaces",
+        "capacity": "Maximum capacity",
+        "capacityValue": "{count, plural, one {# guest} other {# guests}}",
+        "height": "Ceiling height"
+      },
+      "eventTypes": {
+        "label": "Event types",
+        "values": {
+          "corporate-meeting": "Corporate meetings",
+          "wedding": "Weddings",
+          "gala-dinner": "Gala dinners",
+          "press-launch": "Press launches",
+          "incentive": "Incentive trips",
+          "private-screening": "Private screenings"
+        }
+      },
+      "spacesTitle": "Available spaces",
+      "space": {
+        "surfaceLabel": "Surface",
+        "surfaceValue": "{count} sqm",
+        "seatedLabel": "Capacity",
+        "seatedValue": "{count, plural, one {# guest} other {# guests}}",
+        "naturalLight": "Natural light",
+        "configLabel": "Layouts"
+      },
+      "configurations": {
+        "theatre": "Theatre",
+        "classroom": "Classroom",
+        "u-shape": "U-shape",
+        "boardroom": "Boardroom",
+        "banquet": "Banquet",
+        "cocktail": "Cocktail"
+      },
+      "contactIntro": "Request a tailored proposal for your event at {name}.",
+      "contactCta": "Contact the events team",
+      "contactSubject": "Events enquiry — {name}",
+      "contactAria": "Contact the MICE team at {name} by email",
+      "brochureCta": "Events brochure",
+      "brochureSrHint": "PDF, opens in a new tab"
+    },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
       "scoreAria": "{category}: {score} out of 100",

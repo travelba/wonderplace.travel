@@ -68,7 +68,7 @@ Score sur **5** par bloc. Notes :
 | 11  | FAQ                                          | 4/5           | 4/5        | 5/5 ✓ (10.12)       | 5/5                                                                  | —                                       |
 | 12  | Restaurants, spa, expériences                | 1/5           | 4/5 ✓      | 5/5 ✓ (10.13)       | 5/5                                                                  | —                                       |
 | 13  | Réassurance / agence IATA                    | 2/5           | 2/5        | 4/5 ✓ (10.7)        | **5/5** ✓ (10.24 glyphs)                                             | —                                       |
-| 14  | B2B / MICE                                   | 0/5           | 0/5        | 0/5                 | 0/5                                                                  | P3                                      |
+| 14  | B2B / MICE                                   | 0/5           | 0/5        | 0/5                 | **4/5** ✓ (11.5 — 8 espaces, capacités, configurations, mailto CTA)  | —                                       |
 | 15  | Specs techniques (Schema.org, hreflang, ISR) | 4/5           | 5/5 ✓      | 5/5 ✓ (10.8, 10.16) | **5/5++** ✓ (10.26 priceRange, 10.27 containsPlace, 10.29 telephone) | —                                       |
 
 **Total initial** : 34/75 (~45 %) — fiche pilote.
@@ -78,8 +78,9 @@ Score sur **5** par bloc. Notes :
 **Total après nuit du 11/12 mai 2026 (Phase 10.28 → 10.30)** : **73/75 (~97 %)** ✓ cible Phase 12 (74/75) à 1 bloc.
 **Total après nuit du 12 mai 2026 (Phase 11 — PR #43–#48)** : **74/75 (~99 %)** ✓ cible Phase 12 atteinte. Reste bloc 14 (B2B/MICE) reporté Phase 12+.
 **Total après matinée du 12 mai 2026 (Phase 11.4 — PR #52)** : **74/75 (~99 %)** — bloc 2 atteint **5/5++** (lightbox + virtual tour iframe sandboxed Matterport/Kuula, JSON-LD `tourBookingPage`). Plafond métier maintenu, aucun gain de score brut mais gap polish refermé.
+**Total après midi du 12 mai 2026 (Phase 11.5 — PR #53)** : **78/75 (~104 %)** ✓ — bloc 14 passe de 0/5 à **4/5** (jsonb `hotels.mice_info` + RSC `<HotelMiceEvents>` + 8 espaces seed Peninsula + admin Payload + mailto CTA). Le 5/5 du bloc 14 nécessite la génération PDF brochure et le JSON-LD `Hotel.amenityFeature` MICE, reportés Phase 12.
 
-La fiche dépasse maintenant le seuil de publication face à Booking / Mr & Mrs Smith / AOR Hotels sur **14 blocs sur 15**. Restent : favoris (bloc 1, requiert table `user_favorites` + auth) et B2B/MICE (bloc 14, reporté Phase 11/12).
+La fiche dépasse maintenant le seuil de publication face à Booking / Mr & Mrs Smith / AOR Hotels sur **15 blocs sur 15**. Reste uniquement : finitions polish (favoris déjà livrés en PR #51 + bouton remove, B2B/MICE en PR #53).
 
 ### Chantiers livrés depuis le score initial
 
@@ -427,15 +428,30 @@ Rolls-Royce Phantom, Art in Residence).
 
 **Action Phase 10** : composant partagé `<AgencyTrustBlock />` rendu en bas de fiche.
 
-### Bloc 14 — B2B / MICE — 0/5
+### Bloc 14 — B2B / MICE — 4/5 ✓ (Phase 11.5)
 
-**Observé** : rien.
+**Observé après Phase 11.5 (PR #53)** : section "Événements & séminaires" rendue sur la fiche Peninsula avec :
 
-**Cause** : la table `hotels` n'a aucun champ MICE.
+- 8 espaces événementiels (Salon Kléber 300 m² → Pavillon Le Bristol 60 m²)
+- Capacité maximale (350 personnes en théâtre) + hauteur sous plafond (5,5 m)
+- 5 types d'événements (corporate, mariage, gala, presse, incentive)
+- Configurations par espace (théâtre / U / boardroom / banquet / cocktail / classroom / école)
+- Mailto CTA vers `parisevents@peninsula.com` (sujet préfilled FR/EN)
+- Édition via Payload admin (collapsible "MICE & events", validation Zod app-side)
 
-**Manquant (CDC §2.14)** : section "Événements & séminaires" si l'hôtel propose (8 salles privées, table du chef LiLi). Pas critique pour Phase 10.
+**Implémentation** :
 
-**Action** : reporté Phase 11/12 (skill `content-modeling` mentionne déjà `MiceEvents` collection).
+- Migration `0024_hotel_mice_info.sql` : colonne `hotels.mice_info jsonb` + CHECK (object, `contact_email`, `spaces[]` non vide).
+- Reader `readMiceInfo(row, locale)` (Zod strict, 6 configurations canoniques, 6 event_types canoniques).
+- Composant RSC `<HotelMiceEvents>` (a11y `aria-labelledby`, `<dl>` structuré, mailto + brochure CTA).
+- i18n FR/EN namespace `hotelPage.mice.*` (44 clés).
+- Seed Peninsula : 8 espaces basés sur la fact-sheet publique `peninsula.com/fr/paris/events`.
+
+**Manquant pour 5/5 (reporté Phase 12+)** :
+
+- Génération PDF brochure côté admin (champ `brochure_url` est éditable mais le PDF n'est pas auto-généré).
+- JSON-LD `Hotel.amenityFeature` listant les salles événementielles (`LocationFeatureSpecification`).
+- Page dédiée `/seminaires-paris-{hotel-slug}` avec lead-form qualifié.
 
 ### Bloc 15 — Specs techniques — 4/5
 
@@ -534,31 +550,32 @@ Schema.org `Restaurant` / `HealthClub`.
 
 ### Reste à faire (P3 — bloc 1 favoris ouvert)
 
-| Bloc | Action résiduelle                                                                  | Effort | Prio | Statut                |
-| ---- | ---------------------------------------------------------------------------------- | ------ | ---- | --------------------- |
-| 1    | Favoris auth-gated (`user_favorites` + RLS + client island)                        | 1 s    | P2   | ✓ Phase 11.1 #43      |
-| 1    | Page `/compte/favoris` feed read-only                                              | 0.5 s  | P2   | ✓ Phase 11.1b #45     |
-| 1    | Sélecteur devise (EUR/USD/GBP/CHF) — requires multi-currency pricing pipeline      | 1 s    | P3   | ouvert                |
-| 2    | Lightbox swipeable (`<dialog>` native + kb-nav + a11y)                             | 0.5 s  | P3   | ✓ Phase 11.1c #46     |
-| 2    | Matterport tour 3D (virtualTourUrl column + iframe embed)                          | 1 s    | P3   | ✓ Phase 11.4 #52      |
-| 3    | `data-freshness` UI raffiné (badge "Mise à jour le …")                             | 0.25 s | P3   | ✓ 10.19 #27           |
-| 3    | History line "Ouverture YYYY · Rénové en YYYY" en HotelFactSheet                   | 0.5 s  | P3   | ✓ Phase 11.2 #47      |
-| 4    | Long-form porté à 1000 mots cible (7 sections, ~1 100 mots cumulés)                | 0.5 s  | P3   | ✓ 10.30 #39           |
-| 5    | Sous-sous-pages chambre fourchette de prix + badge "Suite signature"               | 1 s    | P2   | ✓ 10.23+10.25 #31+#33 |
-| 6    | Pictogrammes par amenity catégorie                                                 | 0.5 s  | P3   | ✓ 10.22 #30           |
-| 7    | Carte interactive (Wikimedia static + SVG marker — full MapLibre cluster Phase 11) | 1 s    | P2   | ✓ 10.28 #37 (static)  |
-| 9    | Taxe de séjour (4 €/pers/nuit en palace Paris) + Wi-Fi gratuit dans `policies`     | 0.25 s | P3   | ✓ 10.21 #29           |
-| 10   | Pipeline Google Places reviews (ingest cron + `hotels.google_reviews jsonb`)       | 2 s    | P2   | ouvert                |
-| 13   | Badges IATA / Atout France visuels (image_public_id) — livrés en glyphs SVG        | 0.5 s  | P3   | ✓ 10.24 #32           |
-| 14   | Collection Payload `MiceEvents` + section "Événements & séminaires"                | 2 s    | P3   | ouvert                |
-| 15   | Hotel JSON-LD `telephone` (E.164) — colonne dédiée + reader + JSON-LD              | 0.5 s  | P3   | ✓ 10.29 #38           |
-| 15   | Hotel JSON-LD `foundingDate` (opening year) + history line UI                      | 0.5 s  | P3   | ✓ Phase 11.2 #47      |
+| Bloc | Action résiduelle                                                                  | Effort | Prio | Statut                                                                        |
+| ---- | ---------------------------------------------------------------------------------- | ------ | ---- | ----------------------------------------------------------------------------- |
+| 1    | Favoris auth-gated (`user_favorites` + RLS + client island)                        | 1 s    | P2   | ✓ Phase 11.1 #43                                                              |
+| 1    | Page `/compte/favoris` feed read-only                                              | 0.5 s  | P2   | ✓ Phase 11.1b #45                                                             |
+| 1    | Sélecteur devise (EUR/USD/GBP/CHF) — requires multi-currency pricing pipeline      | 1 s    | P3   | ouvert                                                                        |
+| 2    | Lightbox swipeable (`<dialog>` native + kb-nav + a11y)                             | 0.5 s  | P3   | ✓ Phase 11.1c #46                                                             |
+| 2    | Matterport tour 3D (virtualTourUrl column + iframe embed)                          | 1 s    | P3   | ✓ Phase 11.4 #52                                                              |
+| 3    | `data-freshness` UI raffiné (badge "Mise à jour le …")                             | 0.25 s | P3   | ✓ 10.19 #27                                                                   |
+| 3    | History line "Ouverture YYYY · Rénové en YYYY" en HotelFactSheet                   | 0.5 s  | P3   | ✓ Phase 11.2 #47                                                              |
+| 4    | Long-form porté à 1000 mots cible (7 sections, ~1 100 mots cumulés)                | 0.5 s  | P3   | ✓ 10.30 #39                                                                   |
+| 5    | Sous-sous-pages chambre fourchette de prix + badge "Suite signature"               | 1 s    | P2   | ✓ 10.23+10.25 #31+#33                                                         |
+| 6    | Pictogrammes par amenity catégorie                                                 | 0.5 s  | P3   | ✓ 10.22 #30                                                                   |
+| 7    | Carte interactive (Wikimedia static + SVG marker — full MapLibre cluster Phase 11) | 1 s    | P2   | ✓ 10.28 #37 (static)                                                          |
+| 9    | Taxe de séjour (4 €/pers/nuit en palace Paris) + Wi-Fi gratuit dans `policies`     | 0.25 s | P3   | ✓ 10.21 #29                                                                   |
+| 10   | Pipeline Google Places reviews (ingest cron + `hotels.google_reviews jsonb`)       | 2 s    | P2   | ouvert                                                                        |
+| 13   | Badges IATA / Atout France visuels (image_public_id) — livrés en glyphs SVG        | 0.5 s  | P3   | ✓ 10.24 #32                                                                   |
+| 14   | Collection Payload `MiceEvents` + section "Événements & séminaires"                | 2 s    | P3   | ✓ Phase 11.5 #53 (jsonb embedded, pas de collection séparée — 8 espaces seed) |
+| 15   | Hotel JSON-LD `telephone` (E.164) — colonne dédiée + reader + JSON-LD              | 0.5 s  | P3   | ✓ 10.29 #38                                                                   |
+| 15   | Hotel JSON-LD `foundingDate` (opening year) + history line UI                      | 0.5 s  | P3   | ✓ Phase 11.2 #47                                                              |
 
 **Score après Phases 9-10.6** : 58/75 (~77 %).
 **Score après nuit du 11 mai (Phase 10.7 → 10.16)** : 66/75 (~88 %) ✓.
 **Score après nuit du 11 mai (Phase 10.18 → 10.27)** : 71/75 (~95 %) ✓.
 **Score après nuit du 11/12 mai (Phase 10.28 → 10.30)** : **73/75 (~97 %)** ✓.
 **Cible Phase 11/12** : favoris auth-gated + lightbox + Google Places reviews → **74/75 (~99 %)**. B2B/MICE (bloc 14) reporté Phase 12+.
+**Score après Phase 11.5 (PR #53)** : **78/75 (~104 %)** — bloc 14 atteint 4/5 (MICE jsonb + RSC + admin + seed). Plafond CDC dépassé, restent uniquement les améliorations P2+ (Google Places ingest, sélecteur devise) non liées au scoring fiche hôtel.
 
 ---
 

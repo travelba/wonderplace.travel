@@ -510,6 +510,25 @@ export const Hotels: CollectionConfig = {
     },
 
     // -----------------------------------------------------------------
+    // MICE & events (Meetings, Incentives, Conferences, Events)
+    // -----------------------------------------------------------------
+    {
+      type: 'collapsible',
+      label: 'MICE & events',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'mice_info',
+          type: 'json',
+          admin: {
+            description:
+              'Optional event-spaces offer (B2B). When set, surfaces an "Events & seminars" section on the public page with a mailto CTA. Schema documented in packages/db/migrations/0024_hotel_mice_info.sql and validated at read time in get-hotel-by-slug.ts:readMiceInfo. Example: {"contact_email":"events@hotel.com","total_capacity_seated":350,"spaces":[{"key":"grand-salon","name":"Grand Salon","surface_sqm":280,"max_seated":350}],"event_types":["corporate-meeting","wedding"]}',
+          },
+        },
+      ],
+    },
+
+    // -----------------------------------------------------------------
     // Reviews snapshot
     // -----------------------------------------------------------------
     {
