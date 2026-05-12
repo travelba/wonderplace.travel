@@ -112,18 +112,25 @@ jobs:
           path: "**/coverage/**"
           retention-days: 7
 
-  # NOTE: full Next.js production build is disabled in CI for now —
-  # `apps/web` fails to prerender the auto-generated `/404` because the
-  # root layout doesn't render `<html>`/`<body>` (intentional, to let
-  # `[locale]/layout.tsx` own the document for next-intl), which causes
-  # the framework to fall back to the legacy Pages Router error page
-  # that imports `<Html>` from `next/document`. Vercel preview builds
-  # exercise the real build per PR and remain the source of truth until
-  # this is restructured. Follow-up: lift `<html>`/`<body>` into the
-  # root layout and convert `[locale]/layout.tsx` accordingly.
-  #
-  # `apps/admin` build is also failing on the same `<Html>` quirk
-  # via Payload's auto-generated 404. Tracked separately.
-  #
-  # E2E (Playwright) depends on the production build and is therefore
-  # also disabled here. Run locally with `pnpm --filter @cct/web test:e2e`.
+  build:
+    name: Build
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: |
+          npm install -g corepack@latest
+          corepack enable
+          corepack prepare pnpm@10.33.2 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build
+        # `SKIP_ENV_VALIDATION=true` is already in `env:` above. Without
+        # real Supabase/Cloudinary/Upstash creds in CI we'd otherwise
+        # crash at module-load time via `@t3-oss/env-nextjs`.
+
+  # E2E (Playwright) still runs locally only — it needs a live
+  # database + Cloudinary cloud, which we don't wire up in CI yet.
+  # Run with `pnpm --filter @cct/web test:e2e`.
