@@ -104,11 +104,7 @@ export async function HotelReassurance({
       <h2 id="reassurance-title" className="text-fg mb-3 font-serif text-2xl">
         {t('title')}
       </h2>
-      <ul
-        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        role="list"
-        aria-label={t('listAria')}
-      >
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-label={t('listAria')}>
         {items.map((item) => (
           <li
             key={item.key}

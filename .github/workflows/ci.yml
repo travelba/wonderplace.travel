@@ -57,10 +57,21 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
 
-  # NOTE: full repo lint disabled — the shared `@cct/config` ESLint preset
-  # is still in legacy `.eslintrc` format and ESLint v9 requires flat
-  # config. Follow-up: migrate `packages/config/src/eslint/*.cjs` to
-  # `eslint.config.js` and re-enable. See gap analysis backlog.
+  lint:
+    name: Lint
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: |
+          npm install -g corepack@latest
+          corepack enable
+          corepack prepare pnpm@10.33.2 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run lint
 
   typecheck:
     name: Typecheck

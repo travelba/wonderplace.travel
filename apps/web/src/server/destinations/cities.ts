@@ -192,10 +192,11 @@ export async function getDestinationBySlug(
   if (all.length === 0) return null;
 
   const matching = all.filter((h) => citySlug(h.city) === slug);
-  if (matching.length === 0) return null;
+  const [first] = matching;
+  if (first === undefined) return null;
 
-  const cityName = matching[0]!.city;
-  const region = matching[0]!.region;
+  const cityName = first.city;
+  const region = first.region;
 
   const sorted = [...matching].sort((a, b) => {
     const pr = PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];

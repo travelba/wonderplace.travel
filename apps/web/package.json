@@ -8,7 +8,7 @@
     "build": "next build",
     "analyze": "cross-env ANALYZE=true next build",
     "start": "next start --port 3000",
-    "lint": "next lint --max-warnings=0",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:unit": "vitest run --passWithNoTests",

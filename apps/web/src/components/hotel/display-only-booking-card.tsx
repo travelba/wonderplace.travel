@@ -7,7 +7,9 @@ interface DisplayOnlyBookingCardProps {
   readonly checkIn: string;
   readonly checkOut: string;
   readonly adults: number;
-  readonly children: number;
+  /** Number of children in the booking party. Renamed from `children` to avoid
+   * collision with React's reserved prop name (react/no-children-prop). */
+  readonly childrenCount: number;
 }
 
 /**
@@ -44,7 +46,7 @@ export async function DisplayOnlyBookingCard({
   checkIn,
   checkOut,
   adults,
-  children,
+  childrenCount,
 }: DisplayOnlyBookingCardProps): Promise<React.ReactElement> {
   const t = await getTranslations({ locale, namespace: 'hotelPage.displayOnly' });
   const action = locale === 'en' ? '/en/reservation/start' : '/reservation/start';
@@ -113,7 +115,7 @@ export async function DisplayOnlyBookingCard({
               name="children"
               min={0}
               max={9}
-              defaultValue={children}
+              defaultValue={childrenCount}
               className="border-border bg-bg text-fg focus-visible:ring-ring rounded-md border px-3 py-2 outline-none focus-visible:ring-2"
             />
           </label>
