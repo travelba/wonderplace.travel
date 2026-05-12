@@ -16,10 +16,13 @@ env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
   SKIP_ENV_VALIDATION: "true"
-  # Corepack 0.30+ (ships with Node 20) enforces signature checks on the
-  # `packageManager` field by default; ours is plain `pnpm@10.33.2` (no
-  # hash) which fails strict validation on Linux. Disable.
+  # Corepack bundled with Node 20.18.1 ships outdated pnpm signing keys
+  # and fails with "Cannot find matching keyid" when activating
+  # pnpm@10.33.2. We both (a) upgrade corepack to the latest version
+  # in the install step and (b) disable signature verification entirely
+  # as a belt-and-braces fallback.
   COREPACK_ENABLE_STRICT: "0"
+  COREPACK_ENABLE_SIGNATURES: "0"
 
 jobs:
   install:
@@ -30,15 +33,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Diagnose environment
+      - name: Upgrade corepack + activate pnpm
         run: |
-          set -x
-          node --version
-          npm --version
-          which corepack || true
-          corepack --version || true
-      - name: Enable corepack (uses packageManager field for pnpm version)
-        run: |
+          npm install -g corepack@latest
           corepack enable
           corepack prepare pnpm@10.33.2 --activate
           pnpm --version
@@ -54,6 +51,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: |
+          npm install -g corepack@latest
           corepack enable
           corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
@@ -74,6 +72,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: |
+          npm install -g corepack@latest
           corepack enable
           corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
@@ -89,6 +88,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: |
+          npm install -g corepack@latest
           corepack enable
           corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
