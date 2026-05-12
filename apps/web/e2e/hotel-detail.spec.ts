@@ -56,8 +56,11 @@ test.describe('hotel detail page', () => {
     await expect(page.getByText('Paris', { exact: false }).first()).toBeVisible();
 
     // Sections — each H2 the user expects on a hotel page.
+    // The fake hotel is email-mode (no Amadeus offers), so the booking H2
+    // is the "Réservation par concierge" copy. The bookable variant
+    // ("Vérifier les disponibilités") is covered by the search-tunnel specs.
     for (const h2 of [
-      'Vérifier les disponibilités',
+      'Réservation par concierge',
       'À propos',
       'Les essentiels',
       'Services & équipements',
@@ -67,13 +70,15 @@ test.describe('hotel detail page', () => {
       await expect(page.getByRole('heading', { level: 2, name: h2 })).toBeVisible();
     }
 
-    // Email-mode booking → no inline date form, but a clear CTA to
-    // `/reservation/start` carrying the hotel id.
-    const cta = page.getByRole('link', { name: 'Demande de réservation' });
-    await expect(cta).toBeVisible();
-    const href = await cta.getAttribute('href');
-    expect(href).toContain('/reservation/start');
-    expect(href).toContain('hotelId=');
+    // Email-mode booking → renders a teaser GET-form (skill: booking-engine
+    // §display_only). The form lets the user pre-fill dates + party size,
+    // then submits to `/reservation/start` where the heavy concierge
+    // request lives. A hidden `hotelId` input carries the row id.
+    const bookingSection = page.locator('section[aria-labelledby="booking-title"]');
+    const ctaForm = bookingSection.locator('form[action="/reservation/start"]');
+    await expect(ctaForm).toBeVisible();
+    await expect(ctaForm.locator('input[name="hotelId"]')).toHaveAttribute('value', /.+/);
+    await expect(ctaForm.getByRole('button', { name: 'Demander un devis' })).toBeVisible();
   });
 
   test('EN serves the localized slug with correct lang and content', async ({ page }) => {
@@ -81,7 +86,8 @@ test.describe('hotel detail page', () => {
     expect(res?.status()).toBe(200);
     expect(await page.locator('html').getAttribute('lang')).toBe('en');
     await expect(page.getByRole('heading', { level: 1, name: 'Test Hotel (E2E)' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Check availability' })).toBeVisible();
+    // Email-mode booking section (see FR test above for the same rationale).
+    await expect(page.getByRole('heading', { level: 2, name: 'Concierge booking' })).toBeVisible();
   });
 
   test('breadcrumb is wired with the four-step Home → Hotels → City → Hotel chain', async ({
@@ -210,9 +216,19 @@ test.describe('hotel detail page', () => {
     expect(bc.itemListElement?.length).toBe(4);
     expect(bc.itemListElement?.[3]?.name).toBe('Hôtel de Test (E2E)');
 
-    // FAQPage carries the two questions from the seam.
+    // FAQPage carries 1 AEO question ("How do I book {name}?", skill:
+    // geo-llm-optimization) prepended to the 2 editorial questions from
+    // the seam → 3 mainEntity items total.
     const f = faq as { mainEntity?: ReadonlyArray<{ name?: string }> };
-    expect(f.mainEntity?.length).toBe(2);
+    expect(f.mainEntity?.length).toBe(3);
+    // The two editorial questions must be present alongside the AEO one.
+    const names = (f.mainEntity ?? []).map((e) => e.name);
+    expect(names).toEqual(
+      expect.arrayContaining([
+        'Quel est l’horaire du check-in ?',
+        'Le petit-déjeuner est-il inclus ?',
+      ]),
+    );
   });
 
   test('renders a refined freshness badge with a machine-readable <time>', async ({ page }) => {

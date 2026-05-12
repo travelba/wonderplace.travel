@@ -5,7 +5,16 @@ import { JsonLd } from '@cct/seo';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { env } from '@/lib/env';
 
-export const revalidate = 3600;
+// `<JsonLdScript>` calls `headers()` to read the per-request CSP nonce
+// emitted by middleware (skill: security-engineering §CSP). Pages that
+// embed it must render dynamically; combining a `revalidate` directive
+// with `headers()` silently strips the nonce from the cached HTML —
+// the inline JSON-LD scripts would then violate the CSP and be blocked
+// by the browser. We accept the SSR cost on the homepage to keep
+// structured data discoverable. (Long-term: lift `headers()` to the
+// root layout and pass the nonce down via prop drilling so we can
+// re-introduce ISR — tracked in the gap-analysis follow-ups.)
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 

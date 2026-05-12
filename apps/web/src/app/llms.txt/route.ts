@@ -2,11 +2,14 @@ import { NextResponse } from 'next/server';
 
 import { buildLlmsTxt, type LlmsTxtSectionItem } from '@cct/seo';
 
+import { env } from '@/lib/env';
 import { listPublishedHotelSummaries } from '@/server/hotels/get-hotel-by-slug';
 
 // ISR — re-fetches the catalog hourly. The CDN keeps a stale copy for up
 // to a day so this route never serves a slow miss.
 export const revalidate = 3600;
+
+const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 
 /**
  * /llms.txt — concise index for LLMs (skill: geo-llm-optimization).
@@ -18,9 +21,13 @@ export const revalidate = 3600;
  *
  * Phase 8 will pull editorial copy & long descriptions from Payload; for now
  * we ship deterministic seed copy + dynamic catalog.
+ *
+ * We read the site URL from validated env (rather than `request.url`)
+ * so the initial ISR prerender — which runs at build time with a
+ * `localhost` host — doesn't bake the wrong origin into the cached body.
  */
-export async function GET(request: Request): Promise<NextResponse> {
-  const origin = new URL(request.url).origin;
+export async function GET(): Promise<NextResponse> {
+  const origin = (env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/$/, '');
   const hotels = await listPublishedHotelSummaries(50);
 
   const catalogItems: LlmsTxtSectionItem[] = hotels.map((h) => {

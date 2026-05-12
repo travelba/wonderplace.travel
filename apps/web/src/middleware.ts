@@ -30,6 +30,16 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   finalResponse.headers.set('Content-Security-Policy', csp);
   finalResponse.headers.set(NONCE_HEADER, nonce);
 
+  // 5. Agent-skills discovery (skill: geo-llm-optimization §Link Header
+  //    WebMCP). Every HTML response advertises the machine-readable skill
+  //    catalog so LLM crawlers can locate the action surface without
+  //    parsing the page. The hreflang `Link` entries (set by next-intl
+  //    via metadata) and this one coexist as separate comma-joined values.
+  finalResponse.headers.append(
+    'Link',
+    '</.well-known/agent-skills.json>; rel="agent-skills"; type="application/json"',
+  );
+
   return finalResponse;
 }
 

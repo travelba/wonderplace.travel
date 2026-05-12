@@ -1,14 +1,23 @@
 import { NextResponse } from 'next/server';
 
+import { env } from '@/lib/env';
+
 export const dynamic = 'force-static';
 export const revalidate = 86400;
+
+const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 
 /**
  * robots.txt — generated dynamically so the SEO team can override allow/disallow
  * via Payload `RobotsConfig` global. Skill: seo-technical, geo-llm-optimization.
+ *
+ * `force-static` here means the route is prerendered. Reading `request.url`
+ * at build time bakes the build-host (typically `http://localhost:3000`)
+ * into the deployed Sitemap reference. We read the canonical site URL
+ * from validated env to keep production output correct.
  */
-export function GET(request: Request) {
-  const origin = new URL(request.url).origin;
+export function GET() {
+  const origin = (env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/$/, '');
 
   // LLM crawler tokens use the official robots.txt user-agent strings as of 2026:
   //   - `Google-Extended`     — Google's AI training opt-out (no hyphen "bot")
