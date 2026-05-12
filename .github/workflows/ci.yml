@@ -23,20 +23,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10.33.2
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Enable corepack + activate pnpm from packageManager field
-        run: |
-          corepack enable
-          corepack prepare --activate
-          pnpm --version
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
 
   format:
@@ -45,17 +38,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10.33.2
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: |
-          corepack enable
-          corepack prepare --activate
-      - uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
 
@@ -70,17 +59,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10.33.2
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: |
-          corepack enable
-          corepack prepare --activate
-      - uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run typecheck
 
@@ -90,17 +75,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10.33.2
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: |
-          corepack enable
-          corepack prepare --activate
-      - uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run test:unit
       - name: Upload coverage
