@@ -26,16 +26,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install pnpm
+      - name: Diagnose environment
         run: |
-          npm install -g pnpm@10.33.2
+          set -x
+          node --version
+          npm --version
+          which corepack || true
+          corepack --version || true
+      - name: Enable corepack (uses packageManager field for pnpm version)
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.33.2 --activate
           pnpm --version
-      - name: Restore pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store/v3
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile
 
   format:
@@ -47,12 +49,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: npm install -g pnpm@10.33.2
-      - uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store/v3
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: |
+          corepack enable
+          corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
 
@@ -70,12 +69,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: npm install -g pnpm@10.33.2
-      - uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store/v3
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: |
+          corepack enable
+          corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run typecheck
 
@@ -88,12 +84,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: npm install -g pnpm@10.33.2
-      - uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store/v3
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: |
+          corepack enable
+          corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run test:unit
       - name: Upload coverage
