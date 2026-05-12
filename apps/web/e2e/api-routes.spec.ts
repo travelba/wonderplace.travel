@@ -153,35 +153,60 @@ test.describe('public API + well-known', () => {
     }
   });
 
-  test('CSP nonce is propagated to JSON-LD scripts', async ({ request }) => {
-    // We MUST inspect raw HTML here. CSP3 (https://w3c.github.io/webappsec-csp/
-    // §"Restrict Access to the Nonce IDL Attribute") requires browsers to
-    // blank the `nonce` attribute on script elements after they've been
-    // processed, so reading `document.querySelector('script').getAttribute('nonce')`
-    // from Playwright's page context always returns "". Fetching the
-    // server-rendered HTML directly bypasses this stripping and lets us
-    // assert that the middleware nonce was actually emitted by SSR.
-    const res = await request.get('/fr');
-    expect(res.status()).toBe(200);
+  // CSP3 (https://w3c.github.io/webappsec-csp/ §"Restrict Access to the
+  // Nonce IDL Attribute") requires browsers to blank the `nonce` attribute
+  // on script elements after they've been processed, so reading
+  // `document.querySelector('script').getAttribute('nonce')` from Playwright's
+  // page context always returns "". The CSP-nonce contract is therefore
+  // verified by fetching the server-rendered HTML directly and cross-checking
+  // the CSP header against the inline `<script nonce="…">` attributes.
+  //
+  // We exercise every route that emits a JSON-LD payload so any future ISR
+  // re-enable (which silently nukes the nonce — see PR #57 + PR #58) is
+  // caught at the test level.
+  // The destination *city* hub (`/fr/destination/{citySlug}`) is not in
+  // this set because seeding a city via Supabase from the E2E fixtures
+  // would expand the test surface significantly. Its rendering path is
+  // structurally identical to the destination index (same `force-dynamic`
+  // + `<JsonLdScript nonce={…} />` contract) — covered in spirit by the
+  // index check below; lock-in seeding tracked in the gap analysis.
+  const NONCE_ROUTES: ReadonlyArray<{ readonly name: string; readonly path: string }> = [
+    { name: 'home', path: '/fr' },
+    { name: 'destination index', path: '/fr/destination' },
+    { name: 'hotel detail (email-mode fake)', path: '/fr/hotel/hotel-de-test-e2e' },
+    {
+      name: 'hotel room detail',
+      path: '/fr/hotel/hotel-de-test-e2e/chambres/chambre-deluxe-roi',
+    },
+  ];
 
-    // The response's CSP header carries the per-request nonce.
-    const csp = res.headers()['content-security-policy'] ?? '';
-    const cspNonceMatch = csp.match(/'nonce-([^']+)'/);
-    expect(cspNonceMatch, 'CSP header should advertise a nonce-...').not.toBeNull();
-    const cspNonce = cspNonceMatch?.[1] ?? '';
-    expect(cspNonce.length).toBeGreaterThan(0);
+  for (const { name, path } of NONCE_ROUTES) {
+    test(`CSP nonce is propagated to every JSON-LD script on ${name}`, async ({ request }) => {
+      const res = await request.get(path);
+      expect(res.status(), `${path} should respond 200`).toBe(200);
 
-    // Every JSON-LD <script> in the SSR HTML must carry the *same* nonce so
-    // the browser-enforced CSP doesn't block our structured data.
-    const html = await res.text();
-    const scriptMatches = Array.from(
-      html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>/g),
-    );
-    expect(scriptMatches.length).toBeGreaterThanOrEqual(1);
-    for (const m of scriptMatches) {
-      const nonceMatch = m[0].match(/nonce="([^"]+)"/);
-      expect(nonceMatch, `script must carry a nonce: ${m[0]}`).not.toBeNull();
-      expect(nonceMatch?.[1]).toBe(cspNonce);
-    }
-  });
+      // The response's CSP header carries the per-request nonce.
+      const csp = res.headers()['content-security-policy'] ?? '';
+      const cspNonceMatch = csp.match(/'nonce-([^']+)'/);
+      expect(cspNonceMatch, 'CSP header should advertise a nonce-...').not.toBeNull();
+      const cspNonce = cspNonceMatch?.[1] ?? '';
+      expect(cspNonce.length).toBeGreaterThan(0);
+
+      // Every JSON-LD <script> in the SSR HTML must carry the *same* nonce so
+      // the browser-enforced CSP doesn't block our structured data.
+      const html = await res.text();
+      const scriptMatches = Array.from(
+        html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>/g),
+      );
+      expect(
+        scriptMatches.length,
+        `${path} should emit at least one JSON-LD script`,
+      ).toBeGreaterThanOrEqual(1);
+      for (const m of scriptMatches) {
+        const nonceMatch = m[0].match(/nonce="([^"]+)"/);
+        expect(nonceMatch, `script must carry a nonce: ${m[0]}`).not.toBeNull();
+        expect(nonceMatch?.[1]).toBe(cspNonce);
+      }
+    });
+  }
 });

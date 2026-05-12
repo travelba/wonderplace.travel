@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getFakeRoomBySlug } from '@/server/hotels/dev-fake-room-detail';
 import {
   getHotelBySlug,
   isValidSlug,
@@ -228,6 +229,12 @@ export async function getRoomBySlug(
   locale: SupportedLocale,
 ): Promise<HotelRoomDetail | null> {
   if (!isValidSlug(hotelSlug) || !isValidSlug(roomSlug)) return null;
+
+  // Dev/E2E seam — short-circuits when `CCT_E2E_FAKE_HOTEL_ID` is set and
+  // the slug pair maps to a fixture. Keeps the room sub-page testable
+  // without seeding `hotel_rooms` in Supabase.
+  const fake = getFakeRoomBySlug(hotelSlug, roomSlug, locale);
+  if (fake !== null) return fake;
 
   const hotel = await getHotelBySlug(hotelSlug, locale);
   if (!hotel) return null;

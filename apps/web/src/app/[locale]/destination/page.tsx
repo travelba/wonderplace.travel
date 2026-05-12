@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
@@ -10,7 +11,12 @@ import { isRoutingLocale, type Locale } from '@/i18n/routing';
 import { env } from '@/lib/env';
 import { listPublishedCities } from '@/server/destinations/cities';
 
-export const revalidate = 3600;
+// The page emits a `JsonLdScript` carrying the per-request CSP nonce
+// (skill: security-engineering §CSP). Reading `headers()` for that nonce
+// forces dynamic rendering; the explicit directive below makes the
+// contract grep-able and prevents a future ISR re-enable from silently
+// stripping the nonce. See `components/seo/json-ld.tsx` for context.
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 
@@ -57,6 +63,7 @@ export default async function DestinationDirectoryPage({
   const t = await getTranslations('destinationPage');
   const cities = await listPublishedCities();
   const origin = siteOrigin();
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
 
   const itemListJsonLd = JsonLd.withSchemaOrgContext(
     JsonLd.itemListJsonLd({
@@ -70,7 +77,7 @@ export default async function DestinationDirectoryPage({
 
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
-      <JsonLdScript data={itemListJsonLd} />
+      <JsonLdScript data={itemListJsonLd} nonce={nonce} />
 
       <header className="mb-10">
         <p className="text-muted mb-2 text-xs uppercase tracking-[0.18em]">{t('eyebrow')}</p>

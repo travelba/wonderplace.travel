@@ -1,6 +1,7 @@
 import { HotelImage, buildCloudinarySrc } from '@cct/ui';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
@@ -30,12 +31,14 @@ import {
  *   - long-form editorial copy + amenity grid,
  *   - return link to the parent hotel detail page.
  *
- * Rendering mode mirrors the parent hotel page: cold renders are SSR'd
- * then revalidated every hour (`revalidate = 3600`). Build-time
- * pre-rendering covers every published room via
- * `generateStaticParams` + `listPublishedRoomSlugs`.
+ * Rendering mode mirrors the parent hotel page (`force-dynamic`): the
+ * page reads `headers()` to forward the per-request CSP nonce to its
+ * inline `HotelRoom` + `BreadcrumbList` JSON-LD scripts. Combining the
+ * dynamic API with `revalidate` would silently strip the nonce and the
+ * strict-dynamic CSP would block the structured data — see
+ * `components/seo/json-ld.tsx` for the design.
  */
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 
@@ -269,10 +272,12 @@ async function renderRoomPage(
     ]),
   );
 
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
-      <JsonLdScript data={roomJsonLd} />
-      <JsonLdScript data={breadcrumbJsonLd} />
+      <JsonLdScript data={roomJsonLd} nonce={nonce} />
+      <JsonLdScript data={breadcrumbJsonLd} nonce={nonce} />
 
       <nav aria-label={t('breadcrumb.label')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">

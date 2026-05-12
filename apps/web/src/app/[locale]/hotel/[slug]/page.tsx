@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { JsonLd } from '@cct/seo';
@@ -75,21 +76,21 @@ import {
  *  - The page still accepts stay-window `searchParams` (`checkIn`,
  *    `checkOut`, `adults`, `children`) that legitimately change the
  *    booking form + price comparator output for every request.
- *  - It also emits multiple `<JsonLdScript>` blocks that read the
- *    per-request CSP nonce via `next/headers#headers()`. The
- *    combination of `searchParams` + `headers()` + a declared
- *    `revalidate` value caused the production build to throw
- *    `DYNAMIC_SERVER_USAGE` on the first cold render (visible as a
- *    bare 500 page in `next start`), because Next.js cannot
- *    pre-cache a route that touches request-bound data on every
- *    render.
+ *  - It also emits multiple `<JsonLdScript>` blocks that need the
+ *    per-request CSP nonce; the page reads it once via
+ *    `next/headers#headers()` and forwards it as a prop (see
+ *    `components/seo/json-ld.tsx` for the design). The combination of
+ *    `searchParams` + `headers()` + a declared `revalidate` value
+ *    caused the production build to throw `DYNAMIC_SERVER_USAGE` on
+ *    the first cold render, because Next.js cannot pre-cache a route
+ *    that touches request-bound data on every render.
  *  - We therefore opt the route into **full dynamic rendering**
  *    (`force-dynamic`). The HTML is still served fast: the page is
  *    a pure Server Component, every upstream call is either cached
  *    in Redis (Amadeus sentiment) or feeds from a `pgrest` row
- *    Supabase already keeps hot. Re-introducing ISR is tracked as a
- *    follow-up that requires migrating JsonLdScript off `headers()`
- *    (the only outstanding dynamic API in this tree).
+ *    Supabase already keeps hot. Re-introducing ISR would require a
+ *    different CSP strategy (hashes computed at build time instead
+ *    of per-request nonces) — out of scope for now.
  *
  * See ADR-0007 (Sprint 4.1) + commit message in this PR for the
  * production reproduction (a11y test build, fake-hotel SSR).
@@ -634,11 +635,13 @@ async function renderHotelPage(
   ];
   const faqJsonLd = JsonLd.withSchemaOrgContext(JsonLd.faqPageJsonLd(faqPayload));
 
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <main className="max-w-editorial container mx-auto px-4 py-10 sm:py-14">
-      <JsonLdScript data={hotelJsonLd} />
-      <JsonLdScript data={breadcrumbJsonLd} />
-      <JsonLdScript data={faqJsonLd} />
+      <JsonLdScript data={hotelJsonLd} nonce={nonce} />
+      <JsonLdScript data={breadcrumbJsonLd} nonce={nonce} />
+      <JsonLdScript data={faqJsonLd} nonce={nonce} />
 
       <nav aria-label={t('breadcrumb.hotels')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">
