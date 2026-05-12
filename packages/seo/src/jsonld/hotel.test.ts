@@ -368,4 +368,114 @@ describe('hotelJsonLd', () => {
     });
     expect(node.containsPlace).toBeUndefined();
   });
+
+  it('emits eventSpaces as MeetingRoom nodes with floorSize in m² and maximumAttendeeCapacity', () => {
+    const node = hotelJsonLd({
+      name: 'Palace',
+      url: 'https://example.com/p',
+      eventSpaces: [
+        { name: 'Salon Kléber', surfaceSqm: 300, maxSeated: 350 },
+        {
+          name: 'Pavillon Le Bristol',
+          surfaceSqm: 60,
+          maxSeated: 40,
+          description: 'Pavillon de verre dans la cour intérieure.',
+        },
+      ],
+    });
+    expect(Array.isArray(node.containsPlace)).toBe(true);
+    if (Array.isArray(node.containsPlace)) {
+      expect(node.containsPlace).toHaveLength(2);
+      expect(node.containsPlace[0]).toEqual({
+        '@type': 'MeetingRoom',
+        name: 'Salon Kléber',
+        floorSize: { '@type': 'QuantitativeValue', value: 300, unitCode: 'MTK' },
+        maximumAttendeeCapacity: 350,
+      });
+      expect(node.containsPlace[1]).toEqual({
+        '@type': 'MeetingRoom',
+        name: 'Pavillon Le Bristol',
+        floorSize: { '@type': 'QuantitativeValue', value: 60, unitCode: 'MTK' },
+        maximumAttendeeCapacity: 40,
+        description: 'Pavillon de verre dans la cour intérieure.',
+      });
+    }
+  });
+
+  it('merges containedRooms (HotelRoom) and eventSpaces (MeetingRoom) under one containsPlace', () => {
+    const node = hotelJsonLd({
+      name: 'Palace',
+      url: 'https://example.com/p',
+      containedRooms: [{ name: 'Suite', url: 'https://example.com/p/suite' }],
+      eventSpaces: [{ name: 'Grand Salon', surfaceSqm: 280, maxSeated: 200 }],
+    });
+    if (Array.isArray(node.containsPlace)) {
+      expect(node.containsPlace).toHaveLength(2);
+      expect(node.containsPlace[0]).toMatchObject({ '@type': 'HotelRoom' });
+      expect(node.containsPlace[1]).toMatchObject({ '@type': 'MeetingRoom' });
+    }
+  });
+
+  it('caps eventSpaces to 30 entries', () => {
+    const spaces = Array.from({ length: 50 }, (_, i) => ({
+      name: `Salon ${String(i + 1)}`,
+      surfaceSqm: 50 + i,
+      maxSeated: 30 + i,
+    }));
+    const node = hotelJsonLd({
+      name: 'Convention Center',
+      url: 'https://example.com/c',
+      eventSpaces: spaces,
+    });
+    if (Array.isArray(node.containsPlace)) {
+      expect(node.containsPlace).toHaveLength(30);
+    }
+  });
+
+  it('drops eventSpaces entries with non-positive surface, capacity, or empty name', () => {
+    const node = hotelJsonLd({
+      name: 'Palace',
+      url: 'https://example.com/p',
+      eventSpaces: [
+        { name: '   ', surfaceSqm: 100, maxSeated: 80 },
+        { name: 'Bad surface', surfaceSqm: 0, maxSeated: 30 },
+        { name: 'Bad seats', surfaceSqm: 60, maxSeated: -10 },
+        { name: 'NaN surface', surfaceSqm: Number.NaN, maxSeated: 30 },
+        { name: 'Good Salon', surfaceSqm: 75, maxSeated: 50 },
+      ],
+    });
+    if (Array.isArray(node.containsPlace)) {
+      expect(node.containsPlace).toHaveLength(1);
+      expect(node.containsPlace[0]).toMatchObject({
+        '@type': 'MeetingRoom',
+        name: 'Good Salon',
+      });
+    }
+  });
+
+  it('omits the description on MeetingRoom when blank or whitespace-only', () => {
+    const node = hotelJsonLd({
+      name: 'Palace',
+      url: 'https://example.com/p',
+      eventSpaces: [
+        { name: 'A', surfaceSqm: 50, maxSeated: 30, description: '   ' },
+        { name: 'B', surfaceSqm: 60, maxSeated: 40, description: '' },
+      ],
+    });
+    if (Array.isArray(node.containsPlace)) {
+      for (const node2 of node.containsPlace) {
+        expect((node2 as { description?: string }).description).toBeUndefined();
+      }
+    }
+  });
+
+  it('omits containsPlace when both containedRooms and eventSpaces are empty', () => {
+    const node = hotelJsonLd({
+      name: 'Hôtel minimal',
+      url: 'https://example.com/x',
+      containedRooms: [],
+      eventSpaces: [],
+    });
+    expect(node.containsPlace).toBeUndefined();
+  });
 });

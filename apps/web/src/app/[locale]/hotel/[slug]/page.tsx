@@ -491,6 +491,27 @@ async function renderHotelPage(
           }),
         }
       : {}),
+    // MICE event spaces exposed as `Hotel.containsPlace[]` with
+    // `@type: MeetingRoom` (Phase 11.6 / CDC §2.14). The MICE
+    // section on the public page is the human-readable surface for
+    // this data; the JSON-LD mirrors it so search engines and LLM
+    // ingestion pipelines can answer "largest meeting room at X?"
+    // and faceted "Paris hotel with a 300 m² ballroom?" queries.
+    //
+    // The reader (`readMiceInfo`) Zod-validates positive surface /
+    // seat counts upstream, so we forward the localised structure
+    // without re-validating. The localised `notes` becomes the
+    // `description` on the MeetingRoom node.
+    ...(miceInfo !== null && miceInfo.spaces.length > 0
+      ? {
+          eventSpaces: miceInfo.spaces.map((s) => ({
+            name: s.name,
+            surfaceSqm: s.surfaceSqm,
+            maxSeated: s.maxSeated,
+            ...(s.notes !== null ? { description: s.notes } : {}),
+          })),
+        }
+      : {}),
     // Nearby attractions (Phase 10.16 / CDC §2.7+§2.15). The builder
     // caps at 10 entries; we forward the top points of interest as
     // already sorted by `readLocation()` (distance asc). Coordinates

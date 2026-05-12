@@ -25,7 +25,7 @@ type HotelBaseNode = Exclude<Hotel, string>;
 export type HotelNode = HotelBaseNode & {
   dateModified?: string;
   nearbyAttractions?: readonly NearbyAttractionNode[] | NearbyAttractionNode;
-  containsPlace?: readonly ContainedRoomNode[] | ContainedRoomNode;
+  containsPlace?: readonly ContainedPlaceNode[] | ContainedPlaceNode;
   /**
    * Schema.org defines `tourBookingPage` on `LodgingBusiness` as
    * "A page providing information about how to book a tour of some
@@ -52,6 +52,41 @@ type ContainedRoomNode = {
   name: string;
   url: string;
 };
+
+/**
+ * `MeetingRoom` sub-place exposed under the parent hotel's
+ * `containsPlace` (Schema.org: `MeetingRoom` is a `Place` subtype
+ * under the broader Hotels extension, intended for event venues
+ * embedded inside a hotel).
+ *
+ * Carries the three facts MICE planners use to pre-qualify a venue
+ * before requesting a quote:
+ *
+ *   - `name` — the editorial label ("Salon Kléber").
+ *   - `floorSize` — surface as a `QuantitativeValue` in m² (UN/ECE
+ *     unit code `MTK`, Google-recognised). We always emit m² as we
+ *     never store imperial.
+ *   - `maximumAttendeeCapacity` — single integer for the biggest
+ *     supported layout (theatre by default). Schema.org defines
+ *     this on `Event` and `Place`; Google's structured-data tooling
+ *     accepts it on `MeetingRoom` since 2023.
+ *
+ * `description` is optional and carries the localised editorial
+ * notes (e.g. "Salle de bal principale, plafond 5,5 m").
+ *
+ * No `containedInPlace` back-pointer to the parent hotel — the
+ * graph is already nested under the Hotel node so the relation is
+ * implicit. Inlining the back-pointer would only bloat the envelope.
+ */
+type MeetingRoomNode = {
+  '@type': 'MeetingRoom';
+  name: string;
+  floorSize: { '@type': 'QuantitativeValue'; value: number; unitCode: 'MTK' };
+  maximumAttendeeCapacity: number;
+  description?: string;
+};
+
+type ContainedPlaceNode = ContainedRoomNode | MeetingRoomNode;
 
 /**
  * `Place` subtype emitted under `nearbyAttractions`. We keep it as
@@ -203,11 +238,48 @@ export interface HotelJsonLdInput {
    * 3-5 highlight categories).
    */
   readonly containedRooms?: readonly ContainedRoomInput[];
+  /**
+   * MICE event spaces exposed as Schema.org `Hotel.containsPlace`
+   * entries with `@type: MeetingRoom`. The MICE section on the
+   * public page (`<HotelMiceEvents>`) is the human-readable surface
+   * for this data; the JSON-LD mirrors it so search engines and
+   * LLM ingestion pipelines can answer:
+   *
+   *   - "What event spaces does X have?"
+   *   - "Largest meeting room at X?" (max `maximumAttendeeCapacity`)
+   *   - "Hotel in Paris with a 300 m² ballroom?" (faceted retrieval)
+   *
+   * Capped at 30 entries — even the largest convention hotels in our
+   * curated catalogue have fewer than 20 named spaces; 30 is a
+   * defensive ceiling against editorial copy-paste of an exhaustive
+   * function-sheet that would dilute the structured signal.
+   *
+   * Mixed with `containedRooms` (HotelRoom) under the same
+   * `containsPlace` array, because Schema.org's `containsPlace` is a
+   * single property and the `@type` discriminator is what consumers
+   * filter on.
+   */
+  readonly eventSpaces?: readonly MeetingRoomInput[];
 }
 
 export interface ContainedRoomInput {
   readonly name: string;
   readonly url: string;
+}
+
+/**
+ * MICE event-space input for the hotel JSON-LD builder. Matches the
+ * shape of `LocalisedMiceSpace` produced by `readMiceInfo()` in
+ * `apps/web/src/server/hotels/get-hotel-by-slug.ts`. Surface units
+ * are always **square metres** (UN/ECE code `MTK`); we never accept
+ * imperial because the application never stores it.
+ */
+export interface MeetingRoomInput {
+  readonly name: string;
+  readonly surfaceSqm: number;
+  readonly maxSeated: number;
+  /** Optional editorial note (localised at the call site). */
+  readonly description?: string;
 }
 
 export interface HotelFeaturedReviewInput {
@@ -395,15 +467,56 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
       ...(poi.sameAs !== undefined && poi.sameAs.length > 0 ? { sameAs: poi.sameAs } : {}),
     }));
   }
+  // `containsPlace` aggregates two distinct sub-types: editorial
+  // `HotelRoom` sub-pages and `MeetingRoom` MICE spaces. Schema.org
+  // exposes a single property; consumers discriminate on the inner
+  // `@type`. We build the merged array once at the end so both feeds
+  // share the cap budget and the emission order is stable
+  // (rooms first, then meeting rooms — mirrors the visible page
+  // order: rooms section → MICE section).
+  const containedPlaces: ContainedPlaceNode[] = [];
   if (input.containedRooms !== undefined && input.containedRooms.length > 0) {
     // Cap at 20 — editorial pipelines typically curate 3-5 room
     // categories per hotel; the cap is a defensive ceiling, not a hot
     // path.
-    out.containsPlace = input.containedRooms.slice(0, 20).map((room) => ({
-      '@type': 'HotelRoom',
-      name: room.name,
-      url: room.url,
-    }));
+    for (const room of input.containedRooms.slice(0, 20)) {
+      containedPlaces.push({
+        '@type': 'HotelRoom',
+        name: room.name,
+        url: room.url,
+      });
+    }
+  }
+  if (input.eventSpaces !== undefined && input.eventSpaces.length > 0) {
+    for (const space of input.eventSpaces.slice(0, 30)) {
+      // Defensive numeric guards. The reader (`readMiceInfo`)
+      // already Zod-validates positives, but the builder accepts
+      // raw inputs from other callers too (tests, future seeds).
+      if (!Number.isFinite(space.surfaceSqm) || space.surfaceSqm <= 0) continue;
+      if (!Number.isFinite(space.maxSeated) || space.maxSeated <= 0) continue;
+      const trimmedName = space.name.trim();
+      if (trimmedName.length === 0) continue;
+      const node: MeetingRoomNode = {
+        '@type': 'MeetingRoom',
+        name: trimmedName,
+        floorSize: {
+          '@type': 'QuantitativeValue',
+          value: space.surfaceSqm,
+          unitCode: 'MTK',
+        },
+        maximumAttendeeCapacity: space.maxSeated,
+      };
+      if (space.description !== undefined) {
+        const trimmedDescription = space.description.trim();
+        if (trimmedDescription.length > 0) {
+          node.description = trimmedDescription;
+        }
+      }
+      containedPlaces.push(node);
+    }
+  }
+  if (containedPlaces.length > 0) {
+    out.containsPlace = containedPlaces;
   }
   if (input.featuredReviews !== undefined && input.featuredReviews.length > 0) {
     // Cap at 5 to mirror Google's documented Hotel rich-result envelope
