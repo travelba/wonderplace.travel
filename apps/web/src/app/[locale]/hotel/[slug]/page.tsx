@@ -47,6 +47,7 @@ import {
   readGallery,
   readHeroImage,
   readHighlights,
+  readHotelHistoryDates,
   readHotelStory,
   readInventoryCounts,
   readLocation,
@@ -337,6 +338,7 @@ async function renderHotelPage(
   const postalCode = readPostalCode(row);
   const phoneE164 = readPhoneE164(row);
   const inventory = readInventoryCounts(row);
+  const historyDates = readHotelHistoryDates(row);
   const storySections = readHotelStory(row, locale);
   const signatureExperiences = readSignatureExperiences(row, locale);
   const featuredReviews = readFeaturedReviews(row, locale);
@@ -446,6 +448,13 @@ async function renderHotelPage(
     // forward it as-is so LLM ingestion pipelines and Google can
     // surface "Last updated: …" hints.
     ...(row.updated_at !== null && row.updated_at !== '' ? { dateModified: row.updated_at } : {}),
+    // Editorial opening year (Phase 11.2 / CDC §2.15). Surfaced as
+    // Schema.org `foundingDate` — Google's Hotel rich-result accepts a
+    // bare `YYYY` (Organization inheritance) and LLM ingestion pipelines
+    // weight this strongly for "How old is X?" / "When was X built?"
+    // queries. The reader returns `openedYear` only when the DB value
+    // parses cleanly within (1500 .. current_year + 1).
+    ...(historyDates.openedYear !== null ? { foundingDate: String(historyDates.openedYear) } : {}),
     // Editorial room sub-pages exposed as `Hotel.containsPlace[]`
     // (Phase 10.27 / CDC §2.15). Each entry points at the indexable
     // room sub-page URL so search engines and LLM ingestion pipelines
@@ -723,6 +732,8 @@ async function renderHotelPage(
         checkInFrom={policies.checkIn !== null ? policies.checkIn.from : null}
         checkOutUntil={policies.checkOut !== null ? policies.checkOut.until : null}
         petsAllowed={policies.pets !== null ? policies.pets.allowed : null}
+        openedYear={historyDates.openedYear}
+        lastRenovatedYear={historyDates.lastRenovatedYear}
         lastUpdatedLabel={lastUpdated}
         lastUpdatedIso={row.updated_at !== null && row.updated_at !== '' ? row.updated_at : null}
       />

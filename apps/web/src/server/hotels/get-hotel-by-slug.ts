@@ -95,6 +95,8 @@ export const HotelDetailRowSchema = z.object({
     .nullish()
     .transform((v) => v ?? null),
   phone_e164: stringOrEmpty,
+  opened_at: stringOrEmpty,
+  last_renovated_at: stringOrEmpty,
   is_published: z.boolean(),
   updated_at: stringOrEmpty,
 });
@@ -102,7 +104,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, is_published, updated_at';
 
 /**
  * E.164 phone-number format: leading `+`, country code, 4-15 digits, no
@@ -142,6 +144,61 @@ export function readPostalCode(row: HotelDetailRow): string | null {
   const trimmed = row.postal_code.trim();
   if (trimmed.length === 0) return null;
   return POSTAL_CODE_REGEX.test(trimmed) ? trimmed : null;
+}
+
+/**
+ * Editorial opening / last-renovation dates (CDC §2.4 + §2.15).
+ *
+ * The DB stores full `date` values (CHECK-bounded between 1500-01-01 and
+ * `current_date`, and `last_renovated_at >= opened_at` when both are set
+ * — see migration `0022_hotel_dates_columns.sql`). The page only renders
+ * the years; the JSON-LD builder maps `openedYear` to Schema.org
+ * `foundingDate` as a bare `YYYY` string (which Google's hotel
+ * rich-result validator accepts).
+ *
+ * We rely on the DB constraints rather than re-validating ranges here.
+ * Defensive parsing only catches:
+ *   - non-ISO inputs (string came back malformed from PostgREST),
+ *   - empty strings (which `stringOrEmpty` already normalised to `null`),
+ *   - years outside a sane editorial range (1500-current_year + 1) — a
+ *     belt-and-braces guard for legacy rows pre-CHECK constraint.
+ */
+export interface HotelHistoryDates {
+  readonly openedDate: string | null;
+  readonly openedYear: number | null;
+  readonly lastRenovatedDate: string | null;
+  readonly lastRenovatedYear: number | null;
+}
+
+const EDITORIAL_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+function parseEditorialDate(
+  raw: string | null,
+): { readonly iso: string; readonly year: number } | null {
+  if (raw === null) return null;
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) return null;
+  const match = EDITORIAL_DATE_REGEX.exec(trimmed);
+  if (match === null) return null;
+  const yearString = match[1];
+  if (yearString === undefined) return null;
+  const year = Number.parseInt(yearString, 10);
+  if (!Number.isFinite(year)) return null;
+  // Sanity envelope — well beyond the DB CHECK but cheap.
+  const currentYear = new Date().getUTCFullYear();
+  if (year < 1500 || year > currentYear + 1) return null;
+  return { iso: trimmed, year };
+}
+
+export function readHotelHistoryDates(row: HotelDetailRow): HotelHistoryDates {
+  const opened = parseEditorialDate(row.opened_at);
+  const renovated = parseEditorialDate(row.last_renovated_at);
+  return {
+    openedDate: opened?.iso ?? null,
+    openedYear: opened?.year ?? null,
+    lastRenovatedDate: renovated?.iso ?? null,
+    lastRenovatedYear: renovated?.year ?? null,
+  };
 }
 
 /**

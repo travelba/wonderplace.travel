@@ -218,6 +218,31 @@ describe('hotelJsonLd', () => {
     expect(node.dateModified).toBeUndefined();
   });
 
+  it('emits foundingDate when provided (history / age signal)', () => {
+    const node = hotelJsonLd({
+      name: 'Le Peninsula',
+      url: 'https://example.com/p',
+      foundingDate: '1908',
+    });
+    expect(node.foundingDate).toBe('1908');
+  });
+
+  it('emits foundingDate as ISO date string when provided', () => {
+    const node = hotelJsonLd({
+      name: 'Le Peninsula',
+      url: 'https://example.com/p',
+      foundingDate: '1908-04-01',
+    });
+    expect(node.foundingDate).toBe('1908-04-01');
+  });
+
+  it('omits foundingDate when undefined or empty', () => {
+    const a = hotelJsonLd({ name: 'A', url: 'https://example.com/a' });
+    expect(a.foundingDate).toBeUndefined();
+    const b = hotelJsonLd({ name: 'B', url: 'https://example.com/b', foundingDate: '' });
+    expect(b.foundingDate).toBeUndefined();
+  });
+
   it('emits nearbyAttractions as TouristAttraction-flavoured Place array', () => {
     const node = hotelJsonLd({
       name: 'Le Peninsula',

@@ -140,6 +140,17 @@ export interface HotelJsonLdInput {
    */
   readonly dateModified?: string;
   /**
+   * Editorial opening year (CDC §2.15 — `foundingDate` on Schema.org's
+   * `Organization` parent of `Hotel`). Emitted as a bare `YYYY` string
+   * which Google's hotel rich-result test accepts and which LLM
+   * pipelines parse correctly for "How old is X?" queries.
+   *
+   * The reader at the page level (`readHotelHistoryDates`) is the
+   * source of truth for the value range — this builder simply forwards
+   * what it gets, with a defensive non-empty check.
+   */
+  readonly foundingDate?: string;
+  /**
    * Points of interest within walking distance of the hotel, emitted
    * as the `nearbyAttractions` Hotel property (Google-supported
    * extension to Schema.org's `LodgingBusiness`).
@@ -332,6 +343,9 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   }
   if (input.dateModified !== undefined && input.dateModified.length > 0) {
     out.dateModified = input.dateModified;
+  }
+  if (input.foundingDate !== undefined && input.foundingDate.length > 0) {
+    out.foundingDate = input.foundingDate;
   }
   if (input.nearbyAttractions !== undefined && input.nearbyAttractions.length > 0) {
     // Cap at 10 to keep the JSON-LD envelope tight. Google ignores

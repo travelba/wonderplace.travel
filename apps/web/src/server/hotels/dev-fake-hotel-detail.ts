@@ -85,6 +85,12 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     google_rating: 4.7,
     google_reviews_count: 312,
     phone_e164: '+33199990000',
+    // Editorial history (Phase 11.2). The synthetic E2E hotel inherits a
+    // deterministic 2010 opening — old enough to populate the JSON-LD
+    // `foundingDate` field but not so old it tempts smoke tests into
+    // asserting on real historical hotels.
+    opened_at: '2010-06-01',
+    last_renovated_at: null,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
     // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the
