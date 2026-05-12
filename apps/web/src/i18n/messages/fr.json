@@ -776,7 +776,9 @@
       "emptyCta": "Découvrir notre sélection",
       "noPhoto": "Photo à venir",
       "palace": "Palace",
-      "stars": "{count} étoiles"
+      "stars": "{count} étoiles",
+      "removeAction": "Retirer {name} de mes favoris",
+      "removeConfirmation": "{name} a été retiré de vos favoris."
     }
   },
   "reservationStart": {
