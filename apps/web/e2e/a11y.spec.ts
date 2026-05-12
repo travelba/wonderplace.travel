@@ -113,6 +113,8 @@ test.describe('a11y / axe scan', () => {
     { name: 'Cookies policy', path: '/cookies' },
     { name: 'Legal notice', path: '/mentions-legales' },
     // ----- Dynamic surfaces (Phase 11.7) -----------------------
+    { name: 'FR hotel detail', path: '/hotel/hotel-de-test-e2e' },
+    { name: 'EN hotel detail', path: '/en/hotel/hotel-de-test-e2e-en' },
     { name: 'FR search', path: '/recherche' },
     { name: 'EN search', path: '/en/recherche' },
     { name: 'FR sign-in', path: '/compte/connexion' },
@@ -131,38 +133,25 @@ test.describe('a11y / axe scan', () => {
     });
   }
 
-  /**
-   * Hotel detail (FR + EN) and the MICE landmark anchor are deliberately
-   * deferred. The fake-hotel surface currently SSR-throws
-   * `DYNAMIC_SERVER_USAGE` under the production-mode test build (visible
-   * in the Playwright `[WebServer]` log: the page returns a bare `<html>`
-   * with no `lang`, triggering axe's `html-has-lang` rule). The bug is
-   * orthogonal to a11y — `hotel-detail.spec.ts` (`FR renders the hotel
-   * head…`) reproduces the same SSR failure. Restore these scans once the
-   * dynamic-API audit on `apps/web/src/server/hotels/` (likely an indirect
-   * `cookies()` / `headers()` read reachable from `getHotelBySlug` or
-   * `isFakeOffersEnabled`) is closed.
-   */
-  test.fixme('FR hotel detail has no serious/critical violations', async ({ page }) => {
+  test('FR hotel detail exposes the MICE section landmark and CTA', async ({ page }) => {
+    // Smoke check that the recently-shipped MICE section
+    // (Phase 11.5 + 11.6) wires its accessibility primitives the way
+    // axe expects — the broader scan above asserts zero violations
+    // *globally*; this case anchors on the specific affordances we
+    // care about (landmark labelled via `aria-labelledby`, mailto
+    // CTA with descriptive `aria-label`).
     await page.goto('/hotel/hotel-de-test-e2e');
-    await runAxeScan(page, { name: 'FR hotel detail', path: '/hotel/hotel-de-test-e2e' });
-  });
-  test.fixme('EN hotel detail has no serious/critical violations', async ({ page }) => {
-    await page.goto('/en/hotel/hotel-de-test-e2e-en');
-    await runAxeScan(page, {
-      name: 'EN hotel detail',
-      path: '/en/hotel/hotel-de-test-e2e-en',
-    });
-  });
-  test.fixme('FR hotel detail exposes the MICE section landmark and CTA', async ({ page }) => {
-    await page.goto('/hotel/hotel-de-test-e2e');
+
     const section = page.locator('section[aria-labelledby="mice-title"]');
     await expect(section).toBeVisible();
     await expect(page.locator('#mice-title')).toBeVisible();
+
     const cta = section.getByRole('link', { name: /MICE.*Hôtel de Test/i });
     await expect(cta).toBeVisible();
     const href = await cta.getAttribute('href');
     expect(href?.startsWith('mailto:')).toBe(true);
-    expect(href).toContain('events%40hoteldetest.example');
+    // The local part / domain stay un-encoded (mailto: scheme allows
+    // `@` and `.`); only the `subject` query string is URI-encoded.
+    expect(href).toContain('mailto:events@hoteldetest.example?subject=');
   });
 });
