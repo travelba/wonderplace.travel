@@ -1098,6 +1098,24 @@ const HOTEL_RECORD = {
   // code, 4-15 digits). The Peninsula Paris reception line, verified on
   // peninsula.com/en/paris/contact-us as of 2026-05.
   phone_e164: '+33158122888',
+  // Editorial history (Phase 11.2 / CDC §2.4 / §2.15).
+  //
+  //   - 1908: the building opens as the *Hôtel Majestic* (Charles Wallace's
+  //     property; 200 keys for the original "Majestic" — a Belle-Époque
+  //     palace adjoining the Arc de Triomphe).
+  //   - 1936-2009: requisitioned by the French Ministry of Foreign Affairs
+  //     as a conference centre — the Vietnam Peace Accords were signed
+  //     here in 1973.
+  //   - 2014-08-01: reopens after a USD 800M+ restoration by Affine /
+  //     Katara Hospitality with The Peninsula Hotels operating the
+  //     property as The Peninsula Paris (its current identity).
+  //
+  // We capture the *building's* first hotel opening as `opened_at` and
+  // the renovation that reframed it as The Peninsula as
+  // `last_renovated_at`. JSON-LD `foundingDate` renders the year
+  // ("1908"); the HotelFactSheet history line renders both years.
+  opened_at: '1908-04-01' as string,
+  last_renovated_at: '2014-08-01' as string,
 };
 
 /**
@@ -1146,7 +1164,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       number_of_rooms, number_of_suites,
       meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en,
       google_place_id, google_rating, google_reviews_count,
-      phone_e164
+      phone_e164,
+      opened_at, last_renovated_at
     )
     values (
       ${HOTEL_RECORD.slug}, ${HOTEL_RECORD.slug_en}, ${HOTEL_RECORD.name}, ${HOTEL_RECORD.name_en},
@@ -1173,7 +1192,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${HOTEL_RECORD.meta_title_fr}, ${HOTEL_RECORD.meta_title_en},
       ${HOTEL_RECORD.meta_desc_fr}, ${HOTEL_RECORD.meta_desc_en},
       ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count},
-      ${HOTEL_RECORD.phone_e164}
+      ${HOTEL_RECORD.phone_e164},
+      ${HOTEL_RECORD.opened_at}, ${HOTEL_RECORD.last_renovated_at}
     )
     on conflict (slug) do update set
       slug_en = excluded.slug_en,
@@ -1218,6 +1238,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       google_rating = excluded.google_rating,
       google_reviews_count = excluded.google_reviews_count,
       phone_e164 = excluded.phone_e164,
+      opened_at = excluded.opened_at,
+      last_renovated_at = excluded.last_renovated_at,
       updated_at = timezone('utc', now())
     returning id, (xmax = 0) as inserted
   `;
