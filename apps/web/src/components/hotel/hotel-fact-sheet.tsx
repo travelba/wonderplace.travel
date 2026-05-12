@@ -16,6 +16,16 @@ interface HotelFactSheetProps {
   readonly checkInFrom: string | null;
   readonly checkOutUntil: string | null;
   readonly petsAllowed: boolean | null;
+  /**
+   * Editorial opening year (Phase 11.2 / CDC §2.4). When non-null, renders
+   * a "Ouverture YYYY" or "Ouverture YYYY · Rénové en YYYY" row that
+   * grounds the property's history in a quotable fact. Years are
+   * validated upstream by `readHotelHistoryDates`; this component just
+   * displays whatever it receives.
+   */
+  readonly openedYear: number | null;
+  /** Editorial last-renovation year (sibling of `openedYear`). */
+  readonly lastRenovatedYear: number | null;
   readonly lastUpdatedLabel: string | null;
   /**
    * Raw ISO-8601 timestamp of the last edit on this hotel record.
@@ -81,6 +91,8 @@ export async function HotelFactSheet({
   checkInFrom,
   checkOutUntil,
   petsAllowed,
+  openedYear,
+  lastRenovatedYear,
   lastUpdatedLabel,
   lastUpdatedIso,
 }: HotelFactSheetProps): Promise<React.ReactElement | null> {
@@ -118,6 +130,15 @@ export async function HotelFactSheet({
   const petsLine: string | null =
     petsAllowed === null ? null : petsAllowed ? t('petsYes') : t('petsNo');
 
+  const historyLine: string | null =
+    openedYear !== null
+      ? lastRenovatedYear !== null && lastRenovatedYear !== openedYear
+        ? t('historyOpenedRenovated', { opened: openedYear, renovated: lastRenovatedYear })
+        : t('historyOpenedOnly', { opened: openedYear })
+      : lastRenovatedYear !== null
+        ? t('historyRenovatedOnly', { renovated: lastRenovatedYear })
+        : null;
+
   // Format coordinates compactly: keep 4 decimals (~10 m precision —
   // far better than necessary for a hotel street address).
   const geoLine: string | null =
@@ -143,6 +164,9 @@ export async function HotelFactSheet({
   }
   if (petsLine !== null) {
     entries.push({ key: 'pets', label: t('petsLabel'), value: petsLine });
+  }
+  if (historyLine !== null) {
+    entries.push({ key: 'history', label: t('historyLabel'), value: historyLine });
   }
   if (geoLine !== null) {
     entries.push({ key: 'geo', label: t('geoLabel'), value: geoLine });
