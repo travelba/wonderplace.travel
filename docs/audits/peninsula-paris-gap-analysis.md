@@ -525,7 +525,7 @@ Schema.org `Restaurant` / `HealthClub`.
 
 | Bloc | Action résiduelle                                                                  | Effort | Prio | Statut                |
 | ---- | ---------------------------------------------------------------------------------- | ------ | ---- | --------------------- |
-| 1    | Favoris auth-gated (`user_favorites` + RLS + client island)                        | 1 s    | P2   | ouvert                |
+| 1    | Favoris auth-gated (`user_favorites` + RLS + client island)                        | 1 s    | P2   | ✓ Phase 11.1 #43      |
 | 1    | Sélecteur devise (EUR/USD/GBP/CHF) — requires multi-currency pricing pipeline      | 1 s    | P3   | ouvert                |
 | 2    | Lightbox swipeable (carousel client) + Matterport tour                             | 1 s    | P3   | ouvert                |
 | 3    | `data-freshness` UI raffiné (badge "Mise à jour le …")                             | 0.25 s | P3   | ✓ 10.19 #27           |
@@ -587,12 +587,12 @@ Note: les **policies city_tax / wifi** (Phase 10.21) ont été ajoutées **dans 
 
 Migrations résiduelles à séquencer (Phase 11+) :
 
-| Migration                        | Colonnes ajoutées                                                                    | Bloc CDC | Prio |
-| -------------------------------- | ------------------------------------------------------------------------------------ | -------- | ---- |
-| `0020_user_favorites.sql`        | nouvelle table `public.user_favorites` (user_id, hotel_id, created_at, RLS own-only) | §2.1     | P2   |
-| `0021_hotels_google_reviews.sql` | `google_reviews jsonb` (5-10 quotes Google Places, ingest cron J-7)                  | §2.10    | P2   |
-| `0022_hotels_meta_extra.sql`     | `opened_at date`, `last_renovated_at date`                                           | §2.15    | P3   |
-| `0023_hotels_telephone.sql`      | `phone_e164 text` (E.164 format, optional) — exposé en JSON-LD `telephone`           | §2.15    | P3   |
+| Migration                        | Colonnes ajoutées                                                                                 | Bloc CDC | Prio |
+| -------------------------------- | ------------------------------------------------------------------------------------------------- | -------- | ---- |
+| `0021_user_favorites.sql`        | nouvelle table `public.user_favorites` (user_id, hotel_id, created_at, RLS own-only) ✓ Phase 11.1 | §2.1     | P2   |
+| `0021_hotels_google_reviews.sql` | `google_reviews jsonb` (5-10 quotes Google Places, ingest cron J-7)                               | §2.10    | P2   |
+| `0022_hotels_meta_extra.sql`     | `opened_at date`, `last_renovated_at date`                                                        | §2.15    | P3   |
+| `0023_hotels_telephone.sql`      | `phone_e164 text` (E.164 format, optional) — exposé en JSON-LD `telephone`                        | §2.15    | P3   |
 
 **Bug `seed-dev.ts` jsonb binding** : ✓ corrigé Phase 10.20 (PR #28). Le pattern `${JSON.stringify(array)}::jsonb` a été remplacé par `sql.json(toJson(value))` pour les colonnes `amenities` et `highlights`, alignant le seed dev sur le seed Peninsula.
 
