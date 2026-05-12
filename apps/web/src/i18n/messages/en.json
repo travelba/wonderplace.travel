@@ -650,7 +650,9 @@
       "signInTitle": "Sign in",
       "signUpTitle": "Create an account",
       "forgotTitle": "Forgot password",
-      "resetTitle": "New password"
+      "resetTitle": "New password",
+      "favoritesTitle": "My favorites",
+      "favoritesDescription": "Hotels you've saved on ConciergeTravel."
     },
     "shared": {
       "email": "Email address",
@@ -698,6 +700,7 @@
       "title": "Hello {name}",
       "subtitle": "Your confirmed bookings and pending requests.",
       "signOut": "Sign out",
+      "viewFavorites": "My favorites",
       "resetBanner": "Your password has been updated.",
       "sections": {
         "bookings": "Confirmed bookings",
@@ -743,6 +746,20 @@
       "rate_limited": "Too many attempts. Please wait a few minutes and try again.",
       "upstream": "Something went wrong. Please try again.",
       "session_missing": "Your session has expired. Please sign in again to continue."
+    },
+    "favorites": {
+      "eyebrow": "Traveller area",
+      "title": "My favorites",
+      "subtitle": "Hotels you've saved for upcoming stays.",
+      "breadcrumb": "Breadcrumb",
+      "backToDashboard": "← Back to my account",
+      "listAria": "{count, plural, one {# favorite hotel} other {# favorite hotels}}",
+      "emptyTitle": "No favorites yet",
+      "emptyBody": "Tap the heart on any hotel page to save it here for later.",
+      "emptyCta": "Browse our selection",
+      "noPhoto": "Photo coming soon",
+      "palace": "Palace",
+      "stars": "{count} stars"
     }
   },
   "errors": {

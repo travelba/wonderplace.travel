@@ -657,7 +657,9 @@
       "signInTitle": "Connexion",
       "signUpTitle": "Créer un compte",
       "forgotTitle": "Mot de passe oublié",
-      "resetTitle": "Nouveau mot de passe"
+      "resetTitle": "Nouveau mot de passe",
+      "favoritesTitle": "Mes favoris",
+      "favoritesDescription": "Les hôtels que vous avez sauvegardés sur ConciergeTravel."
     },
     "shared": {
       "email": "Adresse e-mail",
@@ -705,6 +707,7 @@
       "title": "Bonjour {name}",
       "subtitle": "Vos réservations confirmées et vos demandes envoyées.",
       "signOut": "Se déconnecter",
+      "viewFavorites": "Mes favoris",
       "resetBanner": "Votre mot de passe a bien été mis à jour.",
       "sections": {
         "bookings": "Réservations confirmées",
@@ -750,6 +753,20 @@
       "rate_limited": "Trop de tentatives. Patientez quelques minutes avant de réessayer.",
       "upstream": "Une erreur est survenue. Veuillez réessayer.",
       "session_missing": "Votre session a expiré. Reconnectez-vous pour continuer."
+    },
+    "favorites": {
+      "eyebrow": "Espace voyageur",
+      "title": "Mes favoris",
+      "subtitle": "Les hôtels que vous avez sauvegardés pour vos prochains séjours.",
+      "breadcrumb": "Fil d'Ariane",
+      "backToDashboard": "← Retour à mon compte",
+      "listAria": "{count, plural, one {# hôtel favori} other {# hôtels favoris}}",
+      "emptyTitle": "Aucun favori pour l'instant",
+      "emptyBody": "Cliquez sur le cœur d'une fiche hôtel pour la retrouver ici plus tard.",
+      "emptyCta": "Découvrir notre sélection",
+      "noPhoto": "Photo à venir",
+      "palace": "Palace",
+      "stars": "{count} étoiles"
     }
   },
   "reservationStart": {

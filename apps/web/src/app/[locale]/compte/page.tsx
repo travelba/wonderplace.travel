@@ -107,15 +107,23 @@ export default async function CompteDashboardPage({
           <p className="text-muted mt-2">{t('dashboard.subtitle')}</p>
         </div>
 
-        <form action={signOutAction_} method="post">
-          <input type="hidden" name="locale" value={locale} />
-          <button
-            type="submit"
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/compte/favoris"
             className="border-border bg-bg text-fg hover:bg-muted/10 focus-visible:ring-ring rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
           >
-            {t('dashboard.signOut')}
-          </button>
-        </form>
+            {t('dashboard.viewFavorites')}
+          </Link>
+          <form action={signOutAction_} method="post">
+            <input type="hidden" name="locale" value={locale} />
+            <button
+              type="submit"
+              className="border-border bg-bg text-fg hover:bg-muted/10 focus-visible:ring-ring rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+            >
+              {t('dashboard.signOut')}
+            </button>
+          </form>
+        </div>
       </header>
 
       {resetBanner ? (
