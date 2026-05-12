@@ -10,6 +10,7 @@ The cahier des charges mandates **Supabase PostgreSQL with RLS native** (CDC §2
 ## Triggers
 
 Invoke when:
+
 - Creating a migration in `packages/db/migrations/`.
 - Adding or altering tables: `hotels`, `hotel_rooms`, `bookings`, `editorial_pages`, `loyalty_members`, `booking_requests_email`, `price_comparisons`, `authors`, `profiles`, `redirects`, etc.
 - Writing or editing RLS policies.
@@ -18,6 +19,7 @@ Invoke when:
 ## Tables and core fields (CDC v3.0 §4)
 
 ### `hotels`
+
 - `id uuid pk default gen_random_uuid()`, `slug text unique not null`, `slug_en text unique`
 - `name text not null`, `name_en text`
 - `stars int check (stars = 5)`, `is_palace bool default false`
@@ -34,11 +36,13 @@ Invoke when:
 - `is_published bool default false`, `created_at`, `updated_at` (trigger)
 
 ### `hotel_rooms`
+
 - `id uuid pk`, `hotel_id uuid references hotels(id) on delete cascade`
 - `room_code text not null`, `name_fr/_en text`, `description_fr/_en text`
 - `max_occupancy int`, `bed_type text`, `size_sqm int`, `amenities jsonb`, `images jsonb`
 
 ### `bookings`
+
 - `id uuid pk`, `booking_ref text unique not null` (format `CT-YYYYMMDD-XXXXX`)
 - `amadeus_pnr text`, `little_booking_id text`
 - `hotel_id uuid references hotels(id)`, `room_id uuid references hotel_rooms(id)`
@@ -54,6 +58,7 @@ Invoke when:
 - `loyalty_tier text`, `loyalty_benefits jsonb`
 
 ### `editorial_pages`
+
 - `id uuid`, `slug_fr text unique not null`, `slug_en text unique`
 - `type text check (type in ('classement','thematique','region','guide','comparatif','saisonnier'))`
 - `title_fr/_en`, `meta_desc_fr/_en`, `aeo_block_fr/_en` (40–60 mots)
@@ -61,14 +66,17 @@ Invoke when:
 - `status text default 'draft' check (status in ('draft','published'))`, `priority text check (priority in ('P0','P1','P2','P3'))`
 
 ### `loyalty_members`
+
 - `id uuid pk references auth.users(id) on delete cascade`
 - `tier text default 'free' check (tier in ('free','premium'))`, `tier_expiry date`, `total_bookings int default 0`
 - `premium_price decimal(8,2)`
 
 ### `booking_requests_email`
+
 - `id`, `hotel_id`, `guest_*`, `requested_checkin/checkout`, `room_preference`, `message`, `status (new/in_progress/quoted/booked/declined)`, `assigned_to`, `internal_notes`, `created_at`
 
 ### `price_comparisons`
+
 - `id`, `hotel_id`, `checkin_date`, `checkout_date`, `price_concierge`, `price_booking`, `price_expedia`, `price_hotelscom`, `price_official`, `expires_at`
 
 ### `authors`, `profiles`, `redirects`
@@ -76,6 +84,7 @@ Invoke when:
 ## Non-negotiable rules
 
 ### RLS
+
 - `alter table <t> enable row level security;` on every business table.
 - `service_role` bypass for migrations and admin server work; never expose service role to the client.
 - Policies separated per role: `anon`, `authenticated`, `editor` (claim-based), `admin`, `operator`.
@@ -84,22 +93,26 @@ Invoke when:
 - Loyalty members readable by owner + admin; writable by service role.
 
 ### Migrations
+
 - Files numbered `NNNN_description.sql`. Idempotent if possible. Drizzle schema kept in sync.
 - Each migration is reviewable as plain SQL. We commit raw SQL, not ORM-generated.
 - New columns are nullable or have defaults to keep deploy zero-downtime.
 
 ### Indexes
+
 - `hotels(slug)` unique, `hotels(is_published, region, city)`, `hotels(makcorps_hotel_id) where makcorps_hotel_id is not null`.
 - `bookings(user_id, status)`, `bookings(checkin_date)` for reporting.
 - GIN on `hotels.faq_content`, `editorial_pages.faq_content`, `hotels.amenities`.
 - `editorial_pages(slug_fr)` unique, `(type, status, priority)`.
 
 ### Generated columns and triggers
+
 - `bookings.nights` generated.
 - `updated_at` trigger via shared function `set_updated_at()`.
 - Slug uniqueness validated by partial unique indexes when locale is involved.
 
 ### JSONB
+
 - Validated by Zod at app layer before insert/update.
 - Document expected shape in a comment at the top of the migration.
 

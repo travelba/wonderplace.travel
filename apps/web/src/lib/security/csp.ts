@@ -32,6 +32,11 @@ const IMG_HOSTS = [
   'blob:',
   'https://res.cloudinary.com',
   'https://*.supabase.co',
+  // Wikimedia Maps OSM tile server — used by `HotelStaticMap` to ship
+  // a free, no-API-key static map of the hotel location. The host is
+  // operated by the Wikimedia Foundation, no PII leaves the browser
+  // beyond the bare `lat,lon,zoom` baked into the tile URL.
+  'https://maps.wikimedia.org',
 ] as const;
 
 const FONT_HOSTS = ["'self'", 'data:'] as const;

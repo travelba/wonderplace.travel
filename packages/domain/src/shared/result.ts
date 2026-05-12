@@ -15,16 +15,13 @@ export const isErr = <T, E>(r: Result<T, E>): r is Err<E> => !r.ok;
 export const map = <T, U, E>(r: Result<T, E>, f: (t: T) => U): Result<U, E> =>
   r.ok ? ok(f(r.value)) : r;
 
-export const flatMap = <T, U, E>(
-  r: Result<T, E>,
-  f: (t: T) => Result<U, E>,
-): Result<U, E> => (r.ok ? f(r.value) : r);
+export const flatMap = <T, U, E>(r: Result<T, E>, f: (t: T) => Result<U, E>): Result<U, E> =>
+  r.ok ? f(r.value) : r;
 
 export const mapErr = <T, E, F>(r: Result<T, E>, f: (e: E) => F): Result<T, F> =>
   r.ok ? r : err(f(r.error));
 
-export const unwrapOr = <T, E>(r: Result<T, E>, fallback: T): T =>
-  r.ok ? r.value : fallback;
+export const unwrapOr = <T, E>(r: Result<T, E>, fallback: T): T => (r.ok ? r.value : fallback);
 
 export const exhaustive = (x: never): never => {
   throw new Error(`Unhandled discriminant: ${JSON.stringify(x)}`);

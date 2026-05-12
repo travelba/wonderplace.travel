@@ -10,20 +10,21 @@ The codebase is organized by **bounded contexts** in `packages/domain/`. Domain 
 ## Triggers
 
 Invoke this skill when:
+
 - Writing new business rules (cancellation policy parsing, loyalty benefits calculation, price comparison scenarios, slug computation, hreflang resolution).
 - Adding entities, value objects, aggregates, or domain services.
 - A piece of logic might be tempted to live "inline" in a route handler or React component.
 
 ## Bounded contexts
 
-| Context | Path | Responsibilities |
-|---|---|---|
-| `hotels` | `packages/domain/hotels` | Hotel entity, Room entity, BookingMode VO, publication state, slug rules |
-| `booking` | `packages/domain/booking` | Booking aggregate, state machine (idle → offer_locked → guest_collected → payment_pending → confirmed/failed), CancellationPolicy parser |
-| `loyalty` | `packages/domain/loyalty` | Tier rules, benefits calculation, eligibility (Little catalog vs all hotels) |
-| `pricing` | `packages/domain/pricing` | Comparator normalization (Makcorps → unified shape), scenario decision (cheaper / equal_with_benefits / more_expensive) |
-| `editorial` | `packages/domain/editorial` | Editorial page state, slug/hreflang/canonical, AEO block validation, FAQ schema |
-| `shared` | `packages/domain/shared` | `Result<T,E>`, branded types, errors, IDs |
+| Context     | Path                        | Responsibilities                                                                                                                         |
+| ----------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `hotels`    | `packages/domain/hotels`    | Hotel entity, Room entity, BookingMode VO, publication state, slug rules                                                                 |
+| `booking`   | `packages/domain/booking`   | Booking aggregate, state machine (idle → offer_locked → guest_collected → payment_pending → confirmed/failed), CancellationPolicy parser |
+| `loyalty`   | `packages/domain/loyalty`   | Tier rules, benefits calculation, eligibility (Little catalog vs all hotels)                                                             |
+| `pricing`   | `packages/domain/pricing`   | Comparator normalization (Makcorps → unified shape), scenario decision (cheaper / equal_with_benefits / more_expensive)                  |
+| `editorial` | `packages/domain/editorial` | Editorial page state, slug/hreflang/canonical, AEO block validation, FAQ schema                                                          |
+| `shared`    | `packages/domain/shared`    | `Result<T,E>`, branded types, errors, IDs                                                                                                |
 
 ## Non-negotiable rules
 
@@ -65,8 +66,10 @@ export type BookingState =
 
 export const lockOffer = (
   state: BookingState,
-  cmd: { offerId: AmadeusOfferId; lockedUntil: Date }
-): Result<BookingState, BookingError> => { /* ... */ };
+  cmd: { offerId: AmadeusOfferId; lockedUntil: Date },
+): Result<BookingState, BookingError> => {
+  /* ... */
+};
 ```
 
 ## References

@@ -350,6 +350,14 @@
       "districtSeparator": "·",
       "viewMap": "View on the map"
     },
+    "share": {
+      "button": "Share",
+      "buttonAria": "Share the {name} page",
+      "toastShared": "Shared",
+      "toastCopied": "Link copied",
+      "toastFailed": "Copy failed — select the link manually",
+      "manualCopyLabel": "Reveal link"
+    },
     "rating": {
       "scoreOf": "{value} / {best}",
       "scoreAria": "Average rating of {value} out of {best}",
@@ -365,7 +373,98 @@
       "reviewBreakdown": "What guests are saying",
       "restaurants": "Restaurants & bars",
       "spa": "Spa & wellness",
-      "gallery": "Photo gallery"
+      "gallery": "Photo gallery",
+      "location": "Location & access",
+      "policies": "Stay policies",
+      "awards": "Awards & recognitions",
+      "reassurance": "Why book with us",
+      "concierge": "Concierge booking",
+      "signatureExperiences": "Signature experiences",
+      "featuredReviews": "What the press says"
+    },
+    "awards": {
+      "intro": "Official distinctions and recognitions awarded to this property.",
+      "issuerWithYear": "{issuer} · {year, number}",
+      "viewSource": "View source"
+    },
+    "signatureExperiences": {
+      "intro": "Exclusive on-site programmes that define this property's character, beyond the room key.",
+      "listAria": "List of the property's signature experiences",
+      "bookingRequired": "Reservation required",
+      "includedInStay": "Included in your stay"
+    },
+    "featuredReviews": {
+      "intro": "Curated pull-quotes from independent travel media and professional rankings — editorial selection, no compensation.",
+      "listAria": "Editorial pull-quotes for this property",
+      "ratingAria": "Score {value} out of {max}"
+    },
+    "amenityCategories": {
+      "wellness": "Wellness",
+      "dining": "Dining",
+      "services": "Services",
+      "family": "Family & pets",
+      "connectivity": "Connectivity",
+      "business": "Business & events",
+      "accessibility": "Accessibility",
+      "sustainability": "Sustainability",
+      "other": "Other amenities"
+    },
+    "story": {
+      "tocTitle": "Contents",
+      "tocLabel": "Story table of contents"
+    },
+    "faq": {
+      "categoryBefore": "Before your stay",
+      "categoryDuring": "During your stay",
+      "categoryAfter": "After your stay",
+      "categoryAgency": "About the property"
+    },
+    "displayOnly": {
+      "headline": "ConciergeTravel concierge booking",
+      "explainer": "{name} is not available for online booking. Share your dates and our concierge will email a tailored proposal.",
+      "sla": "Reply within 24 business hours.",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "adults": "Adults",
+      "children": "Children",
+      "trustChip": "IATA-accredited agency. No card details needed at this stage — payment only after you accept the quote.",
+      "submit": "Request a quote"
+    },
+    "factSheet": {
+      "title": "{name} factsheet",
+      "addressLabel": "Address",
+      "districtLabel": "District",
+      "categoryLabel": "Category",
+      "categoryPalace": "5-star Palace (Atout France distinction)",
+      "categoryStars": "{count, plural, one {# star} other {# stars}}",
+      "roomsLabel": "Capacity",
+      "roomsOnly": "{rooms} rooms",
+      "roomsWithSuites": "{rooms} rooms including {suites} suites",
+      "checkInOutLabel": "Check-in / Check-out",
+      "checkInOut": "Check-in from {in} · Check-out until {out}",
+      "checkInOnly": "Check-in from {in}",
+      "checkOutOnly": "Check-out until {out}",
+      "petsLabel": "Pets",
+      "petsYes": "Welcome",
+      "petsNo": "Not allowed",
+      "geoLabel": "Coordinates",
+      "updatedAt": "Information last updated on {date}.",
+      "updatedAtShort": "Updated",
+      "updatedAtAria": "Information last updated on {date}"
+    },
+    "reassurance": {
+      "title": "Why book with ConciergeTravel?",
+      "listAria": "ConciergeTravel guarantees and commitments",
+      "iataLabel": "IATA-accredited agency",
+      "iataDetail": "GDS net rates negotiated directly, no intermediary, no markup.",
+      "apstLabel": "APST financial guarantee",
+      "apstDetail": "Your payments are protected by the Association Professionnelle de Solidarité du Tourisme.",
+      "paymentLabel": "Secure 3DS2 payment",
+      "paymentDetail": "Amadeus Payments — PCI DSS level 1, 3-D Secure strong authentication.",
+      "gdprLabel": "Data hosted in the EU",
+      "gdprDetail": "Supabase Europe hosting — GDPR-compliant, your details are never resold.",
+      "supportLabel": "Advisors 7 days a week",
+      "supportDetail": "A French-speaking team replies to your enquiries by email within 24 business hours."
     },
     "gallery": {
       "thumbnailsLabel": "Additional photos of the property"
@@ -388,7 +487,12 @@
     "rooms": {
       "occupancy": "{count, plural, one {# guest} other {# guests}}",
       "size": "{count} sqm",
-      "amenities": "Amenities"
+      "amenities": "Amenities",
+      "viewDetail": "View room",
+      "signatureBadge": "Signature",
+      "signatureAria": "Property’s signature suite",
+      "indicativePriceFrom": "From {from} / night",
+      "indicativePriceRange": "{from} – {to} / night"
     },
     "aeo": {
       "question": "How do I book {name} through ConciergeTravel?",
@@ -416,6 +520,73 @@
       "treatmentRooms": "{count, plural, one {# treatment room} other {# treatment rooms}}",
       "featuresLabel": "Facilities & treatments"
     },
+    "location": {
+      "addressLabel": "Address:",
+      "cityLabel": "City:",
+      "viewMap": "View on the map",
+      "mapAria": "View {hotelName} on the map",
+      "staticMapAlt": "Map showing the location of {hotelName}",
+      "staticMapAria": "Open the location of {hotelName} on OpenStreetMap",
+      "mapAttribution": "Map data <osm>© OpenStreetMap contributors</osm> · Tiles <wikimedia>courtesy of the Wikimedia Foundation</wikimedia>",
+      "poisTitle": "Points of interest",
+      "transportsTitle": "Transport",
+      "distanceMeters": "{meters, plural, =0 {on site} other {{meters} m}}",
+      "walkMinutes": "{count, plural, one {# min walk} other {# min walk}}",
+      "transportMode": {
+        "metro": "Metro",
+        "rer": "RER",
+        "tram": "Tram",
+        "bus": "Bus",
+        "train": "Train",
+        "taxi": "Taxi",
+        "airport_shuttle": "Airport shuttle"
+      }
+    },
+    "policies": {
+      "checkInOutTitle": "Check-in & check-out",
+      "checkInLabel": "Check-in",
+      "checkInFrom": "From {from}",
+      "checkInRange": "From {from} to {until}",
+      "checkOutLabel": "Check-out",
+      "checkOutUntil": "Until {until}",
+      "cancellationTitle": "Cancellation",
+      "cancellationFreeUntil": "{count, plural, one {Free cancellation up to # hour before arrival} other {Free cancellation up to # hours before arrival}}",
+      "petsTitle": "Pets",
+      "petsAllowedFree": "Pets are welcome at no extra charge.",
+      "petsAllowedFee": "Pets are welcome ({amount} € fee).",
+      "petsNotAllowed": "Pets are not allowed.",
+      "childrenTitle": "Children",
+      "childrenWelcome": "Children are welcome.",
+      "childrenNotWelcome": "Adults-only property.",
+      "childrenFreeUnder": "Free of charge for children under {age}.",
+      "childrenExtraBed": "Extra bed: {amount} € per night.",
+      "paymentTitle": "Accepted payment",
+      "paymentDepositRequired": "Deposit required at booking.",
+      "paymentNoDeposit": "No deposit required at booking.",
+      "paymentMethod": {
+        "visa": "Visa",
+        "mc": "Mastercard",
+        "amex": "American Express",
+        "diners": "Diners Club",
+        "jcb": "JCB",
+        "unionpay": "UnionPay",
+        "apple_pay": "Apple Pay",
+        "google_pay": "Google Pay",
+        "cash": "Cash",
+        "bank_transfer": "Bank transfer"
+      },
+      "cityTaxTitle": "City tax",
+      "cityTaxAmount": "{amount} {currency} per guest per night, billed in addition to the room rate.",
+      "cityTaxFreeUnder": "Waived for children under {age}.",
+      "wifiTitle": "Wi-Fi",
+      "wifiIncluded": "Complimentary high-speed Wi-Fi included.",
+      "wifiNotIncluded": "Wi-Fi available as a paid add-on. Ask the front desk for details.",
+      "wifiIncludedScope": {
+        "whole_property": "Complimentary high-speed Wi-Fi in all rooms and public spaces.",
+        "public_areas": "Complimentary Wi-Fi in public spaces; in-room access available as a paid option.",
+        "rooms": "Complimentary Wi-Fi in all rooms."
+      }
+    },
     "booking": {
       "intro": "Pick your dates and number of guests to check availability.",
       "checkIn": "Check-in",
@@ -430,6 +601,39 @@
     },
     "loyaltyHint": "Loyalty rewards from the first night for Little catalog hotels.",
     "lastUpdated": "Page updated on {date}"
+  },
+  "roomPage": {
+    "meta": {
+      "titleFallback": "{roomName} — {hotelName} | ConciergeTravel",
+      "signatureSuffix": "{base} · Signature suite",
+      "descriptionFallback": "{roomName} at {hotelName}, {city}. Details, amenities and photos. Book direct with ConciergeTravel, IATA agency."
+    },
+    "breadcrumb": {
+      "label": "Breadcrumb",
+      "home": "Home",
+      "hotels": "Hotels"
+    },
+    "eyebrow": "Room · {hotelName}",
+    "facts": {
+      "size": "Size:",
+      "sizeValue": "{count} sqm",
+      "occupancy": "Occupancy:",
+      "occupancyValue": "{count, plural, one {# guest} other {# guests}}",
+      "bed": "Bedding:",
+      "price": "Indicative rate:",
+      "indicativePriceFrom": "from {from} / night",
+      "indicativePriceRange": "{from} – {to} / night",
+      "signatureBadge": "Signature suite",
+      "signatureAria": "Hotel signature room"
+    },
+    "sections": {
+      "description": "Overview",
+      "amenities": "Room amenities",
+      "gallery": "Photo gallery"
+    },
+    "noDescription": "Detailed description coming soon.",
+    "returnHint": "Book {hotelName} by picking your dates on the hotel page.",
+    "returnCta": "Back to {hotelName}"
   },
   "account": {
     "meta": {

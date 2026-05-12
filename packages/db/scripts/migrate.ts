@@ -50,9 +50,7 @@ async function main(): Promise<void> {
     `;
 
     const migrationsDir = join(scriptDir, '../migrations');
-    const filenames = (await readdir(migrationsDir))
-      .filter((f) => f.endsWith('.sql'))
-      .sort();
+    const filenames = (await readdir(migrationsDir)).filter((f) => f.endsWith('.sql')).sort();
 
     const ledgerRowsUnknown = await sqlConnection`
       select filename from public._cct_sql_migrations

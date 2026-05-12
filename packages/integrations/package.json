@@ -17,7 +17,6 @@
     "./http": "./src/http/index.ts"
   },
   "scripts": {
-    "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run"

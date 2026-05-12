@@ -11,6 +11,7 @@ Le **tier PREMIUM** du programme de fidélité est **modélisé** dans la base d
 ## Contexte
 
 Le cahier des charges (CDC §8.1) prévoit :
+
 - **Tier FREE** activé automatiquement à la 1ère réservation Little catalog → livré en Phase 1.
 - **Tier PREMIUM** payant annuel → prix à définir, partenaires hôteliers à signer.
 

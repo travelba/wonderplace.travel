@@ -350,6 +350,14 @@
       "districtSeparator": "·",
       "viewMap": "Voir sur la carte"
     },
+    "share": {
+      "button": "Partager",
+      "buttonAria": "Partager la fiche {name}",
+      "toastShared": "Partage effectué",
+      "toastCopied": "Lien copié",
+      "toastFailed": "Copie impossible — sélectionnez le lien manuellement",
+      "manualCopyLabel": "Afficher le lien"
+    },
     "rating": {
       "scoreOf": "{value} / {best}",
       "scoreAria": "Note moyenne de {value} sur {best}",
@@ -365,7 +373,98 @@
       "reviewBreakdown": "Ce que disent les voyageurs",
       "restaurants": "Restaurants & bars",
       "spa": "Spa & bien-être",
-      "gallery": "Galerie photos"
+      "gallery": "Galerie photos",
+      "location": "Emplacement & accès",
+      "policies": "Conditions de séjour",
+      "awards": "Distinctions & reconnaissances",
+      "reassurance": "Pourquoi réserver avec nous",
+      "concierge": "Réservation par concierge",
+      "signatureExperiences": "Expériences signature",
+      "featuredReviews": "Ils en parlent"
+    },
+    "awards": {
+      "intro": "Distinctions et reconnaissances officielles attribuées à l'établissement.",
+      "issuerWithYear": "{issuer} · {year, number}",
+      "viewSource": "Voir la source"
+    },
+    "signatureExperiences": {
+      "intro": "Des programmes exclusifs qui font la singularité de cet établissement, au-delà de la nuitée.",
+      "listAria": "Liste des expériences signature de l'établissement",
+      "bookingRequired": "Sur réservation",
+      "includedInStay": "Inclus dans le séjour"
+    },
+    "featuredReviews": {
+      "intro": "Extraits de presse spécialisée et de classements professionnels — sélection éditoriale, sans rémunération.",
+      "listAria": "Citations éditoriales sur l'établissement",
+      "ratingAria": "Note {value} sur {max}"
+    },
+    "amenityCategories": {
+      "wellness": "Bien-être",
+      "dining": "Restauration",
+      "services": "Services",
+      "family": "Famille & animaux",
+      "connectivity": "Connectivité",
+      "business": "Affaires & événements",
+      "accessibility": "Accessibilité",
+      "sustainability": "Engagement responsable",
+      "other": "Autres équipements"
+    },
+    "story": {
+      "tocTitle": "Sommaire",
+      "tocLabel": "Sommaire de la présentation"
+    },
+    "faq": {
+      "categoryBefore": "Avant votre séjour",
+      "categoryDuring": "Pendant votre séjour",
+      "categoryAfter": "Après votre séjour",
+      "categoryAgency": "À propos de l'établissement"
+    },
+    "displayOnly": {
+      "headline": "Réservation par concierge ConciergeTravel",
+      "explainer": "{name} n'est pas disponible à la réservation en ligne. Indiquez vos dates, nous vous transmettons une proposition personnalisée par e-mail.",
+      "sla": "Réponse sous 24 heures ouvrées.",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "adults": "Adultes",
+      "children": "Enfants",
+      "trustChip": "Agence IATA accréditée. Aucune carte demandée à cette étape, paiement uniquement après acceptation du devis.",
+      "submit": "Demander un devis"
+    },
+    "factSheet": {
+      "title": "Fiche d'identité {name}",
+      "addressLabel": "Adresse",
+      "districtLabel": "Quartier",
+      "categoryLabel": "Catégorie",
+      "categoryPalace": "Palace 5 étoiles (distinction Atout France)",
+      "categoryStars": "{count, plural, one {# étoile} other {# étoiles}}",
+      "roomsLabel": "Capacité",
+      "roomsOnly": "{rooms} chambres",
+      "roomsWithSuites": "{rooms} chambres dont {suites} suites",
+      "checkInOutLabel": "Arrivée / Départ",
+      "checkInOut": "Arrivée dès {in} · Départ jusqu'à {out}",
+      "checkInOnly": "Arrivée dès {in}",
+      "checkOutOnly": "Départ jusqu'à {out}",
+      "petsLabel": "Animaux",
+      "petsYes": "Acceptés",
+      "petsNo": "Non acceptés",
+      "geoLabel": "Coordonnées",
+      "updatedAt": "Informations mises à jour le {date}.",
+      "updatedAtShort": "Mis à jour le",
+      "updatedAtAria": "Informations mises à jour le {date}"
+    },
+    "reassurance": {
+      "title": "Pourquoi réserver avec ConciergeTravel ?",
+      "listAria": "Garanties et engagements ConciergeTravel",
+      "iataLabel": "Agence accréditée IATA",
+      "iataDetail": "Tarifs nets négociés via les GDS, sans intermédiaire ni surcharge.",
+      "apstLabel": "Garantie financière APST",
+      "apstDetail": "Vos paiements sont sécurisés par l'Association Professionnelle de Solidarité du Tourisme.",
+      "paymentLabel": "Paiement sécurisé 3DS2",
+      "paymentDetail": "Solution Amadeus Payments — PCI DSS niveau 1, authentification forte 3-D Secure.",
+      "gdprLabel": "Données hébergées dans l'UE",
+      "gdprDetail": "Hébergement Supabase Europe — conforme RGPD, aucune revente de vos coordonnées.",
+      "supportLabel": "Conseillers 7 jours/7",
+      "supportDetail": "Une équipe francophone répond à vos questions par e-mail sous 24 h ouvrées."
     },
     "gallery": {
       "thumbnailsLabel": "Autres photos de l'établissement"
@@ -388,7 +487,12 @@
     "rooms": {
       "occupancy": "{count, plural, one {# voyageur} other {# voyageurs}}",
       "size": "{count} m²",
-      "amenities": "Équipements"
+      "amenities": "Équipements",
+      "viewDetail": "Voir la chambre",
+      "signatureBadge": "Signature",
+      "signatureAria": "Suite signature de l’hôtel",
+      "indicativePriceFrom": "À partir de {from} / nuit",
+      "indicativePriceRange": "{from} – {to} / nuit"
     },
     "aeo": {
       "question": "Comment réserver {name} via ConciergeTravel ?",
@@ -416,6 +520,73 @@
       "treatmentRooms": "{count, plural, one {# salle de soins} other {# salles de soins}}",
       "featuresLabel": "Équipements & soins"
     },
+    "location": {
+      "addressLabel": "Adresse :",
+      "cityLabel": "Ville :",
+      "viewMap": "Voir sur la carte",
+      "mapAria": "Voir {hotelName} sur la carte",
+      "staticMapAlt": "Carte de localisation de {hotelName}",
+      "staticMapAria": "Ouvrir la localisation de {hotelName} sur OpenStreetMap",
+      "mapAttribution": "Données <osm>© contributeurs OpenStreetMap</osm> · Tuiles <wikimedia>fournies par la Wikimedia Foundation</wikimedia>",
+      "poisTitle": "À proximité",
+      "transportsTitle": "Transports",
+      "distanceMeters": "{meters, plural, =0 {sur place} other {{meters} m}}",
+      "walkMinutes": "{count, plural, one {# min à pied} other {# min à pied}}",
+      "transportMode": {
+        "metro": "Métro",
+        "rer": "RER",
+        "tram": "Tram",
+        "bus": "Bus",
+        "train": "Train",
+        "taxi": "Taxi",
+        "airport_shuttle": "Navette aéroport"
+      }
+    },
+    "policies": {
+      "checkInOutTitle": "Arrivée & départ",
+      "checkInLabel": "Arrivée",
+      "checkInFrom": "À partir de {from}",
+      "checkInRange": "De {from} à {until}",
+      "checkOutLabel": "Départ",
+      "checkOutUntil": "Jusqu'à {until}",
+      "cancellationTitle": "Annulation",
+      "cancellationFreeUntil": "{count, plural, one {Annulation gratuite jusqu'à # h avant l'arrivée} other {Annulation gratuite jusqu'à # h avant l'arrivée}}",
+      "petsTitle": "Animaux",
+      "petsAllowedFree": "Animaux acceptés (sans supplément).",
+      "petsAllowedFee": "Animaux acceptés (supplément de {amount} €).",
+      "petsNotAllowed": "Animaux non acceptés.",
+      "childrenTitle": "Enfants",
+      "childrenWelcome": "Enfants bienvenus.",
+      "childrenNotWelcome": "Établissement réservé aux adultes.",
+      "childrenFreeUnder": "Gratuit pour les enfants de moins de {age} ans.",
+      "childrenExtraBed": "Lit d'appoint : {amount} € la nuit.",
+      "paymentTitle": "Paiement accepté",
+      "paymentDepositRequired": "Acompte requis lors de la réservation.",
+      "paymentNoDeposit": "Aucun acompte requis à la réservation.",
+      "paymentMethod": {
+        "visa": "Visa",
+        "mc": "Mastercard",
+        "amex": "American Express",
+        "diners": "Diners Club",
+        "jcb": "JCB",
+        "unionpay": "UnionPay",
+        "apple_pay": "Apple Pay",
+        "google_pay": "Google Pay",
+        "cash": "Espèces",
+        "bank_transfer": "Virement bancaire"
+      },
+      "cityTaxTitle": "Taxe de séjour",
+      "cityTaxAmount": "{amount} {currency} par personne et par nuit, facturés en sus du tarif chambre.",
+      "cityTaxFreeUnder": "Gratuite pour les enfants de moins de {age} ans.",
+      "wifiTitle": "Wi-Fi",
+      "wifiIncluded": "Wi-Fi haut débit inclus, sans supplément.",
+      "wifiNotIncluded": "Wi-Fi en option payante. Détails sur demande à la réception.",
+      "wifiIncludedScope": {
+        "whole_property": "Wi-Fi haut débit inclus dans toutes les chambres et tous les espaces communs.",
+        "public_areas": "Wi-Fi inclus dans les espaces communs ; option payante dans les chambres sur demande.",
+        "rooms": "Wi-Fi inclus dans toutes les chambres."
+      }
+    },
     "booking": {
       "intro": "Sélectionnez vos dates et le nombre de voyageurs pour vérifier la disponibilité.",
       "checkIn": "Arrivée",
@@ -430,6 +601,39 @@
     },
     "loyaltyHint": "Programme de fidélité dès la première nuit pour les hôtels du réseau Little.",
     "lastUpdated": "Fiche mise à jour le {date}"
+  },
+  "roomPage": {
+    "meta": {
+      "titleFallback": "{roomName} — {hotelName} | ConciergeTravel",
+      "signatureSuffix": "{base} · Suite signature",
+      "descriptionFallback": "{roomName} à {hotelName}, {city}. Détails, équipements et photos. Réservez en direct avec ConciergeTravel, agence IATA."
+    },
+    "breadcrumb": {
+      "label": "Fil d'Ariane",
+      "home": "Accueil",
+      "hotels": "Hôtels"
+    },
+    "eyebrow": "Chambre · {hotelName}",
+    "facts": {
+      "size": "Surface :",
+      "sizeValue": "{count} m²",
+      "occupancy": "Capacité :",
+      "occupancyValue": "{count, plural, one {# voyageur} other {# voyageurs}}",
+      "bed": "Literie :",
+      "price": "Tarif indicatif :",
+      "indicativePriceFrom": "à partir de {from} / nuit",
+      "indicativePriceRange": "{from} – {to} / nuit",
+      "signatureBadge": "Suite signature",
+      "signatureAria": "Chambre signature de l'hôtel"
+    },
+    "sections": {
+      "description": "Présentation",
+      "amenities": "Équipements de la chambre",
+      "gallery": "Galerie photos"
+    },
+    "noDescription": "Description détaillée à venir.",
+    "returnHint": "Réservez {hotelName} en sélectionnant vos dates sur la fiche établissement.",
+    "returnCta": "Retour à la fiche {hotelName}"
   },
   "errors": {
     "notFoundTitle": "Page introuvable",

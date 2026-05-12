@@ -15,6 +15,7 @@ export function GET(request: Request): NextResponse {
   const now = new Date().toISOString();
   const xml = buildSitemapIndexXml([
     { loc: `${origin}/sitemaps/hotels.xml`, lastmod: now },
+    { loc: `${origin}/sitemaps/rooms.xml`, lastmod: now },
     { loc: `${origin}/sitemaps/hubs.xml`, lastmod: now },
     { loc: `${origin}/sitemaps/editorial.xml`, lastmod: now },
     { loc: `${origin}/sitemaps/guides.xml`, lastmod: now },

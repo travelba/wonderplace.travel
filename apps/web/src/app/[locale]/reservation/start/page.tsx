@@ -73,7 +73,17 @@ async function fetchHotelHead(
       booking_mode: string;
       is_published: boolean;
     };
-    if (!row.is_published || row.booking_mode !== 'email') return null;
+    // Allow both pure email-mode hotels and display-only fiches: the
+    // latter (e.g. The Peninsula Paris seed) cannot be booked through
+    // any GDS yet, but the concierge team still wants to receive quote
+    // requests via this form. The downstream `email-request` handler
+    // is mode-agnostic — it only needs a published hotel ID.
+    if (
+      !row.is_published ||
+      (row.booking_mode !== 'email' && row.booking_mode !== 'display_only')
+    ) {
+      return null;
+    }
     return { id: row.id, name: row.name, city: row.city, region: row.region };
   } catch (e) {
     // Degraded environments (CI smoke, preview without Supabase env) —

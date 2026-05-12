@@ -10,6 +10,7 @@ Every vendor (Amadeus, Little Hotelier, Makcorps, Apify, Google Places, Brevo, A
 ## Triggers
 
 Invoke when:
+
 - Adding a new integration package.
 - Modifying retry / timeout / error mapping behavior.
 - Editing the public surface of an integration (functions consumed by `apps/web` / `apps/admin`).
@@ -30,11 +31,13 @@ packages/integrations/<vendor>/
 ## Non-negotiable rules
 
 ### Authentication
+
 - Secrets read **only** from validated env via `packages/config/env`.
 - OAuth2 client credentials (Amadeus): cache the access token in Redis with TTL = `expires_in - 60s`. Refresh on 401.
 - Never log tokens, full headers, or PII.
 
 ### HTTP client
+
 - Use the global `fetch` (Edge-compatible). Optional `undici` `Agent` only on Node-only paths.
 - **Mandatory wrapper** `httpRequest({ url, method, body, headers, timeoutMs, retry })`:
   - `AbortController` with default timeout 8s (override per resource).
@@ -43,10 +46,12 @@ packages/integrations/<vendor>/
   - Rate-limit aware: respect `Retry-After` if present.
 
 ### Validation
+
 - Every response is parsed by a Zod schema. No raw JSON returned to callers.
 - If Zod fails: log Sentry `extra` with vendor + operation + input shape (no PII), return `Result.err({ kind: 'parse_failure' })`.
 
 ### Errors
+
 - Typed hierarchy:
   ```ts
   type AmadeusError =
@@ -61,19 +66,23 @@ packages/integrations/<vendor>/
 - Functions return `Result<T, VendorError>`; never throw to callers.
 
 ### Logging
+
 - Sentry breadcrumb on every outbound call: `category: 'http'`, `data: { vendor, operation, status, durationMs }`.
 - Sample 100% of errors, 10% of successful calls in production.
 
 ### Caching
+
 - Read-through cache helper `withRedisCache({ key, ttlSec, fetcher })` (see `redis-caching` skill).
 - Never cache responses containing card data or payment intents.
 
 ### Public surface
+
 - Export functions only, no classes. Keep it tree-shakeable.
 - Inputs validated with Zod at the boundary, not just typed.
 - Stable function names: `searchHotels`, `getHotelOffers`, `getOfferById`, `createOrder`, etc.
 
 ### Tests
+
 - Vitest unit tests with MSW or `fetch-mock` to simulate vendor responses (success, 429, 5xx, malformed).
 - One e2e Playwright run against Amadeus test environment in CI nightly job.
 
@@ -93,12 +102,15 @@ packages/integrations/<vendor>/
 import { env } from '@cct/config/env';
 
 export async function httpRequest<T>(opts: {
-  url: string; method?: 'GET'|'POST'|'PUT'|'DELETE';
-  headers?: Record<string,string>;
+  url: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  headers?: Record<string, string>;
   body?: unknown;
   timeoutMs?: number;
   retry?: { attempts: number; backoffMs: number };
-}): Promise<Response> { /* ... */ }
+}): Promise<Response> {
+  /* ... */
+}
 ```
 
 ## References

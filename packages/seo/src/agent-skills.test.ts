@@ -23,6 +23,7 @@ describe('agent-skills', () => {
         'search',
         'list-cities',
         'get-hotel',
+        'get-hotel-room',
         'filter',
         'compare-prices',
         'booking',

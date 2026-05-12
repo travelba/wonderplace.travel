@@ -10,6 +10,7 @@ The cahier des charges defines two tiers (CDC v3.0 §8). The logic is encapsulat
 ## Triggers
 
 Invoke when:
+
 - Modifying tier rules or benefits.
 - Adding badges or upsell components in fiches / tunnel / account pages.
 - Adjusting a member's tier from back-office.
@@ -18,6 +19,7 @@ Invoke when:
 ## Tiers
 
 ### FREE — "ConciergeTravel Essentiel"
+
 - **Eligibility**: automatic on first confirmed booking.
 - **Hotels eligible**: only `is_little_catalog = true`.
 - **Duration**: 1 year from booking date.
@@ -28,6 +30,7 @@ Invoke when:
 - **Activation**: automatic; mentioned in confirmation email.
 
 ### PREMIUM — "ConciergeTravel Prestige"
+
 - **Eligibility**: paid annual subscription (price TBD; UI ready, billing in Phase 2 — explicitly deferred).
 - **Hotels eligible**: all hotels in the catalog.
 - **Benefits**:
@@ -39,6 +42,7 @@ Invoke when:
 ## Non-negotiable rules
 
 ### Domain logic
+
 - Pure functions in `packages/domain/loyalty/`:
   - `eligibleBenefits({ hotel, member }): Benefit[]`.
   - `applyTierUpgradeOnBooking({ memberState, booking })`.
@@ -46,6 +50,7 @@ Invoke when:
 - Member state immutable; transitions return a new state.
 
 ### UI display rules (CDC §8.2)
+
 - If hotel `is_little_catalog` AND user logged in:
   - Show badge "Avantages Essentiel inclus" with bullet list.
 - If hotel NOT in Little catalog AND user logged in:
@@ -53,21 +58,25 @@ Invoke when:
 - If user not logged in: show generic loyalty teaser linking to `/programme-fidelite/`.
 
 ### Persistence
+
 - On confirmed booking:
   - `bookings.loyalty_tier = active tier at booking time`.
   - `bookings.loyalty_benefits = applied benefits snapshot`.
   - If user has no `loyalty_members` row, create one with `tier = 'free'` (auto activation).
 
 ### Back-office
+
 - Operator can manually adjust tier with reason. Triggers audit log.
 - Admin can extend `tier_expiry`.
 - Read-only timeline view of bookings + tier changes per member.
 
 ### Email touchpoints
+
 - Brevo template `loyalty-welcome` sent on tier FREE auto-activation.
 - Brevo template `loyalty-renewal-reminder` 30 days before expiry.
 
 ### MVP scope flag
+
 - Tier PREMIUM billing flow is **out of MVP scope** (CDC v3.0 §13). The tier exists in data model and UI; subscription page shows "Bientôt disponible". Document the simplification in `docs/adr/0005-loyalty-premium-deferred.md`.
 
 ## Anti-patterns to refuse

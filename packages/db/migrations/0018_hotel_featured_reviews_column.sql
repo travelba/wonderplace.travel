@@ -1,0 +1,61 @@
+-- 0018 — Editorial featured-review quotes per hotel.
+--
+-- Phase 10.14 (gap analysis Peninsula §10 — Avis & notes, score 1/5
+-- before this migration). Surfaces 1-3 short, attributed quotes from
+-- recognised travel media (Forbes Travel Guide, Condé Nast Traveler,
+-- Travel + Leisure, Michelin Guide, etc.) on the public hotel page.
+--
+-- The block is editorial-curated, NOT user-generated: we don't
+-- aggregate raw reviews here. That's why a jsonb column on `hotels`
+-- is enough — we never expect more than a handful of entries per
+-- property, and querying / paginating is not a concern.
+--
+-- Shape (validated by Zod at the read boundary):
+--
+--   [
+--     {
+--       "source": "Forbes Travel Guide",
+--       "source_url": "https://www.forbestravelguide.com/.../the-peninsula-paris",
+--       "author": "Forbes Travel Guide editorial",
+--       "quote_fr": "Le palace conjugue patrimoine Belle Époque et innovation hôtelière comme nul autre à Paris.",
+--       "quote_en": "The palace combines Belle Époque heritage with hotel innovation like no other Paris property.",
+--       "rating": 5,
+--       "max_rating": 5,
+--       "date_iso": "2025-01-15"
+--     },
+--     …
+--   ]
+--
+-- Field rules (enforced by Zod):
+--   - `source` (required, ≤120 chars): the publication/awarding body.
+--   - `source_url` (optional, https only): canonical URL of the review.
+--   - `author` (optional, ≤160 chars): a specific editor/journalist if cited.
+--   - `quote_fr`/`quote_en` (at least one required, ≤500 chars each):
+--     short pull-quote suitable for a `<blockquote>`. Avoid HTML.
+--   - `rating` (optional 0..max_rating): publication-specific score.
+--   - `max_rating` (optional 1..100): scale (5 for Forbes stars, 100
+--     for Travel + Leisure, etc.). Required if `rating` is set.
+--   - `date_iso` (optional, YYYY-MM-DD): publication date.
+--
+-- Schema.org mapping (see `packages/seo/src/jsonld/hotel.ts`):
+--   - `Review[]` items emitted under the Hotel node.
+--   - `reviewBody` ← localized quote.
+--   - `author.@type = Organization`, `author.name` ← `author` or `source`.
+--   - `publisher.@type = Organization`, `publisher.name` ← `source`.
+--   - `reviewRating` ← `{ratingValue, bestRating, worstRating: 0}` when
+--     `rating` + `max_rating` are both set.
+--   - `datePublished` ← `date_iso`.
+--
+-- This is a **CHECK-free** schema on purpose: editorial flexibility
+-- trumps DB-level enforcement here. The Zod parser is the single
+-- source of truth and will reject malformed payloads without
+-- crashing the page (`safeParse` + drop bad entries).
+--
+-- Skill: supabase-postgres-rls (additive), structured-data-schema-org,
+-- content-modeling.
+
+alter table public.hotels
+  add column if not exists featured_reviews jsonb;
+
+comment on column public.hotels.featured_reviews is
+  'Editorial featured-review quotes (Forbes, Condé Nast, Travel + Leisure, …) curated by editors. NOT user-generated. See migration 0018 for shape. Surfaces as <Review> in JSON-LD and a <HotelFeaturedReviews> block on the public page.';

@@ -6,21 +6,21 @@ ConciergeTravel.fr combine une couche éditoriale référence (modèle Tablet Ho
 
 ## Stack
 
-| Couche | Technologie |
-| --- | --- |
-| Framework | Next.js 15 App Router (React 19, RSC) |
-| Langage | TypeScript strict |
-| Base de données | Supabase PostgreSQL + RLS |
-| Auth | Supabase Auth (`@supabase/ssr`) |
-| Cache & rate limiting | Upstash Redis |
-| Recherche | Algolia |
-| CMS / Back-office | Payload CMS 3 |
-| GDS / Inventaire | Amadeus Self-Service Hotels + Little Hotelier |
-| Paiement | Amadeus Payments (PCI géré, hors scope) |
-| Comparateur prix | Makcorps (principal) + Apify (fallback) |
-| E-mails | Brevo (React Email + API) |
-| Observabilité | Sentry + pino + Vercel Analytics |
-| Hébergement | Vercel |
+| Couche                | Technologie                                   |
+| --------------------- | --------------------------------------------- |
+| Framework             | Next.js 15 App Router (React 19, RSC)         |
+| Langage               | TypeScript strict                             |
+| Base de données       | Supabase PostgreSQL + RLS                     |
+| Auth                  | Supabase Auth (`@supabase/ssr`)               |
+| Cache & rate limiting | Upstash Redis                                 |
+| Recherche             | Algolia                                       |
+| CMS / Back-office     | Payload CMS 3                                 |
+| GDS / Inventaire      | Amadeus Self-Service Hotels + Little Hotelier |
+| Paiement              | Amadeus Payments (PCI géré, hors scope)       |
+| Comparateur prix      | Makcorps (principal) + Apify (fallback)       |
+| E-mails               | Brevo (React Email + API)                     |
+| Observabilité         | Sentry + pino + Vercel Analytics              |
+| Hébergement           | Vercel                                        |
 
 ## Architecture monorepo
 
@@ -72,15 +72,15 @@ URLs locales :
 
 ## Scripts
 
-| Script | Action |
-| --- | --- |
-| `pnpm dev` | Démarre `apps/web` + `apps/admin` |
-| `pnpm build` | Build de tout le monorepo (Turborepo) |
-| `pnpm lint` | ESLint sur l'ensemble |
+| Script           | Action                                  |
+| ---------------- | --------------------------------------- |
+| `pnpm dev`       | Démarre `apps/web` + `apps/admin`       |
+| `pnpm build`     | Build de tout le monorepo (Turborepo)   |
+| `pnpm lint`      | ESLint sur l'ensemble                   |
 | `pnpm typecheck` | TypeScript strict sur tous les packages |
-| `pnpm test` | Vitest unit + integration |
-| `pnpm test:e2e` | Playwright (mobile + desktop) |
-| `pnpm format` | Prettier sur tout le repo |
+| `pnpm test`      | Vitest unit + integration               |
+| `pnpm test:e2e`  | Playwright (mobile + desktop)           |
+| `pnpm format`    | Prettier sur tout le repo               |
 
 ## Documentation
 

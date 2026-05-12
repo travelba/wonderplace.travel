@@ -10,6 +10,7 @@ Cache is **Upstash Redis (HTTP)** — works on edge runtime and standard Node. T
 ## Triggers
 
 Invoke when:
+
 - Adding any new cached resource.
 - Changing TTL of an existing cache.
 - Adding rate limiting on a public endpoint.
@@ -31,6 +32,7 @@ Env: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`.
 `<domain>:<purpose>:<scope>:<args>` — colon-separated, all lowercase, kebab-case args.
 
 Examples:
+
 - `amadeus:offers:hotel-by-city:lyon:2026-07-10:2026-07-12:2:0`
 - `amadeus:offer:lock:<offerId>`
 - `amadeus:order:status:<orderId>`
@@ -42,13 +44,14 @@ Examples:
 
 ## Cache levels (CDC §7.2)
 
-| Level | TTL | Use case |
-|---|---|---|
-| **Long** | **6 h** | Hotel page no-dates content (description, photos, amenities snapshot) |
-| **Short** | **15 min** | Search results with dates (Amadeus `/v3/shopping/hotel-offers`) |
-| **No cache** | — | Pre-payment offer lookup (`/v3/shopping/hotel-offers/{offerId}`) — guaranteed fresh price |
+| Level        | TTL        | Use case                                                                                  |
+| ------------ | ---------- | ----------------------------------------------------------------------------------------- |
+| **Long**     | **6 h**    | Hotel page no-dates content (description, photos, amenities snapshot)                     |
+| **Short**    | **15 min** | Search results with dates (Amadeus `/v3/shopping/hotel-offers`)                           |
+| **No cache** | —          | Pre-payment offer lookup (`/v3/shopping/hotel-offers/{offerId}`) — guaranteed fresh price |
 
 Other caches:
+
 - Price comparator (Makcorps/Apify): **15 min** (matches §B.2 normalisation).
 - Google Places reviews: **24 h**.
 - Amadeus order status: **5 min**.

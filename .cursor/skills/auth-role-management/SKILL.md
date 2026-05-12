@@ -10,6 +10,7 @@ Authentication is **Supabase Auth** (CDC §2). The app uses `@supabase/ssr` for 
 ## Triggers
 
 Invoke when:
+
 - Adding or modifying any auth flow (signup, login, password reset, OAuth, magic link).
 - Wiring `middleware.ts` for protected routes.
 - Adding a server action or route handler that must enforce role.
@@ -18,29 +19,32 @@ Invoke when:
 
 ## Roles
 
-| Role | Description | Access scope |
-|---|---|---|
-| `customer` | Public registered user | Own bookings, own loyalty, own profile |
-| `editor` | Editorial team | Editorial pages, FAQs, hotels content (no bookings) |
-| `seo` | SEO/GEO operator | Editorial + redirects + sitemap config |
-| `operator` | Reservations / customer support | Bookings, booking_requests_email, loyalty members |
-| `admin` | Full access | All resources, including RLS service role-equivalent operations through Payload |
+| Role       | Description                     | Access scope                                                                    |
+| ---------- | ------------------------------- | ------------------------------------------------------------------------------- |
+| `customer` | Public registered user          | Own bookings, own loyalty, own profile                                          |
+| `editor`   | Editorial team                  | Editorial pages, FAQs, hotels content (no bookings)                             |
+| `seo`      | SEO/GEO operator                | Editorial + redirects + sitemap config                                          |
+| `operator` | Reservations / customer support | Bookings, booking_requests_email, loyalty members                               |
+| `admin`    | Full access                     | All resources, including RLS service role-equivalent operations through Payload |
 
 Roles are stored in `auth.users.app_metadata.role` (server-set only — clients never write `app_metadata`). Custom JWT claim mirror set via Supabase trigger so RLS policies can read `auth.jwt() ->> 'role'`.
 
 ## Non-negotiable rules
 
 ### Server-side first
+
 - All session reading goes through `apps/web/src/lib/supabase/server.ts` (cookie-based, RSC-safe).
 - Client-side Supabase client is read-only (no privileged calls).
 - Service role key (`SUPABASE_SERVICE_ROLE_KEY`) is loaded **only** in server-only modules and never imported in components.
 
 ### Middleware
+
 - `middleware.ts` mounts `next-intl` first, then a Supabase session refresher (`updateSession`).
 - Protected route segments: `/(account)/**` requires `customer`+; `/admin/**` (Payload) requires editor+ via Payload's own auth.
 - Redirect rules preserve `next` query for post-login return.
 
 ### Server Actions guards
+
 - Helper `requireUser({ role?: AppRole })` wraps actions:
   ```ts
   const { user } = await requireUser({ role: 'operator' });
@@ -48,15 +52,18 @@ Roles are stored in `auth.users.app_metadata.role` (server-set only — clients 
 - Returns typed `Result` on failure; redirects to login if no session.
 
 ### RLS claim usage
+
 - Policies use `auth.jwt() ->> 'role'` for editor/operator/admin checks.
 - Customer policies use `auth.uid()` matching `user_id`.
 - Anonymous reads only on published rows.
 
 ### Password policy
+
 - Minimum 12 chars, breach-checked via Supabase Auth password strength (HaveIBeenPwned integration enabled).
 - 2FA optional for `customer`, mandatory for `admin`/`operator` (TOTP). Enforced server-side via `aal` JWT claim check.
 
 ### Session
+
 - 24h refresh; sliding window. Sensitive actions (cancel booking, view payment ref) require AAL2 if 2FA enabled, or recent sign-in (< 15 min) otherwise.
 
 ## Auth flows

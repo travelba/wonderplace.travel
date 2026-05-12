@@ -47,6 +47,7 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     city: 'Paris',
     district: '1er arrondissement',
     address: '1 rue de Rivoli',
+    postal_code: '75001',
     latitude: 48.8566,
     longitude: 2.3522,
     description_fr:
@@ -83,8 +84,14 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     priority: 'P1',
     google_rating: 4.7,
     google_reviews_count: 312,
+    phone_e164: '+33199990000',
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
+    // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the
+    // HotelFactSheet UI. Synthetic values for the E2E hotel are fine; the
+    // JSON-LD only emits them when positive.
+    number_of_rooms: 80,
+    number_of_suites: 12,
     // No hero/gallery for the E2E synthetic hotel — keeps the fake
     // testable without Cloudinary credentials at build time.
     hero_image: null,
@@ -98,6 +105,7 @@ function buildRooms(): readonly HotelRoomRow[] {
   return [
     {
       id: '22222222-2222-4222-8222-222222222222',
+      slug: 'chambre-deluxe-roi',
       room_code: 'TEST-KING',
       name: 'Chambre Deluxe Roi',
       description: 'Vue jardin, lit king-size, salle de bain en marbre.',
@@ -105,9 +113,13 @@ function buildRooms(): readonly HotelRoomRow[] {
       bed_type: 'King',
       size_sqm: 35,
       amenities: ['Vue jardin', 'Lit king-size', 'Salle de bain marbre'],
+      isSignature: false,
+      indicativePrice: { fromMinor: 95000, toMinor: 130000, currency: 'EUR' },
+      displayOrder: 20,
     },
     {
       id: '33333333-3333-4333-8333-333333333333',
+      slug: 'suite-junior-tuileries',
       room_code: 'TEST-SUITE',
       name: 'Suite Junior Tuileries',
       description: 'Vue Tuileries, salon séparé, bain à remous.',
@@ -115,6 +127,9 @@ function buildRooms(): readonly HotelRoomRow[] {
       bed_type: 'King',
       size_sqm: 55,
       amenities: ['Vue Tuileries', 'Salon séparé', 'Bain à remous'],
+      isSignature: true,
+      indicativePrice: { fromMinor: 220000, toMinor: null, currency: 'EUR' },
+      displayOrder: 10,
     },
   ];
 }

@@ -10,6 +10,7 @@ We use **Algolia** for instant typo-tolerant search on destinations and hotels (
 ## Triggers
 
 Invoke when:
+
 - Designing or modifying Algolia indices (`hotels_fr`, `hotels_en`, `cities_fr`, `cities_en`).
 - Adding searchable attributes, ranking, synonyms, rules.
 - Implementing search UI components (`<SearchBox/>`, `<Hits/>`, `<RefinementList/>`).
@@ -18,6 +19,7 @@ Invoke when:
 ## Indices
 
 ### `hotels_<locale>`
+
 - Records: one per published hotel.
 - `objectID` = hotel UUID.
 - Searchable: `name`, `city`, `district`, `region`, `landmarks`, `aliases`, `description_excerpt` (200 chars), `amenities_top` (top 10).
@@ -26,12 +28,14 @@ Invoke when:
 - Synonyms: Côte d'Azur ↔ Riviera, Provence ↔ Sud, Alpes ↔ Mountain (en), Spa ↔ Wellness (en).
 
 ### `cities_<locale>`
+
 - Records: cities + landmarks for autocomplete.
 - Searchable: `name`, `region`, `landmarks`.
 
 ## Non-negotiable rules
 
 ### Indexing pipeline
+
 - Single source of truth: Postgres + Payload.
 - Indexer in `packages/integrations/algolia-admin/`:
   - Function `indexHotel(hotelId, { locale })` rebuilds the record from Postgres.
@@ -41,29 +45,35 @@ Invoke when:
 - Skip on draft creation; only index on publish or republish.
 
 ### Atomic updates
+
 - `partialUpdateObject` for incremental changes (rating sync, photos add).
 - Full `saveObject` only when many fields change.
 - On unpublish: `deleteObject`.
 
 ### Relevance
+
 - `searchableAttributes` ordered: `name > city > district > region > landmarks > aliases > description_excerpt > amenities_top`.
 - `attributesForFaceting`: include `searchable(themes)` for filtering UX.
 - `customRanking`: `desc(priority_score)` (computed: P0=100, P1=70, P2=40), `desc(google_rating)`, `desc(google_reviews_count)`.
 
 ### Synonyms and rules
+
 - One-way and two-way synonyms for FR/EN destination spellings.
 - Rule: if query matches a city name, boost `cities_<locale>` results above hotels.
 
 ### Search UI
+
 - `react-instantsearch` with **server-side rendering** of initial results for SEO on `/recherche`.
 - Mobile autocomplete: bottom-sheet with categorical sections (Destinations / Hôtels).
 - Empty states actionable: suggest top regions or popular hotels.
 
 ### Privacy
+
 - No personally identifiable information indexed.
 - Search-as-you-type telemetry (Algolia Insights) anonymized; consent banner-gated.
 
 ### Performance
+
 - Initial autocomplete payload < 30KB.
 - Edge-cached fallback list for popular cities (`cache:popular-cities:fr`) served if Algolia is unreachable.
 

@@ -9,6 +9,7 @@ export * from './article';
 export * from './breadcrumb';
 export * from './faq';
 export * from './hotel';
+export * from './hotel-room';
 export * from './item-list';
 export * from './offer';
 export * from './travel-agency';

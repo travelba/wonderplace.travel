@@ -19,19 +19,19 @@ erDiagram
 
 ## Tables métier (`public`)
 
-| Table | Objet principal |
-| --- | --- |
-| `authors` | Auteurs contenus (E‑E‑A‑T, pages éditoriales). |
-| `hotels` | Fiche catalogue (slug FR/EN, connectivités Amadeus/Little/Makcorps, FAQ JSONB…). |
-| `hotel_rooms` | Inventaire présentoir / mapping chambre côté contenu (non forcément 1‑pour‑1 ARI). |
-| `editorial_pages` | Articles / hubs / classements (statut draft/published, `hotel_ids` dénormalisés). |
-| `profiles` | Extension `auth.users` (locale newsletter, préférences). |
-| `loyalty_members` | Snapshot fidélité (tier FREE/PREMIUM modélisé — vente PREMIUM reportée ADR 0005). |
-| `bookings` | Réservations réseau (`booking_ref` `CT‑YYYYMMDD‑xxxxx`), politique annulation verbatim JSONB. |
-| `booking_requests_email` | Demandes hors‑réseau (`booking_mode = email`). |
-| `price_comparisons` | Persistences comparateur (TTL `expires_at`, options concurrents). |
-| `redirects` | 301/302 Payload → middleware Next (anti‑cannibalisation). |
-| `audit_logs` | Traçabilité opérateur (INSERT via service_role / jobs). |
+| Table                    | Objet principal                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------- |
+| `authors`                | Auteurs contenus (E‑E‑A‑T, pages éditoriales).                                                |
+| `hotels`                 | Fiche catalogue (slug FR/EN, connectivités Amadeus/Little/Makcorps, FAQ JSONB…).              |
+| `hotel_rooms`            | Inventaire présentoir / mapping chambre côté contenu (non forcément 1‑pour‑1 ARI).            |
+| `editorial_pages`        | Articles / hubs / classements (statut draft/published, `hotel_ids` dénormalisés).             |
+| `profiles`               | Extension `auth.users` (locale newsletter, préférences).                                      |
+| `loyalty_members`        | Snapshot fidélité (tier FREE/PREMIUM modélisé — vente PREMIUM reportée ADR 0005).             |
+| `bookings`               | Réservations réseau (`booking_ref` `CT‑YYYYMMDD‑xxxxx`), politique annulation verbatim JSONB. |
+| `booking_requests_email` | Demandes hors‑réseau (`booking_mode = email`).                                                |
+| `price_comparisons`      | Persistences comparateur (TTL `expires_at`, options concurrents).                             |
+| `redirects`              | 301/302 Payload → middleware Next (anti‑cannibalisation).                                     |
+| `audit_logs`             | Traçabilité opérateur (INSERT via service_role / jobs).                                       |
 
 Système : table interne **`_cct_sql_migrations`** (journal d’applications SQL), créée par `pnpm --filter @cct/db migrate`.
 
@@ -43,19 +43,19 @@ Politiques RLS de `0001` supposent ce claim présent ou absent (traité comme cl
 
 Résumé d’intent :
 
-| Ressource | Public / client | Équipe |
-| --- | --- | --- |
-| Hôtels + chambres publiées | Lecture | CRUD contenu + onboarding |
-| Pages éditoriales publiées | Lecture | Rédaction / SEO |
-| Réservations | Propriétaire `user_id` | Opérateur / admin |
-| Demandes e‑mail | Propriétaire `submitted_by` | Opérateur / admin |
-| Profils | Soi‑même | — |
-| Fidélité | Lecture individuelle ; pas d’écriture directe client | Opérateur / admin |
+| Ressource                  | Public / client                                      | Équipe                    |
+| -------------------------- | ---------------------------------------------------- | ------------------------- |
+| Hôtels + chambres publiées | Lecture                                              | CRUD contenu + onboarding |
+| Pages éditoriales publiées | Lecture                                              | Rédaction / SEO           |
+| Réservations               | Propriétaire `user_id`                               | Opérateur / admin         |
+| Demandes e‑mail            | Propriétaire `submitted_by`                          | Opérateur / admin         |
+| Profils                    | Soi‑même                                             | —                         |
+| Fidélité                   | Lecture individuelle ; pas d’écriture directe client | Opérateur / admin         |
 
 ## Indexes & JSONB
 
-- Unicité **`hotels.slug`**, **`editorial_pages.slug_fr`**, partiel **`makcorps_hotel_id`**.  
-- GIN `jsonb_path_ops` sur **`hotels.faq_content`**, **`hotels.amenities`**, **`editorial_pages.faq_content`**, **`hotel_rooms.amenities`**.  
+- Unicité **`hotels.slug`**, **`editorial_pages.slug_fr`**, partiel **`makcorps_hotel_id`**.
+- GIN `jsonb_path_ops` sur **`hotels.faq_content`**, **`hotels.amenities`**, **`editorial_pages.faq_content`**, **`hotel_rooms.amenities`**.
 - Recherche / reporting : composites `(bookings.user_id, status)`, `(hotel_id, dates)` pour `price_comparisons`.
 
 ## Schémas JSONB (couche applicative — Zod)
