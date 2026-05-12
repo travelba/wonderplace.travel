@@ -187,6 +187,29 @@ export const Hotels: CollectionConfig = {
           type: 'row',
           fields: [
             {
+              name: 'postal_code',
+              type: 'text',
+              admin: {
+                width: '50%',
+                description:
+                  'Postal code only. Format-checked at write time (FR: NNNNN, EU shapes accepted).',
+              },
+            },
+            {
+              name: 'phone_e164',
+              type: 'text',
+              admin: {
+                width: '50%',
+                description:
+                  'Front-desk phone in E.164 (e.g. "+33158122888"). Surfaces in JSON-LD and click-to-call.',
+              },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
               name: 'latitude',
               type: 'number',
               admin: { width: '50%', step: 0.000001 },
@@ -201,6 +224,22 @@ export const Hotels: CollectionConfig = {
               max: 180,
             },
           ],
+        },
+        {
+          name: 'points_of_interest',
+          type: 'json',
+          admin: {
+            description:
+              'Array of nearby POIs: { name, type, distance_m, walking_time_min?, latitude?, longitude?, sameAs? }. Sorted by distance ascending.',
+          },
+        },
+        {
+          name: 'transports',
+          type: 'json',
+          admin: {
+            description:
+              'Array of transport links: { mode: metro|rer|tram|bus|train|airport_shuttle, line?, name, distance_m, walk_min? }.',
+          },
         },
       ],
     },
@@ -339,6 +378,108 @@ export const Hotels: CollectionConfig = {
             description:
               'Object: { name, surface_sqm?, treatment_rooms?, features_fr[], features_en[] }.',
           },
+        },
+        {
+          name: 'signature_experiences',
+          type: 'json',
+          admin: {
+            description:
+              'Array of signature experiences: { title_fr, title_en, body_fr, body_en, icon? }.',
+          },
+        },
+        {
+          name: 'long_description_sections',
+          type: 'json',
+          admin: {
+            description:
+              'Array of long-form story sections: { anchor (kebab-case), title_fr?, title_en?, body_fr?, body_en? }. Renders as <h3 id> + paragraphs.',
+          },
+        },
+        {
+          name: 'policies',
+          type: 'json',
+          admin: {
+            description:
+              'Object: { check_in, check_out, cancellation, pets, children, city_tax, wifi, payment_methods }. HH:MM regex enforced on times.',
+          },
+        },
+        {
+          name: 'awards',
+          type: 'json',
+          admin: {
+            description:
+              'Array of awards: { name, issuer, year, schema_type? }. Surfaces in HotelDistinctions UI + JSON-LD Hotel.award[].',
+          },
+        },
+        {
+          name: 'featured_reviews',
+          type: 'json',
+          admin: {
+            description:
+              'Array of editorial pull-quotes: { source, source_url?, author?, quote, rating?, max_rating?, date? }. Capped at 5 in JSON-LD.',
+          },
+        },
+      ],
+    },
+
+    // -----------------------------------------------------------------
+    // Inventory & history
+    // -----------------------------------------------------------------
+    {
+      type: 'collapsible',
+      label: 'Inventory & history',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'number_of_rooms',
+              type: 'number',
+              min: 1,
+              admin: {
+                width: '50%',
+                step: 1,
+                description:
+                  'Total bookable units (all categories). Maps to Schema.org numberOfRooms.',
+              },
+            },
+            {
+              name: 'number_of_suites',
+              type: 'number',
+              min: 0,
+              admin: {
+                width: '50%',
+                step: 1,
+                description: 'Editorial count of suites (subset of total rooms).',
+              },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'opened_at',
+              type: 'date',
+              admin: {
+                width: '50%',
+                date: { pickerAppearance: 'dayOnly' },
+                description:
+                  'Original opening date. Year surfaces as Schema.org foundingDate + HotelFactSheet history line.',
+              },
+            },
+            {
+              name: 'last_renovated_at',
+              type: 'date',
+              admin: {
+                width: '50%',
+                date: { pickerAppearance: 'dayOnly' },
+                description:
+                  'Date of the most recent significant renovation. Must be >= opened_at.',
+              },
+            },
+          ],
         },
       ],
     },
