@@ -15,6 +15,7 @@ ConciergeTravel.fr is structured in **four functional layers** (cahier des charg
 ## Triggers
 
 Invoke this skill when:
+
 - Adding a new top-level folder under `apps/`, `packages/`, or `docs/`.
 - Changing rendering strategy of any route (SSG ↔ ISR ↔ SSR).
 - Crossing a layer boundary (e.g. editorial code calling booking internals directly).
@@ -37,15 +38,15 @@ Invoke this skill when:
 
 ## Folder ownership
 
-| Concern | Owner package | Forbidden imports |
-|---|---|---|
-| Public marketing pages | `apps/web/src/app/[locale]/(marketing)` | direct Amadeus client, Payload CMS internals |
-| Booking tunnel | `apps/web/src/app/[locale]/(booking)` | Payload, editorial helpers |
-| Account pages | `apps/web/src/app/[locale]/(account)` | Payload, integrations layer |
-| Domain logic | `packages/domain/<context>` | React, Next.js, Supabase client, fetch |
-| Integrations | `packages/integrations/<vendor>` | React, domain (one-way: domain ← integrations via interfaces) |
-| SEO/GEO | `packages/seo` | direct vendor calls |
-| Back-office | `apps/admin` | front public components |
+| Concern                | Owner package                           | Forbidden imports                                             |
+| ---------------------- | --------------------------------------- | ------------------------------------------------------------- |
+| Public marketing pages | `apps/web/src/app/[locale]/(marketing)` | direct Amadeus client, Payload CMS internals                  |
+| Booking tunnel         | `apps/web/src/app/[locale]/(booking)`   | Payload, editorial helpers                                    |
+| Account pages          | `apps/web/src/app/[locale]/(account)`   | Payload, integrations layer                                   |
+| Domain logic           | `packages/domain/<context>`             | React, Next.js, Supabase client, fetch                        |
+| Integrations           | `packages/integrations/<vendor>`        | React, domain (one-way: domain ← integrations via interfaces) |
+| SEO/GEO                | `packages/seo`                          | direct vendor calls                                           |
+| Back-office            | `apps/admin`                            | front public components                                       |
 
 ## Anti-patterns to refuse
 

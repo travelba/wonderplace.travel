@@ -10,6 +10,7 @@ Per CDC v3.0 §2, monitoring is **Sentry** with **Datadog optional in Phase 2**.
 ## Triggers
 
 Invoke when:
+
 - Adding error handling code paths.
 - Adding logs anywhere on the server.
 - Wiring tracing or transactions.
@@ -18,17 +19,18 @@ Invoke when:
 
 ## Stack
 
-| Tool | Use | Path |
-|---|---|---|
-| Sentry | Errors, tracing, releases | `apps/web/src/sentry.{client,server,edge}.config.ts` and `apps/admin/...` |
-| pino | Structured logs (server) | `packages/observability/logger.ts` |
-| Vercel Analytics | RUM, page views | `apps/web/src/app/layout.tsx` |
-| Web Vitals | LCP/CLS/INP/TTFB | `packages/observability/web-vitals.ts` |
-| Sentry Tunnel | CSP-friendly client SDK | `apps/web/src/app/monitoring/sentry-tunnel/route.ts` |
+| Tool             | Use                       | Path                                                                      |
+| ---------------- | ------------------------- | ------------------------------------------------------------------------- |
+| Sentry           | Errors, tracing, releases | `apps/web/src/sentry.{client,server,edge}.config.ts` and `apps/admin/...` |
+| pino             | Structured logs (server)  | `packages/observability/logger.ts`                                        |
+| Vercel Analytics | RUM, page views           | `apps/web/src/app/layout.tsx`                                             |
+| Web Vitals       | LCP/CLS/INP/TTFB          | `packages/observability/web-vitals.ts`                                    |
+| Sentry Tunnel    | CSP-friendly client SDK   | `apps/web/src/app/monitoring/sentry-tunnel/route.ts`                      |
 
 ## Non-negotiable rules
 
 ### Sentry
+
 - Client + Server + Edge configs (`@sentry/nextjs`).
 - DSN read from env. Different envs: `dev`, `preview`, `production` via `SENTRY_ENV`.
 - **Source maps** uploaded in CI on every release; PII scrubbing on by default.
@@ -40,6 +42,7 @@ Invoke when:
 - Sensitive data scrubbing: `beforeSend` strips `email`, `phone`, `card_*` (must be empty anyway), `authorization`, `cookie`.
 
 ### Logging (pino)
+
 - Server logs only; client logs go to Sentry breadcrumbs.
 - Single logger instance with redaction paths (`req.headers.authorization`, `*.email`, `*.phone`).
 - Levels: `trace`, `debug`, `info`, `warn`, `error`, `fatal`.
@@ -47,23 +50,28 @@ Invoke when:
 - `requestId` propagated through `nanoid` per request (set in middleware, attached to `headers().get('x-request-id')`).
 
 ### Web Vitals
+
 - `reportWebVitals` posts to `/api/metrics/web-vitals` (server endpoint persisting to Vercel Analytics + Sentry custom measurements).
 - Track LCP, CLS, INP, TTFB, FCP per route.
 
 ### Tracing
+
 - Sentry transactions wrap every server action and route handler automatically via `@sentry/nextjs` instrumentation.
 - Custom spans for vendor calls (Amadeus search, Little availability, Makcorps): `Sentry.startSpan({ name: 'amadeus.searchHotels', op: 'http.client' }, ...)`.
 
 ### Alerts (Sentry)
+
 - New error type in `apps/web` production → Slack `#alerts-cct`.
 - Error rate > 1% on `/reservation/*` for 5 min → page on-call.
 - Web Vitals regression: median LCP > 2.5s for 1h on hotel pages → Slack.
 
 ### Health checks
+
 - `/api/health` returns `{ ok: true, deps: { supabase, redis, algolia, amadeus } }` with parallel pings (timeouts 1s each).
 - Used by Vercel external monitors and StatusCake (Phase 2 optional).
 
 ### Datadog (optional, Phase 2)
+
 - Behind feature flag `DATADOG_ENABLED`. RUM SDK lazy-loaded for high-traffic pages only.
 
 ## Anti-patterns to refuse

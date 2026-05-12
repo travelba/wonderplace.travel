@@ -10,6 +10,7 @@ The cahier des charges (CDC v3.0 §15) requires a complete documentation package
 ## Triggers
 
 Invoke when:
+
 - Adding a new README, doc, or runbook.
 - Editing existing documentation.
 - Closing a phase: docs must be up to date before moving forward.
@@ -51,24 +52,29 @@ docs/
 ## Non-negotiable rules
 
 ### Format
+
 - Markdown with YAML frontmatter where useful. ASCII diagrams or Mermaid (no images that drift from code).
 - Headings hierarchy strict; tables of contents auto-rendered for long docs.
 - Code blocks fenced with language tags.
 - Cross-link with relative paths (`../03-integrations/amadeus.md`).
 
 ### Completeness
+
 - Every external dependency has a doc.
 - Every env variable in `docs/10-environment-variables.md` matches `.env.example`.
 - Every architectural decision lives in `docs/adr/` with status (`accepted`, `superseded`, `deprecated`).
 
 ### Tone
+
 - Senior CTO can read the docs without prior context.
 - No marketing tone; precise, factual.
-- Every assertion that could surprise (e.g. PCI scope-out, comparator no-affiliate) explains *why* in 2 lines.
+- Every assertion that could surprise (e.g. PCI scope-out, comparator no-affiliate) explains _why_ in 2 lines.
 
 ### ADR template
+
 ```md
 # ADR NNNN — Title
+
 - Status: accepted
 - Date: YYYY-MM-DD
 - Decision: ...
@@ -79,8 +85,10 @@ docs/
 ```
 
 ### Runbook template (per integration)
+
 ```md
 # Integration — <Vendor>
+
 - Owner package: packages/integrations/<vendor>
 - Endpoints used: ...
 - Auth: ...
@@ -91,6 +99,7 @@ docs/
 ```
 
 ### Checklists
+
 - SEO checklist mirrors CDC §12.1.
 - Launch QA mirrors CDC §12.2.
 - Security checklist mirrors §11.

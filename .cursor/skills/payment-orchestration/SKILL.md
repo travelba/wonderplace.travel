@@ -10,6 +10,7 @@ Payment is **fully delegated to Amadeus Payments** (CDC §5.3, §7.3, §11). Con
 ## Triggers
 
 Invoke when:
+
 - Touching the payment step UI or its server actions.
 - Configuring Apple Pay / Google Pay.
 - Implementing webhook handling for payment status changes.
@@ -18,11 +19,13 @@ Invoke when:
 ## Non-negotiable rules
 
 ### PCI scope
+
 - **No card data anywhere**: PAN, CVV, expiry, holder name in payment context. We accept holder name only as part of the booking guest data, separate from card flow.
 - The payment form is an **Amadeus-hosted iframe** (Web Payment Form), equivalent to Stripe Elements. We render only the wrapper.
 - We persist **only** `amadeus_payment_ref` and `payment_status`. No tokens that could decrypt to a PAN.
 
 ### Flow
+
 1. Guest data collected and validated server-side (Zod).
 2. Server action `initiatePayment({ offerId, bookingDraftId })`:
    - Calls Amadeus to create a payment session for the offer.
@@ -34,23 +37,28 @@ Invoke when:
 7. Server validates the `payment_ref` (HMAC) and finalizes the booking (creates `amadeus-orders` or `little-reservations`), persists in `bookings`, sends Brevo confirmation.
 
 ### Idempotency
+
 - The booking finalization endpoint requires an idempotency key bound to `(offerId, userId, bookingDraftId)`. Stored 24h in Redis.
 - Replays return the previous result.
 
 ### Webhooks
+
 - `/api/webhook/amadeus-payment`: HMAC signature validated against `AMADEUS_PAYMENT_WEBHOOK_SECRET`.
 - Updates `bookings.payment_status` (`authorized → captured → refunded`) atomically.
 - Idempotent: handler keyed on `payment_ref`.
 
 ### Apple Pay
+
 - Domain verification file served from `/.well-known/apple-developer-merchantid-domain-association` (added Phase 9).
 - Tested on Safari iOS as part of E2E.
 
 ### Refunds and cancellations
+
 - Initiated from back-office (operator role) or by user within deadline.
 - Server action calls Amadeus refund endpoint, updates `bookings.status = 'cancelled'`, `payment_status = 'refunded'`, sends customer email.
 
 ### Email-mode bookings
+
 - For hotels with `booking_mode = 'email'`, payment is handled offline (bank transfer or Stripe Link in Phase 2 — explicitly deferred). Tunnel UI shows "Demande de réservation" CTA, not a payment form.
 
 ## UI rules

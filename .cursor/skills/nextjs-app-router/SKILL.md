@@ -10,6 +10,7 @@ We use **Next.js 15 App Router** with **React 19 Server Components by default**.
 ## Triggers
 
 Invoke when:
+
 - Creating any `page.tsx`, `layout.tsx`, `route.ts`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `opengraph-image.tsx`.
 - Writing a Server Action.
 - Tweaking caching behavior (`fetch` options, `revalidateTag`, `revalidatePath`, `unstable_cache`).
@@ -18,29 +19,35 @@ Invoke when:
 ## Non-negotiable rules
 
 ### Server Components by default
+
 - No `'use client'` unless interactivity, browser API, or hooks are required.
 - Heavy editorial pages (hubs, fiches, guides) must be RSC and stream where possible.
 
 ### Caching directives
+
 - Marketing/editorial pages: `export const revalidate = N` matching the matrix (24h pillar/editorial, 12h hubs, 6h hotel pages).
 - Booking tunnel + search results: `export const dynamic = 'force-dynamic'` and **no fetch caching**.
 - API route handlers calling Amadeus availabilities: respect Redis 3-level cache (cf. `redis-caching` skill).
 - Use `revalidateTag('hotel:<slug>')`, `revalidateTag('editorial:<slug>')`, `revalidateTag('hub:<region>')` from Payload `afterChange` hooks. **No raw `revalidatePath` from CMS** — tags only, scoped.
 
 ### Metadata
+
 - Every page must export `generateMetadata` (or static `metadata`) producing: `title`, `description`, `alternates.canonical`, `alternates.languages` (FR/EN hreflang), `openGraph`, `twitter`, `robots`.
 - Robots rules: marketing/editorial = `index,follow`; booking tunnel/account = `noindex,nofollow`.
 
 ### Server Actions
+
 - Wrap with **Zod validation** at the entry. No untrusted client input passes without parse.
 - Return discriminated unions: `{ ok: true; data } | { ok: false; error }`. No throws.
 - Never call vendor APIs (Amadeus, Brevo, etc.) directly: go through `packages/integrations`.
 
 ### Internationalization
+
 - `next-intl` middleware mounted in `middleware.ts`. Default locale `fr` without prefix; `en` prefixed.
 - All page params include `[locale]`. Read locale via `unstable_setRequestLocale(locale)` at top of each page/layout.
 
 ### Streaming, suspense, parallel routes
+
 - Wrap independent data fetches in `<Suspense>` with skeleton fallbacks.
 - Use parallel routes (`@modal`, `@side`) for booking confirmation modals or hotel galleries when it improves UX.
 
@@ -72,7 +79,9 @@ import { AeoBlock } from '@cct/ui/seo/AeoBlock';
 
 export const revalidate = 21600; // 6h ISR per CDC §2.2
 
-export async function generateMetadata({ params }) { /* ... */ }
+export async function generateMetadata({ params }) {
+  /* ... */
+}
 
 export default async function HotelPage({ params: { locale, region, city, hotel } }) {
   unstable_setRequestLocale(locale);

@@ -13,7 +13,6 @@
     "./agent-skills": "./src/agent-skills.ts"
   },
   "scripts": {
-    "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

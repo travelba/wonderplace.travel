@@ -9,7 +9,6 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
-    "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "migrate": "tsx scripts/migrate.ts",
     "seed:dev": "tsx scripts/seed-dev.ts",

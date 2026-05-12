@@ -10,6 +10,7 @@ All transactional and lifecycle emails are sent through **Brevo** (CDC §2). Tem
 ## Triggers
 
 Invoke when:
+
 - Adding or editing an email template.
 - Wiring a workflow (cron, scheduled trigger).
 - Modifying the Brevo client / configuration.
@@ -17,33 +18,36 @@ Invoke when:
 
 ## Templates
 
-| Slug | Trigger | When | Audience |
-|---|---|---|---|
-| `booking-confirmation` | Payment captured | < 30s after capture | Customer |
-| `booking-confirmation-internal` | Booking confirmed | Same | reservations@ |
-| `booking-request-acknowledgement` | `booking_requests_email` row created | Immediate | Customer |
-| `booking-request-internal` | Same | Same | reservations@ |
-| `booking-reminder-j-3` | 3 days before check-in | Cron daily | Customer |
-| `post-stay-followup` | 2 days after check-out | Cron daily | Customer |
-| `loyalty-welcome` | Tier FREE auto-activated | Immediate | Customer |
-| `loyalty-renewal-reminder` | 30 days before tier expiry | Cron daily | Customer |
-| `auth-email-verification` | Signup | Immediate | Customer |
-| `auth-password-reset` | Reset requested | Immediate | Customer |
-| `booking-cancelled` | Status → cancelled | Immediate | Customer |
-| `booking-refund-confirmation` | Status → refunded | Immediate | Customer |
+| Slug                              | Trigger                              | When                | Audience      |
+| --------------------------------- | ------------------------------------ | ------------------- | ------------- |
+| `booking-confirmation`            | Payment captured                     | < 30s after capture | Customer      |
+| `booking-confirmation-internal`   | Booking confirmed                    | Same                | reservations@ |
+| `booking-request-acknowledgement` | `booking_requests_email` row created | Immediate           | Customer      |
+| `booking-request-internal`        | Same                                 | Same                | reservations@ |
+| `booking-reminder-j-3`            | 3 days before check-in               | Cron daily          | Customer      |
+| `post-stay-followup`              | 2 days after check-out               | Cron daily          | Customer      |
+| `loyalty-welcome`                 | Tier FREE auto-activated             | Immediate           | Customer      |
+| `loyalty-renewal-reminder`        | 30 days before tier expiry           | Cron daily          | Customer      |
+| `auth-email-verification`         | Signup                               | Immediate           | Customer      |
+| `auth-password-reset`             | Reset requested                      | Immediate           | Customer      |
+| `booking-cancelled`               | Status → cancelled                   | Immediate           | Customer      |
+| `booking-refund-confirmation`     | Status → refunded                    | Immediate           | Customer      |
 
 ## Non-negotiable rules
 
 ### Templates
+
 - Built with `@react-email/components`. Inline styles, mobile-first.
 - Localized per user `preferred_locale` (FR/EN) — separate templates or a single i18n component.
 - Subject lines in 6 words max, no emoji except where culturally appropriate.
 
 ### Branding
+
 - Header logo (SVG inlined), trust signals: phone, IATA + ASPST, Amadeus payment lock.
 - Footer: company info (legal entity, financial guarantee APST), unsubscribe link only on marketing emails (transactional doesn't legally require it but include preferences link).
 
 ### Sending
+
 - Brevo Transactional API; never SMTP from the app.
 - Helper `sendEmail({ template, to, props, locale })` in `packages/integrations/brevo`:
   - Renders React Email server-side.
@@ -52,6 +56,7 @@ Invoke when:
 - Idempotency via `idempotency:email:<key>` Redis 24h.
 
 ### Cron schedules
+
 - Vercel Cron (`apps/web/src/app/api/cron/...`):
   - `send-j-3-reminders` daily at 09:00 Europe/Paris.
   - `send-post-stay-followups` daily at 10:00.
@@ -59,16 +64,19 @@ Invoke when:
 - Each cron is idempotent (a sent flag set in DB prevents re-sending).
 
 ### Suppression and opt-out
+
 - Marketing opt-in checkbox at signup — stored in `profiles.marketing_opt_in`.
 - Brevo's bounce/spam suppression list synced; we never send to suppressed addresses.
 
 ### Booking-confirmation contents
+
 - Booking ref, hotel summary (image, name, address), dates, room, total, payment ref.
 - Cancellation policy verbatim from `bookings.cancellation_policy`.
 - Loyalty benefits applied (when present).
 - "Préparez votre séjour" section: arrival time, check-in instructions.
 
 ### Internal emails
+
 - Always sent from `reservations@conciergetravel.fr` for booking ops.
 - Include a deep link to the back-office record (`/admin/collections/booking-requests-email/<id>`).
 

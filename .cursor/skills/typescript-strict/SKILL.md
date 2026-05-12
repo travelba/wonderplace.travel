@@ -10,6 +10,7 @@ The cahier des charges mandates **TypeScript strict** because Amadeus, Little Ho
 ## Triggers
 
 Invoke when:
+
 - Creating or editing a `tsconfig*.json`.
 - Declaring DTOs from vendor APIs.
 - Designing data layer types.
@@ -36,8 +37,8 @@ Invoke when:
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
-    "useDefineForClassFields": true
-  }
+    "useDefineForClassFields": true,
+  },
 }
 ```
 
@@ -53,7 +54,9 @@ Invoke when:
 - **Exhaustive switch** with `never`-returning helper:
 
 ```ts
-const exhaustive = (x: never): never => { throw new Error('Unhandled: ' + JSON.stringify(x)); };
+const exhaustive = (x: never): never => {
+  throw new Error('Unhandled: ' + JSON.stringify(x));
+};
 ```
 
 ## Vendor response parsing pattern
@@ -65,12 +68,14 @@ import { z } from 'zod';
 export const HotelOfferZ = z.object({
   type: z.literal('hotel-offers'),
   hotel: z.object({ hotelId: z.string(), name: z.string() }),
-  offers: z.array(z.object({
-    id: z.string(),
-    rateCode: z.string(),
-    price: z.object({ currency: z.string(), total: z.string() }),
-    policies: z.object({ cancellations: z.array(z.unknown()) }).optional(),
-  })),
+  offers: z.array(
+    z.object({
+      id: z.string(),
+      rateCode: z.string(),
+      price: z.object({ currency: z.string(), total: z.string() }),
+      policies: z.object({ cancellations: z.array(z.unknown()) }).optional(),
+    }),
+  ),
 });
 export type HotelOffer = z.infer<typeof HotelOfferZ>;
 

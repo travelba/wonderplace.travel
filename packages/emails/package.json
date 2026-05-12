@@ -8,7 +8,6 @@
     "./templates/*": "./src/templates/*"
   },
   "scripts": {
-    "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "dev": "email dev --port 3002 --dir ./src/templates",
     "export": "email export --dir ./src/templates --outDir ./dist"

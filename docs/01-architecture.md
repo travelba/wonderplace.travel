@@ -73,36 +73,36 @@ flowchart TB
 
 ## Matrice de rendu (CDC §2.2)
 
-| Type de page | Rendu | Revalidation |
-| --- | --- | --- |
-| Pilier `/hotels/france/` | SSG | ISR 24h |
-| Hub régional / ville | SSG | ISR 12h |
-| Fiche hôtel (sans dates) | SSG | ISR 6h |
-| Page éditoriale (classement, thématique, guide) | SSG | ISR 24h |
-| Résultats de recherche avec dates | SSR | No cache |
-| Tunnel de réservation | SSR | No cache |
-| API ARI / availabilities | SSR | Cache Redis 3 niveaux |
+| Type de page                                    | Rendu | Revalidation          |
+| ----------------------------------------------- | ----- | --------------------- |
+| Pilier `/hotels/france/`                        | SSG   | ISR 24h               |
+| Hub régional / ville                            | SSG   | ISR 12h               |
+| Fiche hôtel (sans dates)                        | SSG   | ISR 6h                |
+| Page éditoriale (classement, thématique, guide) | SSG   | ISR 24h               |
+| Résultats de recherche avec dates               | SSR   | No cache              |
+| Tunnel de réservation                           | SSR   | No cache              |
+| API ARI / availabilities                        | SSR   | Cache Redis 3 niveaux |
 
 ## Bounded contexts (DDD)
 
-| Contexte | Responsabilités |
-| --- | --- |
-| `hotels` | Identité, localisation, état de publication, slugs, mode de réservation |
-| `booking` | Aggregate Booking, machine à états, parsing politique d'annulation |
-| `loyalty` | Règles de tiers, calcul des avantages, éligibilité |
-| `pricing` | Normalisation Makcorps/Apify, calcul scénario comparateur |
-| `editorial` | Pages éditoriales, slug/hreflang/canonical, validation AEO/FAQ |
-| `shared` | `Result<T,E>`, branded types, erreurs |
+| Contexte    | Responsabilités                                                         |
+| ----------- | ----------------------------------------------------------------------- |
+| `hotels`    | Identité, localisation, état de publication, slugs, mode de réservation |
+| `booking`   | Aggregate Booking, machine à états, parsing politique d'annulation      |
+| `loyalty`   | Règles de tiers, calcul des avantages, éligibilité                      |
+| `pricing`   | Normalisation Makcorps/Apify, calcul scénario comparateur               |
+| `editorial` | Pages éditoriales, slug/hreflang/canonical, validation AEO/FAQ          |
+| `shared`    | `Result<T,E>`, branded types, erreurs                                   |
 
 ## Couches de cache
 
-| Niveau | TTL | Usage |
-| --- | --- | --- |
-| Long | 6h | Fiche hôtel sans dates (description, photos) |
-| Court | 15min | Recherche avec dates (Amadeus offers) |
-| No cache | — | Lookup pré-paiement (`hotel-offers/{offerId}`) |
-| Comparator | 15min | Makcorps / Apify |
-| Reviews | 24h | Google Places |
+| Niveau     | TTL   | Usage                                          |
+| ---------- | ----- | ---------------------------------------------- |
+| Long       | 6h    | Fiche hôtel sans dates (description, photos)   |
+| Court      | 15min | Recherche avec dates (Amadeus offers)          |
+| No cache   | —     | Lookup pré-paiement (`hotel-offers/{offerId}`) |
+| Comparator | 15min | Makcorps / Apify                               |
+| Reviews    | 24h   | Google Places                                  |
 
 Détails dans le skill `redis-caching` et `docs/03-integrations/upstash-redis.md`.
 
