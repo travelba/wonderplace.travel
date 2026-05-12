@@ -2,6 +2,7 @@ packages:
   - "apps/*"
   - "packages/*"
   - "tests"
+  - "scripts/editorial-pilot"
 
 catalog:
   # Pinned shared dependency versions across the monorepo.

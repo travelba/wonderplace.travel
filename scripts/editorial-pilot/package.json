@@ -1,0 +1,30 @@
+{
+  "name": "@cct/editorial-pilot",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Standalone Sprint 1B pilot — 5-pass AI editorial pipeline for premium hotel fiches (Plaza Athénée, Cap-Eden-Roc).",
+  "scripts": {
+    "run": "tsx src/run.ts",
+    "run:plaza": "tsx src/run.ts plaza-athenee-paris",
+    "run:cap-eden-roc": "tsx src/run.ts hotel-du-cap-eden-roc",
+    "run:bristol": "tsx src/run.ts le-bristol-paris",
+    "run:cheval-blanc": "tsx src/run.ts cheval-blanc-saint-tropez",
+    "run:negresco": "tsx src/run.ts le-negresco-nice",
+    "run:new-3": "tsx src/run.ts le-bristol-paris cheval-blanc-saint-tropez le-negresco-nice",
+    "run:all": "tsx src/run.ts --all",
+    "lint:files": "tsx src/lint-files.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.7",
+    "openai": "^4.78.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

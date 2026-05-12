@@ -1,0 +1,255 @@
+{
+  "slug": "cheval-blanc-saint-tropez",
+  "name": "Cheval Blanc St-Tropez",
+  "operator": "Cheval Blanc / LVMH (Maison Cheval Blanc)",
+  "city": "Saint-Tropez",
+  "region": "Provence-Alpes-Côte d'Azur",
+  "country": "FR",
+  "address": "Plage de la Bouillabaisse, 83990 Saint-Tropez, France",
+  "coordinates": {
+    "lat": 43.2624,
+    "lng": 6.6261,
+    "verified_confidence": "medium",
+    "source": "Approximation Plage de la Bouillabaisse, golfe de Saint-Tropez côté ouest. À recouper avant publication."
+  },
+  "classification": {
+    "stars": 5,
+    "atout_france_palace": true,
+    "atout_france_palace_first_distinction_year": 2019,
+    "verified_confidence": "medium",
+    "source": "Distinction Palace obtenue après rebranding LVMH 2009 — date exacte à confirmer (autour de 2019 selon sources Atout France récentes)"
+  },
+  "history": {
+    "opening_year": 1932,
+    "founder_or_first_operator": "Auguste Pasquier — ouverture sous le nom 'Hôtel de la Pinède'",
+    "verified_confidence": "high",
+    "key_dates": [
+      {
+        "year": 1932,
+        "event": "Ouverture de l'Hôtel de la Pinède par Auguste Pasquier, dans une ancienne pinède privée en bord de plage de la Bouillabaisse",
+        "confidence": "high"
+      },
+      {
+        "year": 1986,
+        "event": "Acquisition par la famille Delion ; renommage 'Résidence de la Pinède', repositionnement haut de gamme",
+        "confidence": "medium"
+      },
+      {
+        "year": 2007,
+        "event": "Rachat de l'établissement par le groupe LVMH dans le cadre de la stratégie de développement de l'enseigne Cheval Blanc (premier hôtel de la marque ouvert à Courchevel en 2006)",
+        "confidence": "high"
+      },
+      {
+        "year": 2009,
+        "event": "Réouverture sous le nom 'Cheval Blanc St-Tropez' après refonte intérieure dirigée par le designer Christian Liaigre — premier Cheval Blanc en bord de mer",
+        "confidence": "high"
+      },
+      {
+        "year": 2013,
+        "event": "Arrivée du chef Arnaud Donckele à La Vague d'Or — obtention rapide des distinctions Michelin",
+        "confidence": "high"
+      },
+      {
+        "year": 2017,
+        "event": "La Vague d'Or obtient sa 3ᵉ étoile Michelin, plaçant Cheval Blanc St-Tropez parmi les rares palaces côtiers français avec une table trois étoiles",
+        "confidence": "high"
+      }
+    ],
+    "cultural_references": [
+      {
+        "type": "history_saint_tropez",
+        "item": "Saint-Tropez : devenu capitale internationale de la jet-set après Et Dieu créa la femme de Roger Vadim (1956) avec Brigitte Bardot — La Pinède accueillait déjà les acteurs et la production",
+        "confidence": "high"
+      },
+      {
+        "type": "haute_couture",
+        "item": "Position privilégiée de la Maison LVMH dans le golfe : Dior fait fréquemment ses présentations Cruise à Saint-Tropez (collection Cruise 2024 présentée au Mexique mais antécédents tropéziens documentés)",
+        "confidence": "medium"
+      },
+      {
+        "type": "yachting",
+        "item": "Le golfe de Saint-Tropez est l'un des principaux centres mondiaux du yachting de luxe (Voiles de Saint-Tropez début octobre) ; Cheval Blanc dispose de son propre ponton",
+        "confidence": "high"
+      }
+    ]
+  },
+  "architecture": {
+    "main_building_style": "Bâtiment provençal blanc et bleu, lignes contemporaines minimalistes, intégration paysagère dans la pinède d'origine",
+    "main_building_architect": "Refonte 2009 par le designer Christian Liaigre (décédé en 2020) — épure méditerranéenne, bois pâles, lin écru, terre cuite",
+    "garden_pool": {
+      "feature": "Piscine extérieure entourée par la pinède centenaire — l'hôtel a préservé une partie significative des pins parasols originels de la propriété",
+      "verified_confidence": "high"
+    },
+    "private_beach": {
+      "feature": "Plage privée de la Bouillabaisse — sable importé, transats Cheval Blanc, service plage par La Terrasse",
+      "verified_confidence": "high"
+    },
+    "ponton": {
+      "feature": "Ponton privé donnant directement sur le golfe de Saint-Tropez — transferts en chris-craft sur demande",
+      "verified_confidence": "high"
+    },
+    "verified_confidence": "medium-high"
+  },
+  "capacity": {
+    "total_keys": 30,
+    "rooms": 21,
+    "suites": 9,
+    "signature_accommodations": [
+      {
+        "name": "Suite Cheval Blanc",
+        "feature": "Suite signature de la Maison — terrasse face mer, mobilier Liaigre, salle de bain en marbre de Carrare"
+      },
+      {
+        "name": "Villa La Pinède",
+        "feature": "Villa de 3 chambres avec piscine privée, héritage du nom historique de l'établissement"
+      }
+    ],
+    "verified_confidence": "medium",
+    "notes_to_check": "Capacité totale exacte 2024-2025 — site officiel Cheval Blanc indique parfois 30, parfois 33 selon rénovations"
+  },
+  "dining": [
+    {
+      "name": "La Vague d'Or",
+      "type": "restaurant_signature",
+      "chef": "Arnaud Donckele",
+      "current_chef": "Arnaud Donckele (depuis 2013)",
+      "michelin_stars": 3,
+      "since_stars": 2017,
+      "cuisine": "Haute cuisine méditerranéenne — Arnaud Donckele est l'un des rares chefs à diriger simultanément deux tables 3 étoiles Michelin (La Vague d'Or à Saint-Tropez et Plénitude au Cheval Blanc Paris)",
+      "verified_confidence": "high",
+      "source": "Guide Michelin France"
+    },
+    {
+      "name": "La Terrasse",
+      "type": "restaurant_beach",
+      "style": "Restaurant de plage signé par les équipes Donckele — cuisine provençale décontractée, pieds dans le sable",
+      "verified_confidence": "high"
+    }
+  ],
+  "wellness": {
+    "spa_name": "Cheval Blanc Spa by Guerlain",
+    "spa_partner": "Guerlain (Maison LVMH)",
+    "size_m2": 600,
+    "signature": "Rituels exclusifs Guerlain Orchidée Impériale — soins en cabines ouvertes sur la pinède",
+    "facilities": ["pool_outdoor", "treatment_rooms_4", "hammam", "fitness_studio"],
+    "verified_confidence": "medium-high"
+  },
+  "service": {
+    "languages_spoken": [
+      "français",
+      "anglais",
+      "italien",
+      "russe",
+      "arabe",
+      "mandarin",
+      "espagnol"
+    ],
+    "concierge": "Les Clefs d'Or",
+    "signature_service": "Service yachting concierge — coordination avec le port de Saint-Tropez (5 km par la mer), location de chris-craft et yachts privés",
+    "verified_confidence": "medium-high"
+  },
+  "signature_features": [
+    "Position en bord de plage de la Bouillabaisse, à l'écart du centre de Saint-Tropez (intimité préservée)",
+    "Ponton privé donnant directement sur le golfe de Saint-Tropez",
+    "Pinède centenaire préservée — l'un des derniers grands espaces verts en bord de mer dans le golfe",
+    "Table 3 étoiles Michelin sur la plage — configuration rare en France",
+    "Saisonnier : ouvert traditionnellement de fin avril à fin septembre",
+    "30 clés seulement — un des plus petits palaces de France, intimité maximale"
+  ],
+  "nearby_pois": [
+    {
+      "name": "Centre-ville de Saint-Tropez (Place des Lices)",
+      "distance_m": 1800,
+      "type": "old_town",
+      "note": "Marché provençal du mardi et samedi matin, lieu mythique du tournoi de pétanque",
+      "confidence": "high"
+    },
+    {
+      "name": "Port de Saint-Tropez",
+      "distance_m": 2200,
+      "type": "harbor",
+      "note": "Port historique, départ des navettes pour les Voiles de Saint-Tropez (1ʳᵉ semaine d'octobre)",
+      "confidence": "high"
+    },
+    {
+      "name": "Plage de Pampelonne",
+      "distance_m": 7000,
+      "type": "beach",
+      "note": "Plage la plus longue du golfe (5 km), restaurants iconiques (Club 55, Loulou, Tahiti)",
+      "confidence": "high"
+    },
+    {
+      "name": "Citadelle de Saint-Tropez",
+      "distance_m": 2300,
+      "type": "fortress_museum",
+      "note": "Forteresse du XVIIᵉ siècle, abrite le Musée d'Histoire Maritime",
+      "confidence": "high"
+    },
+    {
+      "name": "Musée de l'Annonciade",
+      "distance_m": 2100,
+      "type": "museum",
+      "note": "Chapelle du XVIᵉ siècle reconvertie en musée d'art moderne — collection Signac, Matisse, Bonnard liée à Saint-Tropez fin XIXᵉ",
+      "confidence": "high"
+    },
+    {
+      "name": "Aéroport de La Môle (LTT)",
+      "distance_m": 14000,
+      "type": "regional_airport",
+      "note": "Petit aéroport régional, accueille jets privés en saison — Nice à 100 km, transferts hélicoptère possibles depuis l'hôtel",
+      "confidence": "high"
+    }
+  ],
+  "iata_insider": {
+    "advisor_name": "Marc",
+    "advisor_role": "conseiller senior Côte d'Azur ConciergeTravel.fr",
+    "key_observation": "Cheval Blanc joue une carte différente des palaces classiques de la Riviera : 30 clés seulement, ambiance résidence privée plutôt qu'hôtel, table trois étoiles accessible en peignoir depuis la plage. Pour ceux qui ont déjà fait l'Hôtel du Cap-Eden-Roc, c'est l'antithèse en termes de format mais souvent un parallèle bienvenu en termes d'âme.",
+    "best_for": "Couples ou petits groupes recherchant intimité maximale, amateurs de gastronomie haut niveau, voyageurs préférant la plage privée discrète au protocole de palace traditionnel.",
+    "honest_caveat": "Saisonnier strict — fermé d'octobre à avril, donc pas d'option hors saison. Position à l'écart du centre (2 km du port) = transferts systématiques pour la vie tropézienne. Sensible à la fréquentation médiatique en juillet-août : les valets parking voient passer beaucoup de yachts.",
+    "alternative_recommendation": "Pour la même intimité hors saison : Cap-Estel Èze ou Cheval Blanc Courchevel (hiver). Pour le format palace classique en bord de mer : Hôtel du Cap-Eden-Roc."
+  },
+  "pricing_indication": {
+    "low_season_classic_room_from_eur": 1600,
+    "high_season_classic_room_from_eur": 3500,
+    "high_season_during_voiles_from_eur": 5500,
+    "villa_la_pinede_from_eur": 14000,
+    "verified_confidence": "low",
+    "note": "Fourchettes indicatives 2024-2025. Pic prix attendu pendant Voiles de Saint-Tropez début octobre. À recouper avec ARI Amadeus."
+  },
+  "operational": {
+    "seasonal_closure": "Fermé traditionnellement d'octobre à fin avril (6 mois)",
+    "opening_pattern_2025": "Réouverture printemps 2025 — calendrier officiel Cheval Blanc à vérifier",
+    "verified_confidence": "high"
+  },
+  "sources": [
+    {
+      "type": "wikipedia_fr",
+      "url": "https://fr.wikipedia.org/wiki/Cheval_Blanc_St-Tropez",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "official",
+      "url": "https://www.chevalblanc.com/fr/maison/st-tropez/",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "michelin_guide",
+      "url": "https://guide.michelin.com/fr/fr/provence-alpes-cote-d-azur/saint-tropez/restaurant/la-vague-d-or",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "atout_france_palace_registry",
+      "url": "https://www.atout-france.fr/services/classement-hebergement-touristique",
+      "consulted_at": "2026-05-12"
+    }
+  ],
+  "verification_required_before_publication": [
+    "Coordonnées GPS exactes Plage de la Bouillabaisse",
+    "Date exacte de distinction Palace Atout France (autour de 2019 vraisemblable)",
+    "Capacité totale 2024-2025 (30 vs 33 clés)",
+    "Statut Michelin actuel La Vague d'Or",
+    "Année exacte d'arrivée Donckele (2013 confirmé) et 3ᵉ étoile (2017)",
+    "Calendrier saisonnier exact 2025",
+    "Pricing fourchettes via ARI Amadeus"
+  ]
+}

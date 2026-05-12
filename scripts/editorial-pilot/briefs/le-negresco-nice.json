@@ -1,0 +1,266 @@
+{
+  "slug": "le-negresco-nice",
+  "name": "Le Negresco",
+  "operator": "Société Anonyme du Negresco / Fondation Mesnage (héritière de Jeanne Augier)",
+  "city": "Nice",
+  "region": "Provence-Alpes-Côte d'Azur",
+  "country": "FR",
+  "address": "37 Promenade des Anglais, 06000 Nice, France",
+  "coordinates": {
+    "lat": 43.6948,
+    "lng": 7.2588,
+    "verified_confidence": "medium",
+    "source": "Approximation Promenade des Anglais 37. À recouper via API Adresse data.gouv.fr."
+  },
+  "classification": {
+    "stars": 5,
+    "atout_france_palace": false,
+    "atout_france_palace_first_distinction_year": null,
+    "verified_confidence": "high",
+    "source": "Le Negresco n'a pas obtenu la distinction Palace par Atout France à ce jour (mai 2026) — fait connu et parfois polémique dans la presse hôtelière française. L'hôtel reste classé 5 étoiles."
+  },
+  "history": {
+    "opening_year": 1913,
+    "founder_or_first_operator": "Henri Negresco — restaurateur d'origine roumaine, fils de cabaretier, qui finança l'hôtel avec l'aide de banquiers européens",
+    "verified_confidence": "high",
+    "key_dates": [
+      {
+        "year": 1912,
+        "event": "Construction de l'hôtel par Henri Negresco — architecte Édouard-Jean Niermans, qui dessine également l'Hôtel du Palais à Biarritz et le Casino municipal de Nice",
+        "confidence": "high"
+      },
+      {
+        "year": 1913,
+        "event": "Inauguration du Negresco le 4 janvier 1913 — soit la même année que le Plaza Athénée à Paris. Tsar Nicolas II et Empereur François-Joseph parmi les premiers hôtes",
+        "confidence": "high"
+      },
+      {
+        "year": 1920,
+        "event": "Henri Negresco perd l'hôtel à la suite de la Première Guerre mondiale et des difficultés financières — l'établissement passe en gestion bancaire",
+        "confidence": "high"
+      },
+      {
+        "year": 1957,
+        "event": "Acquisition par Paul Augier ; sa fille Jeanne Augier prend la direction effective et entreprend une rénovation patrimoniale ambitieuse",
+        "confidence": "high"
+      },
+      {
+        "year": 2019,
+        "event": "Décès de Jeanne Augier (1923-2019) — propriétaire historique du Negresco. Elle a légué l'établissement à la Fondation Mesnage qu'elle avait créée, dédiée à des œuvres pour personnes handicapées et animaux",
+        "confidence": "high"
+      },
+      {
+        "year": 2022,
+        "event": "Tournage de plusieurs scènes de la série française The Crown et de productions internationales — le Negresco reste un lieu de tournage privilégié",
+        "confidence": "medium"
+      }
+    ],
+    "cultural_references": [
+      {
+        "type": "art_collection",
+        "item": "Collection d'art monumentale et iconographique constituée par Jeanne Augier sur plusieurs décennies — œuvres notables : Nikki de Saint Phalle (Tête), Sosno (sculpture façade), Yves Klein, Salvador Dalí, Niki de Saint Phalle, Toulouse-Lautrec",
+        "confidence": "high"
+      },
+      {
+        "type": "architecture_facade",
+        "item": "Coupole rose iconique sur la façade — inspirée par la maîtresse d'Henri Negresco, qui aurait suggéré la couleur du décolleté qui plaisait au roi Edouard VII",
+        "confidence": "medium-high"
+      },
+      {
+        "type": "cinema",
+        "item": "La Folie des Grandeurs (1971) — Louis de Funès, Yves Montand — scènes parisiennes tournées au Negresco (la décoration baroque servait de fond)",
+        "confidence": "medium"
+      },
+      {
+        "type": "literature_history",
+        "item": "Salvador Dalí séjourna régulièrement au Negresco dans les années 1950-1970 ; Ernest Hemingway, Édith Piaf, Marlene Dietrich, John Lennon, les Beatles ont également résidé",
+        "confidence": "medium-high"
+      }
+    ]
+  },
+  "architecture": {
+    "main_building_style": "Belle Époque pure — bâtiment monumental construit en 14 mois (1912-1913), façade ornée, coupole rose iconique",
+    "main_building_architect": "Édouard-Jean Niermans (1859-1928) — architecte néerlandais naturalisé français, spécialiste des palaces de la Belle Époque",
+    "facade_signature": "Coupole rose iconique, mascarons sculptés, balcons en fer forgé, dimensions monumentales sur la Promenade des Anglais",
+    "interior_design_signature": {
+      "salon_royal": "Salon Royal coiffé d'une verrière Gustave Eiffel datée de 1912, lustre Baccarat de 16 309 cristaux (commande originale du tsar Nicolas II, finalement livré au Negresco)",
+      "verified_confidence": "high"
+    },
+    "verified_confidence": "high"
+  },
+  "capacity": {
+    "total_keys": 124,
+    "rooms": 95,
+    "suites": 29,
+    "signature_accommodations": [
+      {
+        "name": "Suite Belle Époque",
+        "feature": "Suite emblématique avec vue mer directe, mobilier d'époque Napoléon III"
+      },
+      {
+        "name": "Suite Catherine de Médicis",
+        "feature": "Suite thématique — chaque suite du Negresco est dédiée à un personnage ou un mouvement artistique français"
+      }
+    ],
+    "verified_confidence": "medium-high",
+    "notes_to_check": "Capacité 124 clés couramment citée ; vérifier le détail exact sur le site officiel ou Atout France"
+  },
+  "dining": [
+    {
+      "name": "Le Chantecler",
+      "type": "restaurant_signature",
+      "chef": "Virginie Basselot",
+      "current_chef": "Virginie Basselot — Meilleur Ouvrier de France (MOF) Cuisine, première femme MOF Cuisine 2015, en poste au Negresco depuis 2017",
+      "michelin_stars": 2,
+      "since_stars": "Étoiles maintenues depuis l'arrivée de Virginie Basselot ; 2ᵉ étoile décernée en 2020",
+      "cuisine": "Cuisine française moderne d'inspiration provençale et niçoise — produits maraîchers du Comté de Nice (AOP Olive de Nice, poisson de pêche locale)",
+      "verified_confidence": "high",
+      "source": "Guide Michelin France"
+    },
+    {
+      "name": "La Rotonde",
+      "type": "brasserie_carrousel",
+      "feature": "Brasserie historique sous décor de carrousel — chevaux de bois grandeur nature, ambiance fête foraine Belle Époque",
+      "verified_confidence": "high"
+    }
+  ],
+  "wellness": {
+    "spa_name": null,
+    "note": "Le Negresco ne dispose pas d'un grand spa au format des nouveaux palaces — c'est l'une des spécificités assumées de l'établissement, qui mise sur le patrimoine plutôt que sur les standards spa contemporains",
+    "facilities_basic": ["fitness_room", "treatment_room_on_demand"],
+    "verified_confidence": "medium-high"
+  },
+  "service": {
+    "languages_spoken": [
+      "français",
+      "anglais",
+      "italien",
+      "russe",
+      "allemand",
+      "espagnol",
+      "japonais"
+    ],
+    "uniform_signature": "Personnel en uniforme rouge et noir, dessiné par Pierre Cardin dans les années 1960 — signature visuelle aussi forte que la coupole rose",
+    "concierge": "Les Clefs d'Or",
+    "verified_confidence": "high"
+  },
+  "signature_features": [
+    "Coupole rose Belle Époque sur la façade — l'un des édifices les plus photographiés de la Côte d'Azur",
+    "Verrière Gustave Eiffel de 1912 dans le Salon Royal",
+    "Lustre Baccarat de 16 309 cristaux — l'un des plus grands lustres en cristal au monde",
+    "Collection d'art monumentale Jeanne Augier : Niki de Saint Phalle, Klein, Dalí, Sosno, Toulouse-Lautrec",
+    "Uniformes du personnel dessinés par Pierre Cardin dans les années 1960",
+    "Propriété détenue par la Fondation Mesnage — pas de groupe coté, pas d'investisseur étranger",
+    "Position frontale sur la Promenade des Anglais (longueur 7 km de la baie des Anges)"
+  ],
+  "nearby_pois": [
+    {
+      "name": "Promenade des Anglais",
+      "distance_m": 0,
+      "type": "promenade",
+      "note": "Promenade emblématique de 7 km le long de la Baie des Anges — créée par les hivernants britanniques dès 1820",
+      "confidence": "high"
+    },
+    {
+      "name": "Vieux-Nice",
+      "distance_m": 1800,
+      "type": "old_town",
+      "note": "Cours Saleya pour le marché aux fleurs et marché provençal — Cathédrale Sainte-Réparate, Palais Lascaris",
+      "confidence": "high"
+    },
+    {
+      "name": "Cours Saleya (marché)",
+      "distance_m": 1700,
+      "type": "market",
+      "note": "Marché aux fleurs et primeurs du mardi au dimanche matin — institution niçoise depuis le XIXᵉ siècle",
+      "confidence": "high"
+    },
+    {
+      "name": "Colline du Château",
+      "distance_m": 2400,
+      "type": "viewpoint",
+      "note": "Point culminant de la vieille ville, vue panoramique sur la Baie des Anges — accessible par ascenseur public",
+      "confidence": "high"
+    },
+    {
+      "name": "Musée Matisse",
+      "distance_m": 4200,
+      "type": "museum",
+      "note": "Villa Cimiez — collection issue du séjour de Matisse à Nice (1917-1954), où l'artiste passa la fin de sa vie",
+      "confidence": "high"
+    },
+    {
+      "name": "Musée Marc Chagall",
+      "distance_m": 3500,
+      "type": "museum",
+      "note": "Musée national consacré au cycle 'Message biblique' de Chagall",
+      "confidence": "high"
+    },
+    {
+      "name": "Cathédrale orthodoxe Saint-Nicolas",
+      "distance_m": 1900,
+      "type": "religious_building",
+      "note": "Plus grande cathédrale orthodoxe russe hors de Russie — inaugurée en 1912, financée par Nicolas II",
+      "confidence": "high"
+    },
+    {
+      "name": "Aéroport Nice Côte d'Azur",
+      "distance_m": 6500,
+      "type": "airport",
+      "note": "Deuxième aéroport français après Paris CDG/Orly — vols domestiques et internationaux",
+      "confidence": "high"
+    }
+  ],
+  "iata_insider": {
+    "advisor_name": "Sophie",
+    "advisor_role": "conseillère senior Côte d'Azur ConciergeTravel.fr",
+    "key_observation": "Le Negresco n'est pas un palace standard — c'est plutôt une maison-musée habitée, où l'on dort entouré d'œuvres d'art réellement signées et d'archives Belle Époque. Pour qui veut comprendre la Côte d'Azur historique avant le Cap, c'est l'étape culturelle obligée. Le contraste avec un Cheval Blanc épuré ou un Cap-Eden-Roc minéral est total — et c'est précisément l'intérêt.",
+    "best_for": "Amateurs de patrimoine et d'art, voyageurs sensibles à l'histoire de la Riviera, séjours culturels combinés Nice + Cimiez (musées Matisse et Chagall), couples romantiques préférant l'atmosphère 'résidence d'artiste' au style 'resort'.",
+    "honest_caveat": "Pas de spa moderne au format des palaces concurrents (assumé). Certaines chambres standards sont plus modestes en surface que dans un Cheval Blanc ou un Cap-Eden-Roc. Localisation très urbaine — bruit du boulevard certains soirs côté Promenade. L'absence de distinction Palace Atout France est parfois mentionnée, mais ne dit rien de la qualité réelle de l'expérience.",
+    "alternative_recommendation": "Pour le même bord de mer en mode resort + spa : Cap-Eden-Roc (Antibes, à 35 km). Pour le format palace urbain plus moderne : Hôtel de Paris Monte-Carlo. Pour combiner Nice culture + plage : nuit Negresco + déjeuner Plage de la Réserve à Beaulieu."
+  },
+  "pricing_indication": {
+    "low_season_classic_room_from_eur": 480,
+    "high_season_classic_room_from_eur": 850,
+    "suite_belle_epoque_from_eur": 2500,
+    "verified_confidence": "low",
+    "note": "Fourchettes indicatives 2024-2025. Tarifs sensiblement inférieurs aux palaces Atout France parisiens et antibois — positionnement plus accessible relatif."
+  },
+  "operational": {
+    "opening_dates": "Ouvert toute l'année (ouverture continue depuis 1913, sauf rénovations ponctuelles)",
+    "renovation_pattern": "Rénovations chambre par chambre menées par Jeanne Augier jusqu'en 2019 ; programme de rénovation continue depuis sous l'égide de la Fondation Mesnage",
+    "verified_confidence": "medium-high"
+  },
+  "sources": [
+    {
+      "type": "wikipedia_fr",
+      "url": "https://fr.wikipedia.org/wiki/Hôtel_Negresco",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "wikidata",
+      "qid": "Q1473041",
+      "url": "https://www.wikidata.org/wiki/Q1473041",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "official",
+      "url": "https://www.hotel-negresco-nice.com/",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "michelin_guide",
+      "url": "https://guide.michelin.com/fr/fr/provence-alpes-cote-d-azur/nice/restaurant/le-chantecler",
+      "consulted_at": "2026-05-12"
+    }
+  ],
+  "verification_required_before_publication": [
+    "Coordonnées GPS exactes 37 Promenade des Anglais",
+    "Capacité totale exacte chambres/suites",
+    "Statut Michelin actuel Chantecler (2 étoiles confirmées 2024-2025)",
+    "Nombre exact de cristaux du lustre Baccarat (16 309 mentionné — chiffre historique célèbre)",
+    "Liste exhaustive des artistes de la collection Augier (à recouper avec le site officiel)",
+    "Pricing ARI Amadeus en J+0",
+    "Statut actuel d'ouverture / fermeture éventuelle pour rénovation"
+  ]
+}
