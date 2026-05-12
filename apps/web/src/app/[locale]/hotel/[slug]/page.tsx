@@ -67,23 +67,34 @@ import {
 } from '@/server/hotels/get-hotel-by-slug';
 
 /**
- * Rendering mode (Sprint 4.1 refactor):
+ * Rendering mode (Sprint 4.1 refactor + Phase 11.8 follow-up):
  *
  *  - The shared layout no longer reads `cookies()` — the auth area
  *    became a client island (`<AuthArea />`), so the layout tree is
  *    static again.
  *  - The page still accepts stay-window `searchParams` (`checkIn`,
  *    `checkOut`, `adults`, `children`) that legitimately change the
- *    booking form + price comparator output for every request, so
- *    Next.js will treat each unique stay as its own dynamic render
- *    while the slug + locale combination stays cacheable.
- *  - We therefore opt into **ISR with `revalidate = 3600`**: cold
- *    renders are SSR'd, hot renders served from the CDN, and the slug
- *    catalog is pre-rendered at build time via `generateStaticParams`.
+ *    booking form + price comparator output for every request.
+ *  - It also emits multiple `<JsonLdScript>` blocks that read the
+ *    per-request CSP nonce via `next/headers#headers()`. The
+ *    combination of `searchParams` + `headers()` + a declared
+ *    `revalidate` value caused the production build to throw
+ *    `DYNAMIC_SERVER_USAGE` on the first cold render (visible as a
+ *    bare 500 page in `next start`), because Next.js cannot
+ *    pre-cache a route that touches request-bound data on every
+ *    render.
+ *  - We therefore opt the route into **full dynamic rendering**
+ *    (`force-dynamic`). The HTML is still served fast: the page is
+ *    a pure Server Component, every upstream call is either cached
+ *    in Redis (Amadeus sentiment) or feeds from a `pgrest` row
+ *    Supabase already keeps hot. Re-introducing ISR is tracked as a
+ *    follow-up that requires migrating JsonLdScript off `headers()`
+ *    (the only outstanding dynamic API in this tree).
  *
- * See ADR-0007 (Sprint 4.1).
+ * See ADR-0007 (Sprint 4.1) + commit message in this PR for the
+ * production reproduction (a11y test build, fake-hotel SSR).
  */
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
