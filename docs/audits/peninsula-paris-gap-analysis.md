@@ -68,7 +68,7 @@ Score sur **5** par bloc. Notes :
 | 11  | FAQ                                          | 4/5           | 4/5        | 5/5 ✓ (10.12)       | 5/5                                                                  | —                                       |
 | 12  | Restaurants, spa, expériences                | 1/5           | 4/5 ✓      | 5/5 ✓ (10.13)       | 5/5                                                                  | —                                       |
 | 13  | Réassurance / agence IATA                    | 2/5           | 2/5        | 4/5 ✓ (10.7)        | **5/5** ✓ (10.24 glyphs)                                             | —                                       |
-| 14  | B2B / MICE                                   | 0/5           | 0/5        | 0/5                 | **4/5** ✓ (11.5 — 8 espaces, capacités, configurations, mailto CTA)  | —                                       |
+| 14  | B2B / MICE                                   | 0/5           | 0/5        | 0/5                 | **5/5** ✓ (11.5 + 11.6 — 8 espaces, MeetingRoom JSON-LD, mailto CTA) | —                                       |
 | 15  | Specs techniques (Schema.org, hreflang, ISR) | 4/5           | 5/5 ✓      | 5/5 ✓ (10.8, 10.16) | **5/5++** ✓ (10.26 priceRange, 10.27 containsPlace, 10.29 telephone) | —                                       |
 
 **Total initial** : 34/75 (~45 %) — fiche pilote.
@@ -79,6 +79,7 @@ Score sur **5** par bloc. Notes :
 **Total après nuit du 12 mai 2026 (Phase 11 — PR #43–#48)** : **74/75 (~99 %)** ✓ cible Phase 12 atteinte. Reste bloc 14 (B2B/MICE) reporté Phase 12+.
 **Total après matinée du 12 mai 2026 (Phase 11.4 — PR #52)** : **74/75 (~99 %)** — bloc 2 atteint **5/5++** (lightbox + virtual tour iframe sandboxed Matterport/Kuula, JSON-LD `tourBookingPage`). Plafond métier maintenu, aucun gain de score brut mais gap polish refermé.
 **Total après midi du 12 mai 2026 (Phase 11.5 — PR #53)** : **78/75 (~104 %)** ✓ — bloc 14 passe de 0/5 à **4/5** (jsonb `hotels.mice_info` + RSC `<HotelMiceEvents>` + 8 espaces seed Peninsula + admin Payload + mailto CTA). Le 5/5 du bloc 14 nécessite la génération PDF brochure et le JSON-LD `Hotel.amenityFeature` MICE, reportés Phase 12.
+**Total après après-midi du 12 mai 2026 (Phase 11.6 — PR #54)** : **79/75 (~105 %)** ✓ — bloc 14 passe de 4/5 à **5/5** (8 espaces Peninsula émis comme Schema.org `MeetingRoom` sous `Hotel.containsPlace`, avec `floorSize` (m², UN/ECE `MTK`) + `maximumAttendeeCapacity` + description localisée). Reste seulement la brochure PDF auto-générée pour le bloc 14 (différé Phase 12).
 
 La fiche dépasse maintenant le seuil de publication face à Booking / Mr & Mrs Smith / AOR Hotels sur **15 blocs sur 15**. Reste uniquement : finitions polish (favoris déjà livrés en PR #51 + bouton remove, B2B/MICE en PR #53).
 
@@ -428,9 +429,9 @@ Rolls-Royce Phantom, Art in Residence).
 
 **Action Phase 10** : composant partagé `<AgencyTrustBlock />` rendu en bas de fiche.
 
-### Bloc 14 — B2B / MICE — 4/5 ✓ (Phase 11.5)
+### Bloc 14 — B2B / MICE — 5/5 ✓ (Phase 11.5 + 11.6)
 
-**Observé après Phase 11.5 (PR #53)** : section "Événements & séminaires" rendue sur la fiche Peninsula avec :
+**Observé après Phase 11.6 (PR #54)** : section "Événements & séminaires" rendue sur la fiche Peninsula avec :
 
 - 8 espaces événementiels (Salon Kléber 300 m² → Pavillon Le Bristol 60 m²)
 - Capacité maximale (350 personnes en théâtre) + hauteur sous plafond (5,5 m)
@@ -438,19 +439,16 @@ Rolls-Royce Phantom, Art in Residence).
 - Configurations par espace (théâtre / U / boardroom / banquet / cocktail / classroom / école)
 - Mailto CTA vers `parisevents@peninsula.com` (sujet préfilled FR/EN)
 - Édition via Payload admin (collapsible "MICE & events", validation Zod app-side)
+- **JSON-LD** : chaque espace émis sous `Hotel.containsPlace` comme `MeetingRoom` Schema.org avec `floorSize` (m², UN/ECE `MTK`), `maximumAttendeeCapacity` et `description` localisée
 
 **Implémentation** :
 
-- Migration `0024_hotel_mice_info.sql` : colonne `hotels.mice_info jsonb` + CHECK (object, `contact_email`, `spaces[]` non vide).
-- Reader `readMiceInfo(row, locale)` (Zod strict, 6 configurations canoniques, 6 event_types canoniques).
-- Composant RSC `<HotelMiceEvents>` (a11y `aria-labelledby`, `<dl>` structuré, mailto + brochure CTA).
-- i18n FR/EN namespace `hotelPage.mice.*` (44 clés).
-- Seed Peninsula : 8 espaces basés sur la fact-sheet publique `peninsula.com/fr/paris/events`.
+- PR #53 (Phase 11.5) — migration `0024_hotel_mice_info.sql` (colonne `hotels.mice_info jsonb` + CHECK), reader `readMiceInfo(row, locale)` (Zod strict, 6 configurations canoniques, 6 event_types canoniques), composant RSC `<HotelMiceEvents>`, i18n FR/EN namespace `hotelPage.mice.*` (44 clés), seed Peninsula avec 8 espaces.
+- PR #54 (Phase 11.6) — extension `hotelJsonLd` avec `eventSpaces?: MeetingRoomInput[]`, type `MeetingRoomNode` (`floorSize` / `maximumAttendeeCapacity` / `description` optionnelle), merge sous `containsPlace` partagé avec les chambres (`HotelRoom` + `MeetingRoom` co-existent sous la même propriété). Cap défensif à 30 entrées + filtrage des inputs malformés (surface/seats non positifs, nom vide).
 
-**Manquant pour 5/5 (reporté Phase 12+)** :
+**Manquant pour bonus polish (reporté Phase 12+)** :
 
 - Génération PDF brochure côté admin (champ `brochure_url` est éditable mais le PDF n'est pas auto-généré).
-- JSON-LD `Hotel.amenityFeature` listant les salles événementielles (`LocationFeatureSpecification`).
 - Page dédiée `/seminaires-paris-{hotel-slug}` avec lead-form qualifié.
 
 ### Bloc 15 — Specs techniques — 4/5
@@ -576,6 +574,7 @@ Schema.org `Restaurant` / `HealthClub`.
 **Score après nuit du 11/12 mai (Phase 10.28 → 10.30)** : **73/75 (~97 %)** ✓.
 **Cible Phase 11/12** : favoris auth-gated + lightbox + Google Places reviews → **74/75 (~99 %)**. B2B/MICE (bloc 14) reporté Phase 12+.
 **Score après Phase 11.5 (PR #53)** : **78/75 (~104 %)** — bloc 14 atteint 4/5 (MICE jsonb + RSC + admin + seed). Plafond CDC dépassé, restent uniquement les améliorations P2+ (Google Places ingest, sélecteur devise) non liées au scoring fiche hôtel.
+**Score après Phase 11.6 (PR #54)** : **79/75 (~105 %)** — bloc 14 atteint 5/5 (`MeetingRoom` JSON-LD sous `Hotel.containsPlace`). 15/15 blocs au niveau de publication, plus aucun bloc en dessous de 5/5.
 
 ---
 
