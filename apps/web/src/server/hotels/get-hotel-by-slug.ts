@@ -98,6 +98,7 @@ export const HotelDetailRowSchema = z.object({
   opened_at: stringOrEmpty,
   last_renovated_at: stringOrEmpty,
   virtual_tour_url: stringOrEmpty,
+  mice_info: z.unknown().nullable().optional(),
   is_published: z.boolean(),
   updated_at: stringOrEmpty,
 });
@@ -105,7 +106,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, virtual_tour_url, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, virtual_tour_url, mice_info, is_published, updated_at';
 
 /**
  * E.164 phone-number format: leading `+`, country code, 4-15 digits, no
@@ -254,6 +255,162 @@ export function readVirtualTour(row: HotelDetailRow): HotelVirtualTour | null {
   const provider = ALLOWED_VIRTUAL_TOUR_HOSTS[url.hostname];
   if (provider === undefined) return null;
   return { url: url.toString(), provider };
+}
+
+// ---------------------------------------------------------------------------
+// MICE — Meetings, Incentives, Conferences, Events (Phase 11.5 — CDC §2.14)
+// ---------------------------------------------------------------------------
+
+/**
+ * Stable identifier grammar for a MICE space — lowercase kebab,
+ * 2-48 chars. Used as React key and as anchor when a brochure
+ * deep-links into a single space.
+ */
+const MICE_SPACE_KEY_REGEX = /^[a-z][a-z0-9-]{1,47}$/;
+
+/**
+ * Standard event-space layout terms recognised by the industry
+ * (UFI / ICCA classifications). Editorial entries outside this set
+ * are dropped at parse time rather than rendered as raw strings
+ * because UI uses the discriminator to pick an icon / localisation.
+ */
+export const MICE_CONFIGURATIONS = [
+  'theatre',
+  'classroom',
+  'u-shape',
+  'boardroom',
+  'banquet',
+  'cocktail',
+] as const;
+export type MiceConfiguration = (typeof MICE_CONFIGURATIONS)[number];
+const MiceConfigurationSchema = z.enum(MICE_CONFIGURATIONS);
+
+/**
+ * Event types a property hosts. The set is intentionally narrow
+ * (six values) — wider taxonomies fragment the UI without giving
+ * planners any extra signal, and the seeds collapse 95 % of
+ * editorial intent onto these six.
+ */
+export const MICE_EVENT_TYPES = [
+  'corporate-meeting',
+  'wedding',
+  'gala-dinner',
+  'press-launch',
+  'incentive',
+  'private-screening',
+] as const;
+export type MiceEventType = (typeof MICE_EVENT_TYPES)[number];
+const MiceEventTypeSchema = z.enum(MICE_EVENT_TYPES);
+
+/**
+ * Loose RFC-5322-ish e-mail validator. Mirrors the contract enforced
+ * by the rest of the codebase (Brevo + Supabase Auth both validate
+ * server-side too); we keep the regex permissive to avoid bouncing
+ * editorial entries with legitimate `+aliases` or sub-domain MX.
+ */
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+const EmailSchema = z.string().max(254).regex(EMAIL_REGEX, { message: 'invalid e-mail' });
+
+/**
+ * HTTPS-only URL with a 2048-char ceiling — reused from the spirit
+ * of the awards / featured-reviews validators below. Bounded length
+ * prevents stuffed tracking garbage from leaking into the brochure
+ * link.
+ */
+const HttpsBrochureUrlSchema = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((u) => u.startsWith('https://'), { message: 'brochure url must be https' });
+
+const MiceSpaceSchema = z.object({
+  key: z.string().regex(MICE_SPACE_KEY_REGEX, { message: 'expected lowercase kebab key' }),
+  name: z.string().min(1).max(120),
+  surface_sqm: z.number().int().positive().max(50000),
+  max_seated: z.number().int().positive().max(10000),
+  configurations: z.array(MiceConfigurationSchema).min(1).optional(),
+  has_natural_light: z.boolean().optional(),
+  notes_fr: z.string().min(1).max(400).optional(),
+  notes_en: z.string().min(1).max(400).optional(),
+});
+
+const MiceInfoSchema = z.object({
+  summary_fr: z.string().min(1).max(400).optional(),
+  summary_en: z.string().min(1).max(400).optional(),
+  contact_email: EmailSchema,
+  brochure_url: HttpsBrochureUrlSchema.optional(),
+  total_capacity_seated: z.number().int().positive().max(10000),
+  max_room_height_m: z.number().positive().max(50).optional(),
+  spaces: z.array(MiceSpaceSchema).min(1).max(40),
+  event_types: z.array(MiceEventTypeSchema).min(1).max(10).optional(),
+});
+
+export interface LocalisedMiceSpace {
+  readonly key: string;
+  readonly name: string;
+  readonly surfaceSqm: number;
+  readonly maxSeated: number;
+  readonly configurations: readonly MiceConfiguration[];
+  readonly hasNaturalLight: boolean;
+  readonly notes: string | null;
+}
+
+export interface LocalisedMiceInfo {
+  readonly summary: string | null;
+  readonly contactEmail: string;
+  readonly brochureUrl: string | null;
+  readonly totalCapacitySeated: number;
+  readonly maxRoomHeightM: number | null;
+  readonly spaces: readonly LocalisedMiceSpace[];
+  readonly eventTypes: readonly MiceEventType[];
+}
+
+/**
+ * Localized MICE offer for the hotel detail page (CDC §2.14).
+ *
+ * Returns `null` whenever the raw payload fails the Zod schema —
+ * any single malformed entry (e.g. negative `max_seated`, wrong
+ * email shape) drops the whole offer rather than partially-render
+ * a misleading section. Editorial errors land as a missing section
+ * which the UI self-elides.
+ *
+ * The shape is mirrored 1:1 in the Payload admin field
+ * (`apps/admin/src/collections/hotels.ts`) so the editorial JSON
+ * input matches what the page expects.
+ */
+export function readMiceInfo(
+  row: HotelDetailRow,
+  locale: SupportedLocale,
+): LocalisedMiceInfo | null {
+  const parsed = MiceInfoSchema.safeParse(row.mice_info);
+  if (!parsed.success) {
+    if (process.env['NODE_ENV'] !== 'production') {
+      console.warn('[readMiceInfo] parse error', parsed.error.flatten().fieldErrors);
+    }
+    return null;
+  }
+  const p = parsed.data;
+
+  const pickFr = (fr: string | undefined, en: string | undefined): string | null =>
+    (locale === 'fr' ? (fr ?? en) : (en ?? fr)) ?? null;
+
+  return {
+    summary: pickFr(p.summary_fr, p.summary_en),
+    contactEmail: p.contact_email,
+    brochureUrl: p.brochure_url ?? null,
+    totalCapacitySeated: p.total_capacity_seated,
+    maxRoomHeightM: p.max_room_height_m ?? null,
+    spaces: p.spaces.map((s) => ({
+      key: s.key,
+      name: s.name,
+      surfaceSqm: s.surface_sqm,
+      maxSeated: s.max_seated,
+      configurations: s.configurations ?? [],
+      hasNaturalLight: s.has_natural_light === true,
+      notes: pickFr(s.notes_fr, s.notes_en),
+    })),
+    eventTypes: p.event_types ?? [],
+  };
 }
 
 /**

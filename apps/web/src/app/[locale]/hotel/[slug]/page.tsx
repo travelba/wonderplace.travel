@@ -16,6 +16,7 @@ import { HotelFavoriteButton } from '@/components/hotel/hotel-favorite-button';
 import { HotelShareButton } from '@/components/hotel/hotel-share-button';
 import { HotelGallery } from '@/components/hotel/hotel-gallery';
 import { HotelLocation } from '@/components/hotel/hotel-location';
+import { HotelMiceEvents } from '@/components/hotel/hotel-mice-events';
 import { HotelPolicies } from '@/components/hotel/hotel-policies';
 import { HotelReassurance } from '@/components/hotel/hotel-reassurance';
 import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
@@ -52,6 +53,7 @@ import {
   readHotelStory,
   readInventoryCounts,
   readLocation,
+  readMiceInfo,
   readPhoneE164,
   readPolicies,
   readPostalCode,
@@ -349,6 +351,7 @@ async function renderHotelPage(
   const heroPublicId = readHeroImage(row);
   const galleryImages = readGallery(row, locale, name);
   const virtualTour = readVirtualTour(row);
+  const miceInfo = readMiceInfo(row, locale);
   const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const heroDescriptor =
     heroPublicId !== null ? { publicId: heroPublicId, alt: galleryImages[0]?.alt ?? name } : null;
@@ -971,6 +974,8 @@ async function renderHotelPage(
         longitude={row.longitude}
         location={location}
       />
+
+      <HotelMiceEvents locale={locale} hotelName={name} mice={miceInfo} />
 
       <section aria-labelledby="rooms-title" className="mb-12">
         <h2 id="rooms-title" className="text-fg mb-4 font-serif text-2xl">

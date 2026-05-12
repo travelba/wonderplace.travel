@@ -498,6 +498,50 @@
         "kuula": "Kuula"
       }
     },
+    "mice": {
+      "title": "Événements & séminaires",
+      "introFallback": "Organisez vos événements professionnels au {name} : conférences, séminaires, mariages et réceptions privées dans des espaces signature.",
+      "headline": {
+        "spaces": "Espaces événementiels",
+        "capacity": "Capacité maximale",
+        "capacityValue": "{count, plural, one {# personne} other {# personnes}}",
+        "height": "Hauteur sous plafond"
+      },
+      "eventTypes": {
+        "label": "Types d'événements",
+        "values": {
+          "corporate-meeting": "Réunions d'entreprise",
+          "wedding": "Mariages",
+          "gala-dinner": "Dîners de gala",
+          "press-launch": "Lancements presse",
+          "incentive": "Voyages incentive",
+          "private-screening": "Projections privées"
+        }
+      },
+      "spacesTitle": "Espaces disponibles",
+      "space": {
+        "surfaceLabel": "Surface",
+        "surfaceValue": "{count} m²",
+        "seatedLabel": "Capacité",
+        "seatedValue": "{count, plural, one {# pers.} other {# pers.}}",
+        "naturalLight": "Lumière naturelle",
+        "configLabel": "Configurations"
+      },
+      "configurations": {
+        "theatre": "Théâtre",
+        "classroom": "École",
+        "u-shape": "U",
+        "boardroom": "Conseil",
+        "banquet": "Banquet",
+        "cocktail": "Cocktail"
+      },
+      "contactIntro": "Demandez une proposition personnalisée pour votre événement au {name}.",
+      "contactCta": "Contacter l'équipe événements",
+      "contactSubject": "Demande d'information événementielle — {name}",
+      "contactAria": "Contacter l'équipe MICE de {name} par e-mail",
+      "brochureCta": "Brochure événementielle",
+      "brochureSrHint": "PDF, ouvre dans un nouvel onglet"
+    },
     "reviewCategories": {
       "scoreOf": "{score} / 100",
       "scoreAria": "{category} : {score} sur 100",

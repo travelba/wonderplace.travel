@@ -707,6 +707,105 @@ const SIGNATURE_EXPERIENCES = [
   },
 ];
 
+/**
+ * MICE offer (Meetings, Incentives, Conferences, Events) — Phase 11.5.
+ *
+ * The Peninsula Paris operates eight private event spaces totalling
+ * ~860 m² of dedicated event surface. The hero space is the **Salon
+ * Kléber** (300 m², up to 350 in theatre layout). Editorial figures
+ * from the property's published events fact-sheet:
+ *   https://www.peninsula.com/fr/paris/events/meetings-events
+ *
+ * Contact e-mail mirrors the public address on peninsula.com/fr
+ * (sales/events team). It's an editorial test value here; production
+ * data should pull from the property's CRM (Phase 12).
+ *
+ * `total_capacity_seated` is the max single-event guest count (Salon
+ * Kléber theatre layout), NOT the sum of all room capacities — UX
+ * intent is "biggest single party you can host", which is the
+ * planner's first qualifier.
+ */
+const MICE_INFO = {
+  summary_fr:
+    "Huit espaces événementiels privatifs dans un palace de l'avenue Kléber : du Salon Kléber (350 personnes en théâtre) au Pavillon Le Bristol, en passant par des salles à la lumière naturelle plein sud sur cour.",
+  summary_en:
+    'Eight private event spaces in a palace on Avenue Kléber: from the Salon Kléber (350 theatre-style) to the Pavillon Le Bristol, including south-facing courtyard rooms with natural light.',
+  contact_email: 'parisevents@peninsula.com',
+  total_capacity_seated: 350,
+  max_room_height_m: 5.5,
+  spaces: [
+    {
+      key: 'salon-kleber',
+      name: 'Salon Kléber',
+      surface_sqm: 300,
+      max_seated: 350,
+      configurations: ['theatre', 'banquet', 'cocktail', 'classroom'],
+      has_natural_light: true,
+      notes_fr: 'Salle de bal principale, lumière naturelle, plafond à 5,5 m.',
+      notes_en: 'Main ballroom, natural light, 5.5 m ceiling.',
+    },
+    {
+      key: 'salon-belle-epoque',
+      name: 'Salon Belle Époque',
+      surface_sqm: 140,
+      max_seated: 120,
+      configurations: ['theatre', 'banquet', 'cocktail'],
+      has_natural_light: true,
+    },
+    {
+      key: 'salon-kleber-bar',
+      name: 'Salon Kléber Bar',
+      surface_sqm: 80,
+      max_seated: 70,
+      configurations: ['cocktail', 'banquet'],
+      has_natural_light: false,
+    },
+    {
+      key: 'salon-haussmann',
+      name: 'Salon Haussmann',
+      surface_sqm: 90,
+      max_seated: 80,
+      configurations: ['theatre', 'u-shape', 'boardroom', 'banquet'],
+      has_natural_light: true,
+    },
+    {
+      key: 'salon-trocadero',
+      name: 'Salon Trocadéro',
+      surface_sqm: 75,
+      max_seated: 60,
+      configurations: ['theatre', 'u-shape', 'boardroom'],
+      has_natural_light: true,
+    },
+    {
+      key: 'salon-etoile',
+      name: 'Salon Étoile',
+      surface_sqm: 60,
+      max_seated: 40,
+      configurations: ['boardroom', 'u-shape'],
+      has_natural_light: false,
+    },
+    {
+      key: 'salon-iena',
+      name: 'Salon Iéna',
+      surface_sqm: 55,
+      max_seated: 35,
+      configurations: ['boardroom', 'classroom'],
+      has_natural_light: true,
+    },
+    {
+      key: 'pavillon-le-bristol',
+      name: 'Pavillon Le Bristol',
+      surface_sqm: 60,
+      max_seated: 40,
+      configurations: ['banquet', 'cocktail'],
+      has_natural_light: true,
+      notes_fr: 'Pavillon de verre dans la cour intérieure, idéal pour les cocktails privés.',
+      notes_en: 'Glass pavilion in the inner courtyard, perfect for private cocktails.',
+    },
+  ],
+  event_types: ['corporate-meeting', 'wedding', 'gala-dinner', 'press-launch', 'incentive'],
+};
+
 const POLICIES = {
   check_in: {
     // Peninsula Time programme allows check-in from 6:00 AM (subject to
@@ -1126,6 +1225,10 @@ const HOTEL_RECORD = {
   virtual_tour_url: null as string | null,
 };
 
+// Re-typed reference so the SQL builder below doesn't have to repeat
+// the literal constant inside template parts.
+const HOTEL_MICE = MICE_INFO;
+
 /**
  * Round-trip through `JSON.stringify` + `JSON.parse` to convert any
  * `readonly` / branded TS types into the plain JSON-shaped value that
@@ -1174,7 +1277,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       google_place_id, google_rating, google_reviews_count,
       phone_e164,
       opened_at, last_renovated_at,
-      virtual_tour_url
+      virtual_tour_url,
+      mice_info
     )
     values (
       ${HOTEL_RECORD.slug}, ${HOTEL_RECORD.slug_en}, ${HOTEL_RECORD.name}, ${HOTEL_RECORD.name_en},
@@ -1203,7 +1307,8 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       ${HOTEL_RECORD.google_place_id}, ${HOTEL_RECORD.google_rating}, ${HOTEL_RECORD.google_reviews_count},
       ${HOTEL_RECORD.phone_e164},
       ${HOTEL_RECORD.opened_at}, ${HOTEL_RECORD.last_renovated_at},
-      ${HOTEL_RECORD.virtual_tour_url}
+      ${HOTEL_RECORD.virtual_tour_url},
+      ${sql.json(toJson(HOTEL_MICE))}
     )
     on conflict (slug) do update set
       slug_en = excluded.slug_en,
@@ -1251,6 +1356,7 @@ async function upsertHotel(sql: postgres.TransactionSql): Promise<string> {
       opened_at = excluded.opened_at,
       last_renovated_at = excluded.last_renovated_at,
       virtual_tour_url = excluded.virtual_tour_url,
+      mice_info = excluded.mice_info,
       updated_at = timezone('utc', now())
     returning id, (xmax = 0) as inserted
   `;

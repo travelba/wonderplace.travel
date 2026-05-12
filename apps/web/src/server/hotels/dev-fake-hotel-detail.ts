@@ -94,6 +94,11 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     // No virtual tour for the synthetic E2E hotel — keeps the iframe
     // off the test page so smoke specs don't have to mock Matterport.
     virtual_tour_url: null,
+    // No MICE section on the synthetic E2E hotel — keeps the test page
+    // free of the B2B section so smoke specs aren't tempted to assert
+    // on event-spaces data that doesn't match the leisure tunnel they
+    // exercise.
+    mice_info: null,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
     // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the
