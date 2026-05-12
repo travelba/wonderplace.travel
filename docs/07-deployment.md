@@ -11,4 +11,8 @@
 > - Rollback : Vercel Promote previous + Supabase PITR (Point-in-Time-Recovery).
 > - Health endpoint : `/api/health` ping Supabase / Redis / Algolia / Amadeus.
 
+## Runbooks ops
+
+- [`docs/runbooks/vercel-setup.md`](runbooks/vercel-setup.md) — setup et reconfiguration du projet Vercel `wonderplace-travel` (Root Directory, Node version, env vars, redeploy, rollback, diagnostic).
+
 Skill : `cicd-release-management`.

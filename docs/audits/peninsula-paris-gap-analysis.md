@@ -547,6 +547,22 @@ Schema.org `Restaurant` / `HealthClub`.
 
 ---
 
+## 5bis. Infra & déploiement — gaps non-CDC (Phase 11)
+
+Hors §2, mais bloquants pour livrer un preview observable et une prod fiable.
+
+| Sujet                              | État au 12 mai                                                                       | Action                                                                                                                                          | Prio | Statut   |
+| ---------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---- | -------- |
+| Vercel `wonderplace-travel` deploy | 20+ deploys ERROR                                                                    | Root Directory `apps/web` à set dashboard + `apps/web/vercel.json` ajouté — voir [`docs/runbooks/vercel-setup.md`](../runbooks/vercel-setup.md) | P1   | en cours |
+| Vercel `apps/admin` (Payload)      | aucun projet                                                                         | Créer un 2ᵉ projet Vercel dédié — runbook §2                                                                                                    | P2   | ouvert   |
+| ESLint v9 flat config              | preset legacy `.eslintrc`                                                            | Migrer `packages/config/src/eslint/*.cjs` vers `eslint.config.js`, réactiver le job CI `Lint`                                                   | P2   | ouvert   |
+| Root layout `apps/web`             | `<html>`/`<body>` dans `[locale]/layout.tsx` → `/404` prerender échoue en build prod | Restructurer pour root layout owns `<html>` + `<body>`, locale layout owns provider, réactiver le job CI `Build`                                | P2   | ouvert   |
+| Root layout `apps/admin`           | même quirk Next.js 15 + Payload v3 static export                                     | Symétrie de l'action `apps/web`                                                                                                                 | P3   | ouvert   |
+| Vercel env vars production         | tout en `SKIP_ENV_VALIDATION=true` par défaut                                        | Câbler Supabase, Cloudinary, Upstash, Algolia, Brevo, Sentry, Makcorps (3 scopes : Production, Preview, Development)                            | P2   | ouvert   |
+| DNS `www.conciergetravel.fr`       | non rattaché                                                                         | Une fois deploy stable, mapper le domaine Vercel — runbook §3                                                                                   | P3   | ouvert   |
+
+---
+
 ## 6. Gaps schéma Supabase à combler
 
 Migrations Phase 10 livrées :
