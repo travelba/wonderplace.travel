@@ -94,11 +94,37 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
     // No virtual tour for the synthetic E2E hotel — keeps the iframe
     // off the test page so smoke specs don't have to mock Matterport.
     virtual_tour_url: null,
-    // No MICE section on the synthetic E2E hotel — keeps the test page
-    // free of the B2B section so smoke specs aren't tempted to assert
-    // on event-spaces data that doesn't match the leisure tunnel they
-    // exercise.
-    mice_info: null,
+    // Minimal MICE entry so the a11y scan can validate the section's
+    // landmarks, headings, mailto CTA and structured `<dl>` list. The
+    // payload is intentionally tiny (one space, two event types) so
+    // it doesn't pollute the leisure-tunnel specs which assert against
+    // the rooms grid, the FAQ and the booking CTA.
+    mice_info: {
+      summary_fr: 'Deux espaces événementiels privatifs au cœur de Paris pour vos réceptions.',
+      summary_en: 'Two private event spaces in the heart of Paris for your receptions.',
+      contact_email: 'events@hoteldetest.example',
+      total_capacity_seated: 80,
+      max_room_height_m: 4.2,
+      event_types: ['corporate-meeting', 'wedding'],
+      spaces: [
+        {
+          key: 'salon-test',
+          name: 'Salon de Test',
+          surface_sqm: 120,
+          max_seated: 80,
+          configurations: ['theatre', 'banquet'],
+          has_natural_light: true,
+        },
+        {
+          key: 'salle-conseil',
+          name: 'Salle Conseil',
+          surface_sqm: 40,
+          max_seated: 20,
+          configurations: ['boardroom', 'u-shape'],
+          has_natural_light: false,
+        },
+      ],
+    },
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
     // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the
