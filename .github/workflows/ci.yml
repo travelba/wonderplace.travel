@@ -12,15 +12,15 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 20.18.1
+  NODE_VERSION: 20.19.4
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
   SKIP_ENV_VALIDATION: "true"
-  # Corepack bundled with Node 20.18.1 ships outdated pnpm signing keys
-  # and fails with "Cannot find matching keyid" when activating
-  # pnpm@10.33.2. We both (a) upgrade corepack to the latest version
-  # in the install step and (b) disable signature verification entirely
-  # as a belt-and-braces fallback.
+  # Some transitive deps (e.g. eslint-visitor-keys@5) require Node
+  # >=20.19, so we pin a recent 20.x LTS. Corepack on older Node 20
+  # also shipped outdated pnpm signing keys; we both upgrade corepack
+  # at install time and relax its strict/signature checks as a
+  # belt-and-braces fallback.
   COREPACK_ENABLE_STRICT: "0"
   COREPACK_ENABLE_SIGNATURES: "0"
 
