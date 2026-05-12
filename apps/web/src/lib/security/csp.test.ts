@@ -34,6 +34,12 @@ describe('buildCspHeader', () => {
     expect(header).toContain('https://*.amadeus.com');
   });
 
+  it('whitelists Matterport + Kuula iframe hosts (HotelVirtualTour)', () => {
+    const header = buildCspHeader({ nonce: 'n', isDev: false });
+    expect(header).toMatch(/frame-src[^;]*https:\/\/my\.matterport\.com/);
+    expect(header).toMatch(/frame-src[^;]*https:\/\/kuula\.co/);
+  });
+
   it('whitelists Supabase + Upstash + Algolia for connect-src', () => {
     const header = buildCspHeader({ nonce: 'n', isDev: false });
     expect(header).toContain('https://*.supabase.co');

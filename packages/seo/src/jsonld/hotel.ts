@@ -26,6 +26,14 @@ export type HotelNode = HotelBaseNode & {
   dateModified?: string;
   nearbyAttractions?: readonly NearbyAttractionNode[] | NearbyAttractionNode;
   containsPlace?: readonly ContainedRoomNode[] | ContainedRoomNode;
+  /**
+   * Schema.org defines `tourBookingPage` on `LodgingBusiness` as
+   * "A page providing information about how to book a tour of some
+   * Place, such as an Accommodation … as well as other kinds of
+   * tours as appropriate." schema-dts misses it on the narrower
+   * `Hotel` subtype, so we re-open the field here.
+   */
+  tourBookingPage?: string;
 };
 
 /**
@@ -150,6 +158,22 @@ export interface HotelJsonLdInput {
    * what it gets, with a defensive non-empty check.
    */
   readonly foundingDate?: string;
+  /**
+   * Optional URL of an external immersive 3D / 360° tour of the
+   * property (e.g. Matterport, Kuula). Surfaced as Schema.org
+   * `LodgingBusiness.tourBookingPage` — Google's Hotel rich-result
+   * documentation honours the field, and LLM ingestion pipelines
+   * use it to answer "Can I take a virtual tour of X?" queries.
+   *
+   * The caller is responsible for restricting the URL to a curated
+   * allowlist of providers (the reader in
+   * `apps/web/src/server/hotels/get-hotel-by-slug.ts:readVirtualTour`
+   * enforces Matterport + Kuula and mirrors the CSP `frame-src`
+   * directive in `apps/web/src/lib/security/csp.ts`). The builder
+   * itself simply forwards the value with a defensive non-empty
+   * check; it does NOT re-validate the URL shape.
+   */
+  readonly tourBookingPage?: string;
   /**
    * Points of interest within walking distance of the hotel, emitted
    * as the `nearbyAttractions` Hotel property (Google-supported
@@ -346,6 +370,9 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   }
   if (input.foundingDate !== undefined && input.foundingDate.length > 0) {
     out.foundingDate = input.foundingDate;
+  }
+  if (input.tourBookingPage !== undefined && input.tourBookingPage.length > 0) {
+    out.tourBookingPage = input.tourBookingPage;
   }
   if (input.nearbyAttractions !== undefined && input.nearbyAttractions.length > 0) {
     // Cap at 10 to keep the JSON-LD envelope tight. Google ignores

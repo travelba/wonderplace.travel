@@ -243,6 +243,22 @@ describe('hotelJsonLd', () => {
     expect(b.foundingDate).toBeUndefined();
   });
 
+  it('emits tourBookingPage when provided (Matterport / Kuula)', () => {
+    const node = hotelJsonLd({
+      name: 'Le Peninsula',
+      url: 'https://example.com/p',
+      tourBookingPage: 'https://my.matterport.com/show/?m=zEWsxhZpGba',
+    });
+    expect(node.tourBookingPage).toBe('https://my.matterport.com/show/?m=zEWsxhZpGba');
+  });
+
+  it('omits tourBookingPage when undefined or empty', () => {
+    const a = hotelJsonLd({ name: 'A', url: 'https://example.com/a' });
+    expect(a.tourBookingPage).toBeUndefined();
+    const b = hotelJsonLd({ name: 'B', url: 'https://example.com/b', tourBookingPage: '' });
+    expect(b.tourBookingPage).toBeUndefined();
+  });
+
   it('emits nearbyAttractions as TouristAttraction-flavoured Place array', () => {
     const node = hotelJsonLd({
       name: 'Le Peninsula',
