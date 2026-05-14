@@ -132,12 +132,17 @@ const isDev = process.env['NODE_ENV'] !== 'production';
 
 const baseConfig = withBundleAnalyzer(withNextIntl(nextConfig));
 
-export default isDev
-  ? baseConfig
-  : withSentryConfig(baseConfig, {
+// Skip the Sentry wrapper when the auth token is missing — otherwise the
+// post-build sourcemap upload step crashes silently (visible only as
+// "Collecting build traces ..." → Error) on Vercel preview builds where
+// Sentry credentials are intentionally not provisioned.
+const shouldWrapSentry = !isDev && sentryAuthToken !== undefined && sentryAuthToken.length > 0;
+
+export default shouldWrapSentry
+  ? withSentryConfig(baseConfig, {
       org: 'travelba',
       project: 'cct-web',
-      ...(sentryAuthToken !== undefined ? { authToken: sentryAuthToken } : {}),
+      authToken: sentryAuthToken,
       silent: process.env['CI'] !== 'true',
       widenClientFileUpload: true,
       hideSourceMaps: true,
@@ -145,4 +150,5 @@ export default isDev
       tunnelRoute: '/monitoring',
       reactComponentAnnotation: { enabled: true },
       telemetry: false,
-    });
+    })
+  : baseConfig;
