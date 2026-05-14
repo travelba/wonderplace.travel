@@ -48,6 +48,13 @@ const PoiSchema = z.object({
   confidence: ConfidenceSchema.optional(),
 });
 
+const ExternalSourceFactSchema = z.object({
+  source: z.string(),
+  url: z.string().url().optional(),
+  verbatim: z.string().min(20),
+  confidence: z.enum(['high', 'medium-high', 'medium', 'medium-low', 'low']).optional(),
+});
+
 export const BriefSchema = z.object({
   slug: z.string().min(3),
   name: z.string().min(3),
@@ -95,6 +102,7 @@ export const BriefSchema = z.object({
   pricing_indication: z.record(z.unknown()).optional(),
   operational: z.record(z.unknown()).optional(),
   sources: z.array(SourceSchema).min(2),
+  external_source_facts: z.array(ExternalSourceFactSchema).optional(),
   verification_required_before_publication: z.array(z.string()).min(1),
 });
 

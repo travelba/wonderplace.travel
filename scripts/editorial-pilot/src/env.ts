@@ -22,6 +22,16 @@ const optionalProvider = z.preprocess(
   ProviderSchema.optional(),
 );
 
+const optionalUuid = z.preprocess(
+  (v) => (typeof v === 'string' && v.trim().length === 0 ? undefined : v),
+  z
+    .string()
+    .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
+      message: 'must be a v4 UUID',
+    })
+    .optional(),
+);
+
 const EnvSchema = z
   .object({
     OPENAI_API_KEY: optionalApiKey,
@@ -29,6 +39,17 @@ const EnvSchema = z
     EDITORIAL_PILOT_PROVIDER: optionalProvider,
     EDITORIAL_PILOT_OPENAI_MODEL: z.string().min(3).default('gpt-4o-2024-11-20'),
     EDITORIAL_PILOT_ANTHROPIC_MODEL: z.string().min(3).default('claude-sonnet-4-5-20250929'),
+    DATATOURISME_API_KEY: optionalUuid,
+    DATATOURISME_API_BASE: z.string().url().default('https://api.datatourisme.fr/v1'),
+    TAVILY_API_KEY: z.preprocess(
+      (v) => (typeof v === 'string' && v.trim().length === 0 ? undefined : v),
+      z
+        .string()
+        .regex(/^tvly-(?:dev-|prod-)?[A-Za-z0-9_-]{20,}$/u, {
+          message: 'must look like tvly-… (Tavily API key)',
+        })
+        .optional(),
+    ),
   })
   .refine((v) => Boolean(v.OPENAI_API_KEY) || Boolean(v.ANTHROPIC_API_KEY), {
     message:

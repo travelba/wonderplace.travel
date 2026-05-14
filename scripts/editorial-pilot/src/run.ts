@@ -47,8 +47,9 @@ async function main(): Promise<void> {
       const lint = r.result.finalLintReport.counts;
       const initialLint = r.result.initialLintReport.counts;
       const cleanTag = r.result.finalLintReport.clean ? '✓ CLEAN' : '⚠ DIRTY';
+      const scrubTag = r.result.anchorScrub ? ' scrub✓' : '';
       console.log(
-        `  ✓ ${r.slug} — ${r.result.factCheckReport.final_recommendation} — ${tokens.input + tokens.output} tokens — linter ${initialLint.total}→${lint.total} (blocker ${initialLint.blocker}→${lint.blocker}, high ${initialLint.high}→${lint.high}) ${cleanTag}`,
+        `  ✓ ${r.slug} — ${r.result.factCheckReport.final_recommendation} — ${tokens.input + tokens.output} tokens — linter ${initialLint.total}→${lint.total} (blocker ${initialLint.blocker}→${lint.blocker}, high ${initialLint.high}→${lint.high}) ${cleanTag}${scrubTag}`,
       );
     } else {
       console.log(`  ✗ ${r.slug} — ${r.error}`);

@@ -4,3 +4,7 @@
 # frequently; a sub-second `tsc --noEmit` per package via Turbo cache
 # is the right trade-off between safety and DX.
 pnpm turbo run typecheck
+
+# Validate the agent-skills catalogue stays consistent. Cheap (<2s),
+# guards capitalisation hygiene (see .cursor/rules/skills-capitalisation.mdc).
+pnpm validate:skills

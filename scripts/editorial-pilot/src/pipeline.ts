@@ -9,9 +9,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PILOT_ROOT = resolve(__dirname, '..');
 const PROMPTS_DIR = resolve(PILOT_ROOT, 'prompts');
-const BRIEFS_DIR = resolve(PILOT_ROOT, 'briefs');
+// EDITORIAL_PILOT_BRIEFS_DIR overrides the default 'briefs' folder.
+// Used to point the pipeline at auto-generated briefs (briefs-auto/) without
+// touching the hand-crafted ones.
+const BRIEFS_DIR = resolve(PILOT_ROOT, process.env['EDITORIAL_PILOT_BRIEFS_DIR'] ?? 'briefs');
 const OUTPUT_DIR = resolve(PILOT_ROOT, 'output');
-const DOCS_PILOT_DIR = resolve(PILOT_ROOT, '../../docs/editorial/pilots');
+const DOCS_PILOT_DIR_DEFAULT = resolve(PILOT_ROOT, '../../docs/editorial/pilots');
+const DOCS_PILOT_DIR = resolve(
+  PILOT_ROOT,
+  process.env['EDITORIAL_PILOT_DOCS_DIR'] ?? DOCS_PILOT_DIR_DEFAULT,
+);
 
 interface PassResult {
   readonly passId: string;
@@ -34,6 +41,8 @@ export interface PipelineResult {
   readonly linterFixerIterations: readonly PassResult[];
   readonly initialLintReport: LinterReport;
   readonly finalLintReport: LinterReport;
+  /** Pass 7 — final anchor-scrub (suppresses residual hallucinations). Null when feature flag is off. */
+  readonly anchorScrub: PassResult | null;
   readonly final: string;
   readonly totalTokens: { input: number; output: number };
 }
@@ -113,14 +122,18 @@ export async function runPipelineForHotel(slug: string, llm: LlmClient): Promise
   console.log(`\n━━━ ${slug} ━━━`);
 
   const brief = await loadBrief(slug);
-  const [prompt1, prompt2, prompt3, prompt4, prompt5, prompt6] = await Promise.all([
+  const [prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, prompt7] = await Promise.all([
     loadPrompt('01-draft-factuel.md'),
     loadPrompt('02-variation-syntaxique.md'),
     loadPrompt('03-humanisation-magazine.md'),
     loadPrompt('04-fact-check.md'),
     loadPrompt('05-correctrice-post-fact-check.md'),
     loadPrompt('06-linter-fixer.md'),
+    loadPrompt('07-anchor-scrub.md'),
   ]);
+
+  // Pass 7 anchor-scrub can be disabled via env flag for A/B comparisons.
+  const anchorScrubEnabled = process.env['EDITORIAL_PILOT_ANCHOR_SCRUB'] !== 'false';
 
   const outputDir = resolve(OUTPUT_DIR, slug);
   await mkdir(outputDir, { recursive: true });
@@ -268,6 +281,31 @@ export async function runPipelineForHotel(slug: string, llm: LlmClient): Promise
     );
   }
 
+  // Snapshot the pre-scrub output so we can A/B-compare and audit what the scrub removed.
+  await writeFile(resolve(outputDir, '06-post-linter.md'), final, 'utf-8');
+
+  // Pass 7 — anchor-scrub : final chirurgical removal/softening of residual hallucinations.
+  let anchorScrub: PassResult | null = null;
+  if (anchorScrubEnabled) {
+    anchorScrub = await runPass(
+      llm,
+      'pass-7',
+      'anchor-scrub final',
+      prompt7,
+      `=== BRIEF JSON ===\n${JSON.stringify(brief, null, 2)}\n\n=== TEXTE FINAL POST-LINTER (Pass 6) ===\n${final}`,
+      { temperature: 0.1, maxTokens: 5500 },
+    );
+    const scrubbed = stripCodeFence(anchorScrub.content);
+    if (scrubbed.length > 0) {
+      final = scrubbed;
+      await writeFile(resolve(outputDir, '07-anchor-scrub.md'), final, 'utf-8');
+      console.log(`  → Pass 7 anchor-scrub applied (${anchorScrub.outputTokens} out tokens)`);
+    } else {
+      console.warn(`  ⚠ Pass 7 anchor-scrub returned empty content — keeping post-linter version`);
+      anchorScrub = null;
+    }
+  }
+
   await writeFile(resolve(outputDir, 'final.md'), final, 'utf-8');
 
   await mkdir(DOCS_PILOT_DIR, { recursive: true });
@@ -285,14 +323,16 @@ export async function runPipelineForHotel(slug: string, llm: LlmClient): Promise
       humanisation.inputTokens +
       factCheck.inputTokens +
       (correction?.inputTokens ?? 0) +
-      linterFixerTokens.input,
+      linterFixerTokens.input +
+      (anchorScrub?.inputTokens ?? 0),
     output:
       draft.outputTokens +
       variation.outputTokens +
       humanisation.outputTokens +
       factCheck.outputTokens +
       (correction?.outputTokens ?? 0) +
-      linterFixerTokens.output,
+      linterFixerTokens.output +
+      (anchorScrub?.outputTokens ?? 0),
   };
 
   const summary = {
@@ -307,11 +347,13 @@ export async function runPipelineForHotel(slug: string, llm: LlmClient): Promise
       fact_check: factCheck.durationMs,
       ...(correction ? { correction: correction.durationMs } : {}),
       linter_fixer_iterations_ms: linterFixerIterations.map((p) => p.durationMs),
+      ...(anchorScrub ? { anchor_scrub: anchorScrub.durationMs } : {}),
     },
     fact_check_recommendation: factCheckReport.final_recommendation,
     fact_check_summary: factCheckReport.summary,
     blockers: factCheckReport.blockers_for_publication,
     pass_5_applied: correction !== null,
+    pass_7_applied: anchorScrub !== null,
     linter: {
       initial: initialLintReport.counts,
       final: currentLintReport.counts,
@@ -340,6 +382,7 @@ export async function runPipelineForHotel(slug: string, llm: LlmClient): Promise
     linterFixerIterations,
     initialLintReport,
     finalLintReport: currentLintReport,
+    anchorScrub,
     final,
     totalTokens: totals,
   };

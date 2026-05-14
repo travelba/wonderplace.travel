@@ -16,11 +16,11 @@ Tu ne réécris PAS l'ensemble. Tu **patches** les passages signalés, et **uniq
 
 Lis le rapport JSON `fact_check_report`. Concentre-toi sur :
 
-- **Tous les findings de catégorie `HALLUCINATION`** avec `severity: blocker` → **corriger absolument**
+- **Tous les findings de catégorie `HALLUCINATION`** quelle que soit la sévérité → **corriger absolument** (blocker, high, medium, low)
 - **Tous les findings de catégorie `DIVERGENT_NUMBERS`** → **corriger absolument**
 - **Findings de catégorie `WARN_MEDIUM` avec severity ≥ medium** → **nuancer** ("selon les sources", "indicativement")
 - Les **WARN_LOW** → laisser tels quels (déjà nuancés par construction)
-- Les **CULTURAL_TO_VERIFY** → laisser mais ajouter une nuance discrète si la sévérité est ≥ medium ("selon Wikipedia", "rapporté par Fitzgerald")
+- Les **CULTURAL_TO_VERIFY** → ajouter le préfixe "à environ" pour les distances POIs, sinon nuance discrète ("selon Wikipedia").
 
 ### Étape 2 — Application chirurgicale
 
@@ -151,7 +151,7 @@ Tu reçois en `user` message, séparés clairement :
 
 Avant de répondre, vérifie :
 
-1. ☐ Toutes les HALLUCINATIONs `severity: blocker` ont été corrigées (supprimées ou remplacées) ?
+1. ☐ TOUTES les HALLUCINATIONs (toutes sévérités) ont été corrigées — supprimées ou remplacées par un fait du brief ?
 2. ☐ Tous les DIVERGENT_NUMBERS ont été corrigés ?
 3. ☐ Les WARN_MEDIUM ≥ medium ont été nuancés ?
 4. ☐ Le verbatim conseiller IATA est intact ?
@@ -160,5 +160,13 @@ Avant de répondre, vérifie :
 7. ☐ Aucun nouveau mot des listes A à G n'a été introduit ?
 8. ☐ La longueur totale reste à ±10% du Pass 3 ?
 9. ☐ Aucune section n'a été supprimée ?
+10. ☐ **Anti-pattern Phase 3** : aucune des 7 phrases-types A-G n'est dans le texte final :
+    - A. "Lors de notre visite", "Nous avons été frappés", "Notre conseillère X confiait"
+    - B. Architecte qui "orchestre" / "insuffle" / "conçoit un mariage de"
+    - C. Description sensorielle de décor (boiseries XVIIIe, mobilier d'époque) non sourcée
+    - D. Distance POI sans préfixe "environ" ou "~"
+    - E. Conciergerie nommée (LVMH, Dorchester) non confirmée dans `service`
+    - F. Référence historique sans `cultural_references` ni `external_source_facts`
+    - G. Date d'obtention du statut Palace non sourcée
 
 **Si la moindre case n'est pas cochée → corrige.**

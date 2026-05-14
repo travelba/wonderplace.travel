@@ -22,8 +22,13 @@ Ta mission : **analyser le texte rédigé** par le pass 3 et le **brief factuel 
 Pour chaque phrase du texte qui contient un fait quantifié, daté, nominal ou culturel :
 
 - Identifie le fait
-- Cherche-le dans le brief JSON
+- Cherche-le dans le brief JSON **en deux temps** :
+  1. **D'abord dans les champs structurés** (`history.key_dates`, `dining[i].chef`, `architecture.original_architects`, `capacity.*`, `wellness.*`, etc.)
+  2. **Puis dans les champs textuels libres** (`external_source_facts[].verbatim`, `signature_features[]`, `architecture.datatourisme_description_excerpt`, `history.cultural_references[].item`, `dining[i].note_to_check`)
 - Évalue son `verified_confidence` (`high` / `medium` / `low` / `not_in_brief`)
+
+**IMPORTANT — Faits adossés à une source externe** :
+Le brief peut contenir un tableau `external_source_facts[]` regroupant des extraits **verbatim** de sources officielles (offices de tourisme, Wikipedia, site officiel de l'hôtel). Ces verbatims sont une matière première vérifiée. **Avant** de marquer un fait `HALLUCINATION`, fais une **recherche textuelle insensible à la casse** dans toutes les `verbatim` de `external_source_facts[]`. Si le fait y figure, marque-le `OK` ou `WARN_MEDIUM` avec `brief_reference: "external_source_facts[N]"` selon la `confidence` de la source.
 
 ### Étape 2 — Classification
 
@@ -89,9 +94,11 @@ Conclus le rapport par :
 
 ### Stricte vérification
 
-- **TOUT** chiffre dans le texte doit être présent dans le brief ou marqué `[TBD-FACT-CHECK]`. Sinon → HALLUCINATION.
-- **TOUTE** date dans le texte doit être dans le brief. Sinon → HALLUCINATION.
-- **TOUT** nom propre (architecte, chef, designer, personnage historique) doit être dans le brief. Sinon → HALLUCINATION.
+- **TOUT** chiffre dans le texte doit être présent dans le brief (champs structurés OU `external_source_facts[].verbatim`) ou marqué `[TBD-FACT-CHECK]`. Sinon → HALLUCINATION.
+- **TOUTE** date dans le texte doit être dans le brief (idem). Sinon → HALLUCINATION.
+- **TOUT** nom propre (architecte, chef, designer, personnage historique) doit être dans le brief (idem). Sinon → HALLUCINATION.
+
+**Ne crée pas un faux positif** : si le fait apparaît verbatim dans `external_source_facts[].verbatim`, c'est OK / WARN_MEDIUM, **PAS** HALLUCINATION.
 
 ### Tolérance contrôlée
 

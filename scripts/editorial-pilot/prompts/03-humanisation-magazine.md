@@ -28,6 +28,8 @@ Tu peux ajouter des éléments sensoriels (lumière, matière, son, parfum), MAI
 - ❌ Tout parfum spécifique non déductible d'un fait du brief
 - ❌ Tout son spécifique non déductible
 - ❌ Toute ambiance numérique précise (température, nombre de personnes, niveau sonore)
+- ❌ **Toute description de décor d'un restaurant / bar / spa** non présente verbatim dans `dining[i].signature`, `wellness.signature`, ou `external_source_facts[].verbatim` (ex : "fresques murales et lustres en cristal", "carrelages minutieusement conservés")
+- ❌ **Toute formule générique conclusive** : "incarne l'union parfaite entre…", "chaque espace raconte une histoire", "reflète l'héritage du luxe à la française", "art de vivre à la parisienne". Si le texte glisse vers une formule conclusive de ce type, supprime-la et reste factuel.
 
 ### Test de l'ancrage
 
@@ -36,6 +38,18 @@ Pour chaque phrase sensorielle ajoutée, demande-toi :
 > "Si un fact-checker rigoureux me demande la source de ce détail, est-ce que je peux pointer un champ exact du brief JSON ?"
 
 Si **non** → tu réécris la phrase sans ce détail, ou tu le retires.
+
+### Sept interdictions explicites (héritées du Pass 1, à respecter aussi en Pass 3)
+
+Identiques aux interdictions du prompt Pass 1 :
+
+- **A. Pseudo-citation insider** : aucune "lors de notre visite", "nous avons été frappés", "notre conseillère X confiait" — **sauf si** le brief fournit `iata_insider.key_observation` non-AUTO_DRAFT. Si la section est vide, la rédaction au "nous avons constaté" est interdite.
+- **B. Attribution stylistique architectes** : interdiction de "orchestrer", "insuffler", "concevoir un mariage de styles". Seuls le nom et l'année figurant dans le brief sont autorisés.
+- **C. Description sensorielle de décor / cuisine** non présente verbatim dans le brief.
+- **D. Distances POIs** : préfixer toujours par "à environ", "~", "à quelques minutes à pied".
+- **E. Service & équipe** : si `service.auto_status = 'pending'`, rédiger UN paragraphe générique de 50-80 mots ("Service d'un Palace 5\*, conciergerie expérimentée, standards propres à la catégorie") — aucun nom de groupe (LVMH, Dorchester, Oetker), aucune liste de langues précises.
+- **F. Références culturelles** : interdiction d'évoquer Françoise Sagan, Saint-Tropez années 1950, "depuis un siècle", "Belle Époque", "intérieur bourgeois XVIIIe" sauf si le verbatim figure dans le brief.
+- **G. Statut Palace** : interdiction de "premier Palace de France", "depuis 2011", sauf verbatim dans le brief.
 
 ---
 
@@ -79,21 +93,23 @@ Si **non** → tu réécris la phrase sans ce détail, ou tu le retires.
    - « Le palace ouvrit ses portes le 1ᵉʳ octobre 1908. »
    - « F. Scott Fitzgerald y séjourna en 1925 et en fit le décor de _Tendre est la nuit_. »
 
-### 6.3 — Signature IATA insider autorité
+### 6.3 — Signature IATA insider autorité (CONDITIONNELLE)
 
-1. **1 verbatim attribué nommément à un conseiller IATA** quelque part dans la fiche.
-   - Utilise le nom du brief : `iata_insider.advisor_name` et `iata_insider.advisor_role`.
-   - Le verbatim DOIT reformuler `iata_insider.key_observation` du brief.
-   - Format obligatoire :
+**Évaluation préalable obligatoire** : examine `iata_insider.key_observation` du brief.
 
-   > « {observation experte reformulée du brief} » — {Prénom}, {rôle} ConciergeTravel.fr
+- Si la valeur **commence par `AUTO_DRAFT`** ou contient « observation insider à rédiger » → **PAS DE VERBATIM**. Tu n'inventes JAMAIS de citation conseiller. La section "Notre verdict" est rédigée comme un paragraphe d'analyse tiers neutre, sans guillemets, sans nom propre fictif. Idem si `iata_insider.best_for`/`honest_caveat` commencent par `AUTO_DRAFT`.
+- Si la valeur **contient une observation réelle** non-AUTO_DRAFT → tu PEUX (mais ce n'est plus une obligation absolue) écrire un verbatim attribué nommément :
 
-2. **1 recommandation experte mesurée** quelque part dans la fiche (utilise `iata_insider.best_for`, `iata_insider.honest_caveat`, `iata_insider.alternative_recommendation` du brief) :
-   - "Idéal pour {persona du brief}."
-   - "À éviter si {contrainte du brief}."
-   - **Inclure la nuance honnête** : « Le seul réel inconvénient : {caveat du brief} »
+  > « {observation experte reformulée du brief} » — {Prénom}, {rôle} ConciergeTravel.fr
 
-3. **1 incise courte tiret cadratin** apportant une nuance d'expert : « — détail rarement mentionné — », « — exception rare en France — ».
+**Recommandation experte mesurée** :
+
+- Si `iata_insider.best_for` ET `iata_insider.honest_caveat` sont non-AUTO_DRAFT, écrire :
+  - "Idéal pour {persona du brief}."
+  - **Inclure la nuance honnête** : « Le seul réel inconvénient : {caveat du brief} »
+- Sinon, conclure par une phrase d'analyse factuelle SANS persona inventée.
+
+**1 incise courte tiret cadratin** apportant une nuance d'expert ANCRÉE dans un fait du brief : « — détail rarement mentionné dans le matériel marketing — », « — exception rare en France — ». Pas d'incise inventée.
 
 ---
 
@@ -207,19 +223,20 @@ Tu ne peux PAS utiliser :
 
 ---
 
-## CHECKLIST FINALE (10 points)
+## CHECKLIST FINALE (11 points)
 
 Avant de répondre, vérifie :
 
 1. ☐ Lead 80-120 mots avec scène d'ouverture sensorielle ANCRÉE dans le brief ?
 2. ☐ Chaque section H2 a au moins 1 paragraphe sensoriel ANCRÉ ?
 3. ☐ Au moins 1 phrase au passé simple dans "Histoire" ?
-4. ☐ Verbatim conseiller IATA présent et attribué nommément (`iata_insider.advisor_name`) ?
-5. ☐ Recommandation experte mesurée avec nuance honnête (`iata_insider.honest_caveat`) ?
+4. ☐ Verbatim conseiller IATA présent et attribué nommément (`iata_insider.advisor_name`) — **uniquement si `iata_insider.key_observation` n'est pas AUTO_DRAFT** ?
+5. ☐ Recommandation experte mesurée avec nuance honnête (`iata_insider.honest_caveat`) — **uniquement si non-AUTO_DRAFT** ?
 6. ☐ Au moins 1 référence culturelle vérifiable PUISÉE du brief ?
 7. ☐ Tous les chiffres et sources du draft conservés ?
 8. ☐ Aucun mot des listes A à G n'apparaît (refais la recherche textuelle) ?
 9. ☐ Rythme respecté (≥ 30% courtes, ≥ 15% longues) ?
 10. ☐ ZÉRO détail sensoriel inventé non dérivable du brief ?
+11. ☐ **Anti-pattern Phase 3** : Aucune des 7 phrases-types A-G n'a été réintroduite après le Pass 1 strict (cf. liste des interdictions ci-dessus) ?
 
 **Si la moindre case n'est pas cochée → recommence.**
