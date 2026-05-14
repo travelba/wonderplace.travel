@@ -4,6 +4,7 @@ import { buildLlmsTxt, type LlmsTxtSectionItem } from '@cct/seo';
 
 import { env } from '@/lib/env';
 import { listPublishedHotelSummaries } from '@/server/hotels/get-hotel-by-slug';
+import { listPublishedRankings } from '@/server/rankings/get-ranking-by-slug';
 
 // ISR — re-fetches the catalog hourly. The CDN keeps a stale copy for up
 // to a day so this route never serves a slow miss.
@@ -28,7 +29,10 @@ const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
  */
 export async function GET(): Promise<NextResponse> {
   const origin = (env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/$/, '');
-  const hotels = await listPublishedHotelSummaries(50);
+  const [hotels, rankings] = await Promise.all([
+    listPublishedHotelSummaries(50),
+    listPublishedRankings(),
+  ]);
 
   const catalogItems: LlmsTxtSectionItem[] = hotels.map((h) => {
     const distinction = h.isPalace ? 'Palace' : `${h.stars} étoiles`;
@@ -37,6 +41,16 @@ export async function GET(): Promise<NextResponse> {
       description: `${h.nameFr} (${h.city}) — ${distinction}. Fiche complète : photos, chambres, restaurants, FAQ, distinctions.`,
     };
   });
+
+  // Editorial rankings — surface the full slate so LLM crawlers can
+  // discover every classement without paginating through the hub.
+  const rankingItems: LlmsTxtSectionItem[] = rankings.map((r) => ({
+    url: `${origin}/fr/classement/${r.slug}`,
+    description:
+      r.factualSummaryFr !== null && r.factualSummaryFr.length > 0
+        ? r.factualSummaryFr
+        : `${r.titleFr} — classement éditorial ConciergeTravel (${r.entryCount} hôtel${r.entryCount === 1 ? '' : 's'}).`,
+  }));
 
   const body = buildLlmsTxt({
     siteName: 'ConciergeTravel.fr',
@@ -72,6 +86,21 @@ export async function GET(): Promise<NextResponse> {
             {
               title: `Catalogue (top ${catalogItems.length} fiches éditoriales)`,
               items: catalogItems,
+            },
+          ]
+        : []),
+      ...(rankingItems.length > 0
+        ? [
+            {
+              title: `Classements éditoriaux (${rankingItems.length} sélections)`,
+              items: [
+                {
+                  url: `${origin}/fr/classements`,
+                  description:
+                    'Hub de tous les classements (filtres par type, lieu, thématique, occasion).',
+                },
+                ...rankingItems,
+              ],
             },
           ]
         : []),

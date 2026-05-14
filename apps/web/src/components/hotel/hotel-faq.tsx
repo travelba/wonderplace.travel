@@ -47,7 +47,7 @@ export async function HotelFaq({
   };
 
   return (
-    <section aria-labelledby="faq-title" className="mb-12">
+    <section id="faq" aria-labelledby="faq-title" className="mb-12 scroll-mt-24">
       <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">
         {t('sections.faq')}
       </h2>
