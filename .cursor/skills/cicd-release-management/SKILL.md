@@ -111,3 +111,6 @@ Database environments map to **separate Supabase projects** for `staging` and `p
 - CDC v3.0 §13 (phasage), §15 (livrables).
 - Vercel + Supabase docs.
 - `test-strategy`, `observability-monitoring`, `security-engineering` skills.
+- **`windows-dev-environment`** — primary maintainer runs PowerShell;
+  local commands (migration runs, CLI scripts) must follow the quoting
+  and SSL-strip patterns documented there.

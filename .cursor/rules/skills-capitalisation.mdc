@@ -1,0 +1,70 @@
+---
+description: Continuous skill capitalisation — capture non-obvious lessons as new skills or skill additions so future agents don't pay the same cost.
+alwaysApply: true
+---
+
+# Skill capitalisation — make every session compound
+
+The repo ships **32 agent skills** under `.cursor/skills/`. They are the
+single biggest lever for agent quality. The system improves only if every
+session contributes the lessons it paid for.
+
+## When to capture a lesson (mandatory check at task end)
+
+Before considering a non-trivial task complete, do this self-audit:
+
+1. **Did I hit a non-obvious gotcha that took ≥ 2 iterations to solve?**
+2. **Will another agent (or me, in the next session) hit the same wall?**
+3. **Is the gotcha already covered by an existing skill?**
+
+If `1 + 2` are yes and `3` is no, capture it. Two paths:
+
+### Path A — extend an existing skill (most common)
+
+Find the closest skill in [`.cursor/skills/README.md`](mdc:.cursor/skills/README.md)
+and add a subsection ("Rule N — …" or a new entry in "Anti-patterns").
+Match the surrounding tone: concrete, third person, code examples from
+the actual repo.
+
+### Path B — create a new skill (rarer, foundation-level only)
+
+Trigger only when the pattern crosses ≥ 3 existing skills, or when it's
+a whole topic with no existing home. Follow the checklist in
+[`.cursor/skills/README.md`](mdc:.cursor/skills/README.md) §4.
+
+## Mandatory hygiene when creating or extending a skill
+
+- **Third-person description** in the frontmatter (Cursor reads only the
+  description at session start — it's the discovery surface).
+- **Body ≤ 500 lines** with explicit `## Triggers` section.
+- **Concrete code, repo paths, anti-patterns** (no theory without an
+  example).
+- **Cross-link** from the new content's "References" section to ≥ 2
+  related skills, AND **reverse-link** from those skills back to the new
+  content.
+- **Update** [`.cursor/skills/README.md`](mdc:.cursor/skills/README.md) —
+  matrix row + category list.
+- **Update** [`AGENTS.md`](mdc:AGENTS.md) "Where to look first" table if
+  the topic is new and high-frequency.
+
+## What NOT to capture
+
+- One-off bugs that won't recur.
+- Things the agent should already know (basic TS, basic Next.js, basic SQL).
+- Personal opinions without a concrete failure case behind them.
+- Time-sensitive information ("after May 2026, use the v3 API…") — use
+  an "Old patterns (deprecated)" subsection instead.
+
+## What MUST be captured (red-flag patterns)
+
+- A schema-validation failure that recurred across multiple invocations.
+- A vendor API quirk not documented in the public docs.
+- A TypeScript strict / `exactOptionalPropertyTypes` edge case.
+- A shell / environment gotcha specific to Windows or the repo's toolchain.
+- A prompt-engineering tactic that materially improved LLM output.
+- A performance, security, or accessibility pitfall the linter doesn't catch.
+
+## Reference
+
+[`.cursor/skills/README.md`](mdc:.cursor/skills/README.md) — catalogue,
+matrix, capitalisation workflow.

@@ -32,19 +32,27 @@ Lower layers **never** import from higher layers. See `.cursor/rules/architectur
 
 ## 3. Where to look first
 
-| Task                                          | Start here                                                                       |
-| --------------------------------------------- | -------------------------------------------------------------------------------- |
-| Add a business rule                           | `packages/domain/` + `.cursor/rules/architecture-layers.mdc`                     |
-| New vendor integration                        | `.cursor/skills/api-integration/SKILL.md` + `.cursor/rules/integrations-api.mdc` |
-| New public route                              | `apps/web/src/app/[locale]/` + `.cursor/rules/nextjs-app-router.mdc`             |
-| **Hotel detail page** (15 blocks)             | `.cursor/rules/hotel-detail-page.mdc` (CDC §2 checklist + ADR-0007/0008/0009)    |
-| Room sub-page `/hotel/[slug]/chambres/[room]` | `.cursor/rules/hotel-detail-page.mdc` + ADR-0009                                 |
-| New Supabase table / RLS policy               | `packages/db/migrations/` + `.cursor/rules/supabase-rls.mdc`                     |
-| JSON-LD / robots / llms.txt                   | `packages/seo/` + `.cursor/rules/seo-geo.mdc`                                    |
-| Payload collection / back-office hook         | `apps/admin/` + `.cursor/skills/backoffice-cms/SKILL.md`                         |
-| E2E for a new journey                         | `apps/web/e2e/` + `.cursor/rules/e2e-testing.mdc`                                |
-| Security / CSP / auth                         | `.cursor/rules/security-csp.mdc`                                                 |
-| Perf, Sentry, logs                            | `.cursor/rules/observability-perf.mdc`                                           |
+| Task                                          | Start here                                                                              |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Add a business rule                           | `packages/domain/` + `.cursor/rules/architecture-layers.mdc`                            |
+| New vendor integration                        | `.cursor/skills/api-integration/SKILL.md` + `.cursor/rules/integrations-api.mdc`        |
+| **LLM pipeline (editorial, AEO, content)**    | `.cursor/skills/llm-output-robustness/SKILL.md`                                         |
+| **LLM extraction from web content (Tavily)**  | `.cursor/skills/content-enrichment-pipeline/SKILL.md` + `llm-output-robustness` §rule-9 |
+| **Multi-source factual enrichment**           | `.cursor/skills/content-enrichment-pipeline/SKILL.md`                                   |
+| **Zod schema → React props**                  | `.cursor/skills/typescript-strict-zod-interop/SKILL.md`                                 |
+| **PowerShell / Windows dev commands**         | `.cursor/skills/windows-dev-environment/SKILL.md`                                       |
+| New public route                              | `apps/web/src/app/[locale]/` + `.cursor/rules/nextjs-app-router.mdc`                    |
+| **JSON-LD page → must be `force-dynamic`**    | `.cursor/skills/structured-data-schema-org/SKILL.md` §CSP-nonce-contract                |
+| **Hotel detail page** (15 blocks)             | `.cursor/rules/hotel-detail-page.mdc` (CDC §2 checklist + ADR-0007/0008/0009)           |
+| Room sub-page `/hotel/[slug]/chambres/[room]` | `.cursor/rules/hotel-detail-page.mdc` + ADR-0009                                        |
+| **Editorial guide / ranking page**            | `.cursor/skills/editorial-long-read-rendering/SKILL.md` + `llm-output-robustness`       |
+| **TOC sidebar / EnrichedText / auto-link**    | `.cursor/skills/editorial-long-read-rendering/SKILL.md`                                 |
+| New Supabase table / RLS policy               | `packages/db/migrations/` + `.cursor/rules/supabase-rls.mdc`                            |
+| JSON-LD / robots / llms.txt                   | `packages/seo/` + `.cursor/rules/seo-geo.mdc`                                           |
+| Payload collection / back-office hook         | `apps/admin/` + `.cursor/skills/backoffice-cms/SKILL.md`                                |
+| E2E for a new journey                         | `apps/web/e2e/` + `.cursor/rules/e2e-testing.mdc`                                       |
+| Security / CSP / auth                         | `.cursor/rules/security-csp.mdc`                                                        |
+| Perf, Sentry, logs                            | `.cursor/rules/observability-perf.mdc`                                                  |
 
 ### Structural decisions already taken (don't relitigate without an ADR)
 
@@ -95,8 +103,27 @@ Lower layers **never** import from higher layers. See `.cursor/rules/architectur
 
 ## 7. When in doubt
 
-- Check `.cursor/skills/<topic>/SKILL.md` — there are 30+ skills covering every vertical.
+- Check `.cursor/skills/<topic>/SKILL.md` — there are 35+ skills covering every vertical. Browse the catalogue: [`.cursor/skills/README.md`](.cursor/skills/README.md).
 - Open `docs/adr/` for past decisions.
 - Ask a human before disabling a CI check, lowering a Supabase RLS policy, or removing a Sentry init.
+
+## 8. Capitalisation continue — if you discover a new pattern, capture it
+
+The agent who follows you should not pay the cost of a lesson you already
+paid. **When you hit a non-obvious gotcha during a session, before closing
+the task:**
+
+1. Decide if it's reusable (will another agent or session hit this?).
+2. Pick the closest existing skill and add a short subsection, OR create a
+   new skill via `.cursor/skills/<new-skill>/SKILL.md` (see
+   `~/.cursor/skills-cursor/create-skill/SKILL.md` for the template).
+3. Cross-link it from the related skills' "References" section so it's
+   discoverable from multiple angles.
+4. Update [`.cursor/skills/README.md`](.cursor/skills/README.md) — both
+   the catalogue and the "problem → skill" matrix.
+
+Patterns worth capturing: vendor API quirks, schema validation traps,
+shell/env gotchas, prompt-engineering tactics that worked, type-level
+interop oddities. Anything that took you more than one iteration to fix.
 
 Welcome aboard.

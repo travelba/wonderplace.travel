@@ -30,6 +30,26 @@ Invoke when:
 - API route handlers calling Amadeus availabilities: respect Redis 3-level cache (cf. `redis-caching` skill).
 - Use `revalidateTag('hotel:<slug>')`, `revalidateTag('editorial:<slug>')`, `revalidateTag('hub:<region>')` from Payload `afterChange` hooks. **No raw `revalidatePath` from CMS** — tags only, scoped.
 
+### JSON-LD pages MUST be `force-dynamic` (CSP nonce contract)
+
+Any page emitting `<JsonLdScript>` (= every editorial, hotel, hub, home,
+guide, classement, marque, categorie page) MUST be `force-dynamic`,
+because the script's CSP nonce is per-request:
+
+```ts
+export const dynamic = 'force-dynamic'; // CSP nonce + Supabase admin fetches.
+```
+
+Re-introducing `revalidate = N` on such a page silently caches HTML
+with `nonce=""` — the browser then refuses to execute the JSON-LD and
+Google sees zero structured data. This regression was paid twice
+(PR #56 hotel detail, PR #57 home). Reference:
+`apps/web/src/components/seo/json-ld.tsx` (doc block) and
+`structured-data-schema-org` §CSP-nonce-contract.
+
+The Vercel CDN edge cache still mitigates the cost of `force-dynamic`
+for editorial routes whose underlying data only changes on publish.
+
 ### Metadata
 
 - Every page must export `generateMetadata` (or static `metadata`) producing: `title`, `description`, `alternates.canonical`, `alternates.languages` (FR/EN hreflang), `openGraph`, `twitter`, `robots`.
@@ -104,3 +124,6 @@ export default async function HotelPage({ params: { locale, region, city, hotel 
 - Next.js 15 App Router docs.
 - CDC v3.0 §2.2 (rendering), §6 (SEO/GEO), §9 (mobile-first).
 - `seo-technical`, `redis-caching`, `responsive-ui-architecture` skills.
+- **`structured-data-schema-org`** — CSP nonce contract details for JSON-LD.
+- **`security-engineering`** — full CSP3 policy + middleware.
+- **`editorial-long-read-rendering`** — two-column layout, TOC sidebar pattern.

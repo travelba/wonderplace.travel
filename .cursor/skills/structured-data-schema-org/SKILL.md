@@ -38,8 +38,41 @@ Invoke when:
 
 - Pure functions in `packages/seo/jsonld/<schema>.ts`. No side effects.
 - Input: a domain DTO. Output: typed JSON-LD object validated by Zod against a Schema.org subset.
-- Render via `<JsonLd />` component (uses `<script type="application/ld+json">`).
+- Render via `<JsonLdScript data={…} nonce={…} />` (uses `<script type="application/ld+json">`).
 - One JSON-LD block per `@type` per page; no block merging into a `@graph` unless multiple top-level types are necessary (then validate with Schema.org).
+
+### CSP nonce contract — non-negotiable (paid for twice: PR #56, #57)
+
+The site runs under a strict CSP3 policy:
+
+```
+script-src 'self' 'nonce-{nonce}' 'strict-dynamic'
+```
+
+There is **no `'unsafe-inline'` fallback in production**. Any
+`<script type="application/ld+json">` without the per-request nonce is
+silently dropped by the browser → zero rich results indexed.
+
+The contract this codifies:
+
+1. **Read the nonce at the page boundary, once**, via `headers()`:
+
+   ```ts
+   const nonce = (await headers()).get('x-nonce') ?? undefined;
+   ```
+
+2. **Pass it explicitly** as a `nonce` prop to every `JsonLdScript` on the page. NEVER call `headers()` inside the JsonLdScript leaf — earlier versions did and it caused `DYNAMIC_SERVER_USAGE` 500s.
+3. **The page MUST be `force-dynamic`.** Calling `headers()` already
+   marks the route dynamic; the explicit `export const dynamic = 'force-dynamic'`
+   keeps the contract grep-able and prevents a future ISR re-enable
+   from silently stripping the nonce.
+4. **Never** emit a raw `<script>` tag — always wrap with the shared
+   `<JsonLdScript />` component (`apps/web/src/components/seo/json-ld.tsx`).
+
+Reference: `apps/web/src/components/seo/json-ld.tsx` (long doc comment
+explaining the PR #56/#57 regressions). See also
+`nextjs-app-router` §JSON-LD-and-dynamic-rendering and
+`security-engineering` §CSP.
 
 ### Hotel
 
@@ -161,3 +194,6 @@ Invoke when:
 - Excel "Schema JSON-LD" sheet.
 - Google Search Central — Structured Data docs.
 - `seo-technical`, `geo-llm-optimization`, `content-modeling` skills.
+- **`editorial-long-read-rendering`** — JSON-LD block composition for guides/rankings.
+- **`security-engineering`** — full CSP policy details and middleware setup.
+- **`nextjs-app-router`** — force-dynamic constraint when emitting JSON-LD.

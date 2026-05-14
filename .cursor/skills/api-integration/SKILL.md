@@ -117,3 +117,8 @@ export async function httpRequest<T>(opts: {
 
 - CDC v3.0 §5 (intégrations externes), §11 (security).
 - `redis-caching`, `observability-monitoring`, `security-engineering` skills.
+- **`llm-output-robustness`** — required reading when the "vendor" is an
+  LLM (OpenAI, Anthropic, etc.): multi-call single-concern pipelines,
+  schemas tolerant to LLM drift, allowlist post-validation, retry strategy.
+- **`windows-dev-environment`** — Supabase SSL strip, PowerShell quoting
+  when invoking integration scripts from the dev shell.
