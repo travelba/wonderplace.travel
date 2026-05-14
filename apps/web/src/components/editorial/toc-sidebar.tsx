@@ -45,8 +45,9 @@ export function TocSidebar({ anchors, locale }: Props): ReactElement | null {
           .sort(
             (a, b) => (a.target as HTMLElement).offsetTop - (b.target as HTMLElement).offsetTop,
           );
-        if (visible.length > 0) {
-          setActiveId(visible[0]!.target.id);
+        const first = visible[0];
+        if (first) {
+          setActiveId(first.target.id);
         }
       },
       { rootMargin: '-25% 0px -65% 0px', threshold: 0 },

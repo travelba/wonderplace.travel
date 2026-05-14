@@ -149,7 +149,7 @@ export function RelatedHotels({
                 <p className="mt-1 text-sm text-neutral-600">{sec.sub}</p>
               </header>
 
-              <ul role="list" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {sec.items.map((row) => {
                   const href = pickLink(row, locale);
                   const name = pickName(row, locale);

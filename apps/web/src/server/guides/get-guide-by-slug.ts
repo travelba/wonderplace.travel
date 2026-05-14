@@ -176,7 +176,6 @@ export async function getGuideBySlug(slug: string): Promise<GuideRow | null> {
   if (error !== null || data === null) return null;
   const parsed = GuideRowSchema.safeParse(data);
   if (!parsed.success) {
-    // eslint-disable-next-line no-console
     console.warn(
       `[get-guide-by-slug] schema-fail for "${slug}": ${parsed.error.issues
         .map((i) => `${i.path.join('.')}: ${i.message}`)

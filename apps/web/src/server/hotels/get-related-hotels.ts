@@ -125,7 +125,7 @@ export async function getRelatedHotels(args: {
   //    query to the published catalog and filter in memory. With 30
   //    rows this is fine; once we cross ~500 properties we'll add a
   //    `brand_slug` column + index.
-  let sameBrand: RelatedHotelRow[] = [];
+  const sameBrand: RelatedHotelRow[] = [];
   if (brand !== null) {
     const brandRes = await supabase
       .from('hotels')

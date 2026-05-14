@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 import { env } from '@/lib/env';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 
