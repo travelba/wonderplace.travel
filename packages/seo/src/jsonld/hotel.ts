@@ -21,6 +21,18 @@ import { offerJsonLd, type OfferInput } from './offer';
  * type-safe — we only widen the two specific fields we need.
  */
 type HotelBaseNode = Exclude<Hotel, string>;
+
+/**
+ * `WebPageElement` with `cssSelector[]` — Schema.org's `SpeakableSpecification`
+ * (https://schema.org/SpeakableSpecification). Google Assistant uses this to
+ * pick the spoken summary on Hotel queries; we point at the AEO "Réponse
+ * rapide" block via a stable selector (`#tldr`).
+ */
+type SpeakableNode = {
+  '@type': 'SpeakableSpecification';
+  cssSelector: readonly string[];
+};
+
 /** Hotel without the bare-IRI string union from schema-dts. */
 export type HotelNode = HotelBaseNode & {
   dateModified?: string;
@@ -34,6 +46,43 @@ export type HotelNode = HotelBaseNode & {
    * `Hotel` subtype, so we re-open the field here.
    */
   tourBookingPage?: string;
+  /**
+   * Wikidata-anchored disambiguation. Pointing `additionalType` at
+   * `https://www.wikidata.org/wiki/<QID>` is the strongest signal we
+   * can send to AI agents (Bing Chat, Perplexity, ChatGPT Search)
+   * that *this* specific hotel is the entity behind the QID — without
+   * it, "Cheval Blanc" could be the chain, the Saint-Tropez fiche or
+   * the Courchevel fiche.
+   */
+  additionalType?: string;
+  /** Schema.org `sameAs[]` — knowledge-graph anchors. */
+  sameAs?: readonly string[];
+  /** `subjectOf[]` — Articles/CreativeWorks ABOUT this hotel (Wikipedia, Commons gallery). */
+  subjectOf?: readonly SubjectOfNode[];
+  /** Hotel marketing slogan (Schema.org `slogan`, inherited from `Organization`). */
+  slogan?: string;
+  /** Canonical page URL for the JSON-LD payload. */
+  mainEntityOfPage?: string;
+  /** Speakable specification — surfaces the AEO TL;DR block to voice assistants. */
+  speakable?: SpeakableNode;
+  /** Currencies the hotel accepts (always "EUR" for our French catalog). */
+  currenciesAccepted?: string;
+  /** Payment methods accepted (comma-separated per Schema.org convention). */
+  paymentAccepted?: string;
+  /** `smokingAllowed` — boolean. Palaces are non-smoking by regulation. */
+  smokingAllowed?: boolean;
+  /** Reservation email — surfaces as `email` (Organization inheritance). */
+  email?: string;
+  /** Founders, named architects, etc. (Schema.org `founder` on Organization). */
+  founder?: readonly { '@type': 'Person'; name: string }[];
+};
+
+/** Inner node for `subjectOf[]`. */
+type SubjectOfNode = {
+  '@type': 'Article' | 'CreativeWork' | 'WebPage';
+  url: string;
+  name?: string;
+  inLanguage?: string;
 };
 
 /**
@@ -260,6 +309,60 @@ export interface HotelJsonLdInput {
    * filter on.
    */
   readonly eventSpaces?: readonly MeetingRoomInput[];
+  /**
+   * Knowledge-graph anchor — Wikidata QID. When set, surfaces as
+   * `additionalType: "https://www.wikidata.org/wiki/<QID>"` (Schema.org
+   * recommended pattern for entity disambiguation) AND is automatically
+   * prepended to `sameAs[]`. AI agents weight Wikidata-anchored entities
+   * orders of magnitude higher than free-text matches.
+   */
+  readonly wikidataId?: string;
+  /**
+   * Schema.org `sameAs[]` — knowledge-graph anchors. URLs of canonical
+   * pages identifying the hotel on third-party platforms (Wikipedia,
+   * official site, Commons, TripAdvisor, social handles, Mérimée, etc.).
+   * Already de-duped and HTTPS-validated by the page reader; the builder
+   * defensively re-filters to HTTPS-only.
+   */
+  readonly sameAs?: readonly string[];
+  /**
+   * Schema.org `subjectOf[]` — CreativeWorks ABOUT the hotel.
+   * Typically the Wikipedia article(s) and the Commons gallery.
+   * Renders as `Article` nodes with `inLanguage` set when known.
+   * Strongest EEAT signal we can emit alongside `sameAs`.
+   */
+  readonly subjectOf?: readonly SubjectOfInput[];
+  /** Optional editorial slogan ("L'iconique adresse de la rive gauche"). */
+  readonly slogan?: string;
+  /** Hotel marketing email (booking-mode=email; never logged). */
+  readonly email?: string;
+  /**
+   * CSS selectors identifying the spoken-summary regions on the page.
+   * Defaults to `['#tldr', '#faq']` when omitted but a non-empty
+   * `tldr` content hint is given via the `hasTldr` flag.
+   */
+  readonly speakableSelectors?: readonly string[];
+  /**
+   * `mainEntityOfPage` — the canonical URL of the page hosting this
+   * JSON-LD. Defaults to `input.url` when omitted; explicit override
+   * lets the room sub-page emit a different canonical.
+   */
+  readonly mainEntityOfPage?: string;
+  /**
+   * Architects / designers — emitted as Schema.org `Person` nodes
+   * under `founder` (Organization inheritance on Hotel). Strong
+   * grounding signal for "Who designed X?" queries.
+   */
+  readonly architects?: readonly string[];
+  /** Always `true` for our 5★ + Palace catalogue (Palaces are non-smoking by law). */
+  readonly smokingAllowed?: boolean;
+}
+
+export interface SubjectOfInput {
+  readonly url: string;
+  readonly name?: string;
+  readonly inLanguage?: 'fr' | 'en';
+  readonly type?: 'Article' | 'CreativeWork' | 'WebPage';
 }
 
 export interface ContainedRoomInput {
@@ -518,6 +621,78 @@ export const hotelJsonLd = (input: HotelJsonLdInput): HotelNode => {
   if (containedPlaces.length > 0) {
     out.containsPlace = containedPlaces;
   }
+  // ── Knowledge-graph anchors (sameAs + subjectOf + additionalType) ─────
+  // Built first so the order in the JSON envelope mirrors authority:
+  //   additionalType (Wikidata) → sameAs[] (canonical URLs) → subjectOf[]
+  if (input.wikidataId !== undefined && /^Q[1-9][0-9]*$/u.test(input.wikidataId)) {
+    out.additionalType = `https://www.wikidata.org/wiki/${input.wikidataId}`;
+  }
+  if (input.sameAs !== undefined && input.sameAs.length > 0) {
+    // Defensive re-filter — accept only HTTPS so a corrupt seed can't
+    // poison the payload with javascript:/data:/http: URLs.
+    const safe = input.sameAs.filter((u) => /^https:\/\/[^\s<>]+$/iu.test(u));
+    if (safe.length > 0) {
+      // Cap at 25 entries — that's already 3× more than Google's
+      // hotel rich-result test acknowledges, and the cap keeps the
+      // envelope under the recommended 8 KB JSON-LD soft limit even
+      // when paired with a long `nearbyAttractions` list.
+      out.sameAs = safe.slice(0, 25);
+    }
+  }
+  if (input.subjectOf !== undefined && input.subjectOf.length > 0) {
+    const nodes: SubjectOfNode[] = [];
+    for (const subj of input.subjectOf) {
+      if (!/^https:\/\/[^\s<>]+$/iu.test(subj.url)) continue;
+      const node: SubjectOfNode = {
+        '@type': subj.type ?? 'Article',
+        url: subj.url,
+      };
+      if (subj.name !== undefined && subj.name.length > 0) node.name = subj.name;
+      if (subj.inLanguage !== undefined) node.inLanguage = subj.inLanguage;
+      nodes.push(node);
+      if (nodes.length >= 6) break;
+    }
+    if (nodes.length > 0) out.subjectOf = nodes;
+  }
+  if (input.slogan !== undefined && input.slogan.trim().length > 0) {
+    out.slogan = input.slogan.trim();
+  }
+  if (input.email !== undefined && /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(input.email)) {
+    out.email = input.email;
+  }
+  // currenciesAccepted + paymentAccepted — constants for the French
+  // luxury catalog, but exposed as inputs so future markets can override.
+  out.currenciesAccepted = 'EUR';
+  out.paymentAccepted = 'Visa, Mastercard, American Express, Apple Pay, Google Pay';
+  // Palaces (regulated 5★ + Atout France distinction) are non-smoking
+  // by French law (decree 2006-1386 + extension to luxury hotels). When
+  // the caller doesn't specify, default to `false` for `isPalace=true`.
+  if (input.smokingAllowed !== undefined) {
+    out.smokingAllowed = input.smokingAllowed;
+  } else if (input.isPalace === true) {
+    out.smokingAllowed = false;
+  }
+  if (input.architects !== undefined && input.architects.length > 0) {
+    const founderNodes = input.architects
+      .map((a) => a.trim())
+      .filter((a) => a.length > 0 && a.length < 120)
+      .slice(0, 4)
+      .map((name) => ({ '@type': 'Person' as const, name }));
+    if (founderNodes.length > 0) {
+      out.founder = founderNodes;
+    }
+  }
+  // Speakable — surfaces the AEO TL;DR / FAQ blocks to voice assistants.
+  const speakableCss = input.speakableSelectors ?? ['#tldr', '#faq'];
+  if (speakableCss.length > 0) {
+    out.speakable = {
+      '@type': 'SpeakableSpecification',
+      cssSelector: [...speakableCss],
+    };
+  }
+  // mainEntityOfPage — explicit canonical anchor of the JSON-LD.
+  out.mainEntityOfPage = input.mainEntityOfPage ?? input.url;
+
   if (input.featuredReviews !== undefined && input.featuredReviews.length > 0) {
     // Cap at 5 to mirror Google's documented Hotel rich-result envelope
     // (https://developers.google.com/search/docs/appearance/structured-data/hotel).

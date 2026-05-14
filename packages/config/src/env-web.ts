@@ -67,6 +67,18 @@ export const env = createEnv({
     NEXT_PUBLIC_SENTRY_DSN: process.env['NEXT_PUBLIC_SENTRY_DSN'],
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env['NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME'],
   },
-  skipValidation: process.env['SKIP_ENV_VALIDATION'] === 'true',
+  skipValidation:
+    process.env['SKIP_ENV_VALIDATION'] === 'true' ||
+    process.env['NEXT_PUBLIC_SKIP_ENV_VALIDATION'] === 'true',
   emptyStringAsUndefined: true,
+  onValidationError: (error) => {
+    // Default behaviour throws "Invalid environment variables" with `[object Object]`.
+    // Surface the actual Zod issues so we can act on them in dev + CI.
+    const formatted = JSON.stringify(error.flatten().fieldErrors, null, 2);
+    // eslint-disable-next-line no-console
+    console.error('[env-web] Environment validation failed:\n' + formatted);
+    throw new Error(
+      `Invalid environment variables: ${Object.keys(error.flatten().fieldErrors).join(', ')}`,
+    );
+  },
 });
