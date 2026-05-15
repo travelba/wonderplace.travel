@@ -139,3 +139,6 @@ Invoke when:
 - CDC v3.0 §6.5, §8 (cursor brief).
 - Excel arborescence — sheets "GEO & Agentique" and "Schema JSON-LD".
 - `seo-technical`, `structured-data-schema-org`, `content-modeling` skills.
+- **`llm-output-robustness`** — allowlist post-validation patterns used
+  by the editorial pipelines to guarantee EEAT signals (no hallucinated
+  sources reach the DB).

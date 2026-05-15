@@ -120,18 +120,35 @@ const nextConfig: NextConfig = {
  * `silent: !CI` keeps local builds quiet; CI gets full upload logs. The auth
  * token is optional: when missing (CI smoke build, dev) no upload happens and
  * the wrapper degrades to plain `withNextIntl(nextConfig)` semantics.
+ *
+ * In `next dev` we skip the wrapper entirely: Sentry's webpack plugin injects
+ * a Sentry import into the edge `instrumentation` bundle, and webpack dev's
+ * `eval`-based source maps trigger `EvalError: Code generation from strings
+ * disallowed` inside the edge runtime. The wrapper still runs for `next build`
+ * (production), which is what matters for SDK source-map upload.
  */
 const sentryAuthToken = process.env['SENTRY_AUTH_TOKEN'];
+const isDev = process.env['NODE_ENV'] !== 'production';
 
-export default withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
-  org: 'travelba',
-  project: 'cct-web',
-  ...(sentryAuthToken !== undefined ? { authToken: sentryAuthToken } : {}),
-  silent: process.env['CI'] !== 'true',
-  widenClientFileUpload: true,
-  hideSourceMaps: true,
-  disableLogger: true,
-  tunnelRoute: '/monitoring',
-  reactComponentAnnotation: { enabled: true },
-  telemetry: false,
-});
+const baseConfig = withBundleAnalyzer(withNextIntl(nextConfig));
+
+// Skip the Sentry wrapper when the auth token is missing — otherwise the
+// post-build sourcemap upload step crashes silently (visible only as
+// "Collecting build traces ..." → Error) on Vercel preview builds where
+// Sentry credentials are intentionally not provisioned.
+const shouldWrapSentry = !isDev && sentryAuthToken !== undefined && sentryAuthToken.length > 0;
+
+export default shouldWrapSentry
+  ? withSentryConfig(baseConfig, {
+      org: 'travelba',
+      project: 'cct-web',
+      authToken: sentryAuthToken,
+      silent: process.env['CI'] !== 'true',
+      widenClientFileUpload: true,
+      hideSourceMaps: true,
+      disableLogger: true,
+      tunnelRoute: '/monitoring',
+      reactComponentAnnotation: { enabled: true },
+      telemetry: false,
+    })
+  : baseConfig;

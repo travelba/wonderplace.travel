@@ -116,6 +116,19 @@ jobs:
     name: Build
     needs: install
     runs-on: ubuntu-latest
+    # Placeholder env vars so the Supabase JS client can be instantiated
+    # at build-time prerender (the static routes that touch Supabase
+    # already wrap the calls in try/catch and degrade to empty arrays
+    # on error — see /llms.txt and /[locale]/classements).
+    # Real values live in Vercel for preview/production deploys.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "ci-placeholder-anon-key"
+      SUPABASE_SERVICE_ROLE_KEY: "ci-placeholder-service-role-key"
+      NEXT_PUBLIC_SITE_URL: "https://ci.conciergetravel.fr"
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "ci-placeholder"
+      NEXT_PUBLIC_ALGOLIA_APP_ID: "CIPLACEHOLDER"
+      NEXT_PUBLIC_ALGOLIA_SEARCH_KEY: "ci-placeholder-search-key"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -127,9 +140,10 @@ jobs:
           corepack prepare pnpm@10.33.2 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build
-        # `SKIP_ENV_VALIDATION=true` is already in `env:` above. Without
-        # real Supabase/Cloudinary/Upstash creds in CI we'd otherwise
-        # crash at module-load time via `@t3-oss/env-nextjs`.
+        # `SKIP_ENV_VALIDATION=true` is already in workflow `env:` above
+        # to bypass the @t3-oss/env-nextjs Zod check; the placeholder
+        # values above let Supabase / Algolia / Cloudinary client
+        # constructors succeed even though their network calls won't.
 
   # E2E (Playwright) still runs locally only — it needs a live
   # database + Cloudinary cloud, which we don't wire up in CI yet.

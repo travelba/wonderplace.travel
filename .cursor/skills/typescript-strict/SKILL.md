@@ -101,3 +101,5 @@ export const parseHotelOffer = (raw: unknown) => HotelOfferZ.safeParse(raw);
 - CDC v3.0 §2 (TypeScript strict obligatoire).
 - TypeScript handbook — strict modes.
 - `domain-driven-design`, `api-integration` skills.
+- **`typescript-strict-zod-interop`** — required reading when Zod schemas
+  flow into React props or when fixing `exactOptionalPropertyTypes` errors.

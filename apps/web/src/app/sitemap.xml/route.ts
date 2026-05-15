@@ -28,6 +28,7 @@ export function GET(): NextResponse {
     { loc: `${origin}/sitemaps/hubs.xml`, lastmod: now },
     { loc: `${origin}/sitemaps/editorial.xml`, lastmod: now },
     { loc: `${origin}/sitemaps/guides.xml`, lastmod: now },
+    { loc: `${origin}/sitemaps/rankings.xml`, lastmod: now },
   ]);
   return new NextResponse(xml, {
     headers: {

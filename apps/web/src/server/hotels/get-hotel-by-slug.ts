@@ -99,6 +99,20 @@ export const HotelDetailRowSchema = z.object({
   last_renovated_at: stringOrEmpty,
   virtual_tour_url: stringOrEmpty,
   mice_info: z.unknown().nullable().optional(),
+  // External identifiers & knowledge-graph anchors (migration 0025).
+  // All optional — backfilled by `scripts/editorial-pilot/src/enrichment/enrich-wikidata-ids.ts`.
+  wikidata_id: stringOrEmpty,
+  wikipedia_url_fr: stringOrEmpty,
+  wikipedia_url_en: stringOrEmpty,
+  tripadvisor_location_id: stringOrEmpty,
+  booking_com_hotel_id: stringOrEmpty,
+  expedia_property_id: stringOrEmpty,
+  hotels_com_hotel_id: stringOrEmpty,
+  agoda_hotel_id: stringOrEmpty,
+  official_url: stringOrEmpty,
+  email_reservations: stringOrEmpty,
+  commons_category: stringOrEmpty,
+  external_sameas: z.unknown().nullable().optional(),
   is_published: z.boolean(),
   updated_at: stringOrEmpty,
 });
@@ -106,7 +120,7 @@ export const HotelDetailRowSchema = z.object({
 export type HotelDetailRow = z.infer<typeof HotelDetailRowSchema>;
 
 const HOTEL_COLUMNS =
-  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, virtual_tour_url, mice_info, is_published, updated_at';
+  'id, slug, slug_en, name, name_en, stars, is_palace, region, department, city, district, address, postal_code, latitude, longitude, description_fr, description_en, highlights, amenities, faq_content, restaurant_info, spa_info, points_of_interest, transports, policies, awards, signature_experiences, featured_reviews, hero_image, gallery_images, long_description_sections, number_of_rooms, number_of_suites, meta_title_fr, meta_title_en, meta_desc_fr, meta_desc_en, booking_mode, amadeus_hotel_id, priority, google_rating, google_reviews_count, phone_e164, opened_at, last_renovated_at, virtual_tour_url, mice_info, wikidata_id, wikipedia_url_fr, wikipedia_url_en, tripadvisor_location_id, booking_com_hotel_id, expedia_property_id, hotels_com_hotel_id, agoda_hotel_id, official_url, email_reservations, commons_category, external_sameas, is_published, updated_at';
 
 /**
  * E.164 phone-number format: leading `+`, country code, 4-15 digits, no
@@ -146,6 +160,232 @@ export function readPostalCode(row: HotelDetailRow): string | null {
   const trimmed = row.postal_code.trim();
   if (trimmed.length === 0) return null;
   return POSTAL_CODE_REGEX.test(trimmed) ? trimmed : null;
+}
+
+/**
+ * External identifiers + knowledge-graph anchors (migration 0025).
+ *
+ * Surfaces to:
+ *   - the JSON-LD `sameAs[]` array (Schema.org best-practice signal that
+ *     anchors the hotel in the AI/agentic knowledge graph — Wikidata,
+ *     Wikipedia, official website, social handles, OTA listings),
+ *   - the `subjectOf[]` array (Article schema pointing at the Wikipedia
+ *     and Commons gallery pages — strong EEAT signal),
+ *   - the `additionalType` URL (Schema.org `Hotel` is too coarse; we
+ *     point at the Wikidata QID so AI agents disambiguate the exact
+ *     property — a "Cheval Blanc" can be the chain, the Courchevel
+ *     fiche, or the Saint-Tropez fiche; only the QID is unambiguous),
+ *   - the booking widget (email_reservations for booking_mode=email),
+ *   - the price-comparator persisted fallback (booking_com_hotel_id,
+ *     expedia_property_id, hotels_com_hotel_id — never exposed on the
+ *     UI per addendum v3.2: no logos, no clickable refs).
+ *
+ * All values are passed through narrow validators so a corrupt DB row
+ * (or an editor mistake reaching production) can never poison the
+ * JSON-LD with a half-typed identifier.
+ */
+export interface HotelExternalIds {
+  /** Wikidata QID — `Q1573604` etc. Source of truth for `additionalType`. */
+  readonly wikidataId: string | null;
+  /** French Wikipedia article URL — `subjectOf` + `sameAs`. */
+  readonly wikipediaUrlFr: string | null;
+  /** English Wikipedia article URL — `subjectOf` (en locale) + `sameAs`. */
+  readonly wikipediaUrlEn: string | null;
+  /** Official hotel website (HTTPS). Surfaces as `url` companion + `sameAs`. */
+  readonly officialUrl: string | null;
+  /** Reservation email — drives the `mailto:` CTA when booking_mode=email. */
+  readonly emailReservations: string | null;
+  /** Wikimedia Commons category — powers the photo-import pipeline. */
+  readonly commonsCategory: string | null;
+  /** TripAdvisor location ID — `sameAs` target (numeric). */
+  readonly tripadvisorLocationId: string | null;
+  /** Booking.com hotel slug — comparator only, never UI. */
+  readonly bookingComHotelId: string | null;
+  /** Expedia numeric property ID — comparator only, never UI. */
+  readonly expediaPropertyId: string | null;
+  /** Hotels.com numeric hotel ID — comparator only, never UI. */
+  readonly hotelsComHotelId: string | null;
+  /** Agoda numeric hotel ID — comparator only, never UI. */
+  readonly agodaHotelId: string | null;
+  /** Wikipedia Commons category gallery URL — derived from `commonsCategory`. */
+  readonly commonsGalleryUrl: string | null;
+  /** TripAdvisor location URL — derived from `tripadvisorLocationId`. */
+  readonly tripadvisorUrl: string | null;
+  /**
+   * Social and press links surfaced as JSON-LD `sameAs[]`. Already
+   * filtered to HTTPS-only entries and limited to known platforms
+   * ({@link KNOWN_SAMEAS_KEYS}). Any other key in the DB is silently
+   * dropped at the reader so a typo never leaks to a public payload.
+   */
+  readonly sameAs: readonly string[];
+  /**
+   * Knowledge-graph facts extracted from Wikidata (`external_sameas`
+   * blob): inception year, architect names, heritage designations,
+   * Mérimée ID, Google Maps CID. Surfaces in the press kit + sidebar.
+   */
+  readonly knowledgeGraph: {
+    readonly inceptionYear: number | null;
+    readonly architects: readonly string[];
+    readonly heritageDesignations: readonly string[];
+    readonly merimeeId: string | null;
+    readonly googleMapsCid: string | null;
+  };
+}
+
+const EXT_HTTPS_URL_REGEX = /^https:\/\/[^\s<>]+$/iu;
+const EXT_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
+const QID_REGEX = /^Q[1-9][0-9]*$/u;
+const NUMERIC_ID_REGEX = /^[0-9]+$/u;
+const SLUG_ID_REGEX = /^[a-z0-9-]+$/u;
+
+/** Whitelisted `sameAs` platforms (skill: security-engineering — no
+ *  open redirect via arbitrary external_sameas keys). Order matters:
+ *  the JSON-LD builder emits the array in this order so Wikidata /
+ *  Wikipedia (the strongest authority signals) lead. */
+const KNOWN_SAMEAS_KEYS = [
+  'twitter',
+  'instagram',
+  'facebook',
+  'youtube',
+  'linkedin',
+  'pinterest',
+  'tiktok',
+  'michelin',
+  'tablet',
+  'lhw',
+  'virtuoso',
+  'forbes',
+  'condenast',
+] as const;
+
+function takeStringOrNull(v: unknown): string | null {
+  if (typeof v !== 'string') return null;
+  const t = v.trim();
+  return t.length > 0 ? t : null;
+}
+
+function safeHttps(v: unknown): string | null {
+  const s = takeStringOrNull(v);
+  if (s === null) return null;
+  return EXT_HTTPS_URL_REGEX.test(s) ? s : null;
+}
+
+export function readExternalIds(row: HotelDetailRow): HotelExternalIds {
+  const wikidataRaw = takeStringOrNull(row.wikidata_id);
+  const wikidataId = wikidataRaw !== null && QID_REGEX.test(wikidataRaw) ? wikidataRaw : null;
+
+  const wikipediaUrlFr = safeHttps(row.wikipedia_url_fr);
+  const wikipediaUrlEn = safeHttps(row.wikipedia_url_en);
+  const officialUrl = safeHttps(row.official_url);
+
+  const emailRaw = takeStringOrNull(row.email_reservations);
+  const emailReservations = emailRaw !== null && EXT_EMAIL_REGEX.test(emailRaw) ? emailRaw : null;
+
+  const commonsCategory = takeStringOrNull(row.commons_category);
+  const commonsGalleryUrl =
+    commonsCategory !== null
+      ? `https://commons.wikimedia.org/wiki/Category:${encodeURIComponent(commonsCategory).replace(/%20/g, '_')}`
+      : null;
+
+  const tripadvisorRaw = takeStringOrNull(row.tripadvisor_location_id);
+  const tripadvisorLocationId =
+    tripadvisorRaw !== null && NUMERIC_ID_REGEX.test(tripadvisorRaw) ? tripadvisorRaw : null;
+  const tripadvisorUrl =
+    tripadvisorLocationId !== null
+      ? `https://www.tripadvisor.com/Hotel_Review-d${tripadvisorLocationId}`
+      : null;
+
+  const bookingRaw = takeStringOrNull(row.booking_com_hotel_id);
+  const bookingComHotelId =
+    bookingRaw !== null && SLUG_ID_REGEX.test(bookingRaw) ? bookingRaw : null;
+  const expediaRaw = takeStringOrNull(row.expedia_property_id);
+  const expediaPropertyId =
+    expediaRaw !== null && NUMERIC_ID_REGEX.test(expediaRaw) ? expediaRaw : null;
+  const hotelsComRaw = takeStringOrNull(row.hotels_com_hotel_id);
+  const hotelsComHotelId =
+    hotelsComRaw !== null && NUMERIC_ID_REGEX.test(hotelsComRaw) ? hotelsComRaw : null;
+  const agodaRaw = takeStringOrNull(row.agoda_hotel_id);
+  const agodaHotelId = agodaRaw !== null && NUMERIC_ID_REGEX.test(agodaRaw) ? agodaRaw : null;
+
+  // ── Knowledge-graph + sameAs blob ──────────────────────────────────────
+  const sameAsList: string[] = [];
+  if (wikidataId !== null) sameAsList.push(`https://www.wikidata.org/wiki/${wikidataId}`);
+  if (wikipediaUrlFr !== null) sameAsList.push(wikipediaUrlFr);
+  if (wikipediaUrlEn !== null) sameAsList.push(wikipediaUrlEn);
+  if (officialUrl !== null) sameAsList.push(officialUrl);
+
+  let inceptionYear: number | null = null;
+  const architects: string[] = [];
+  const heritageDesignations: string[] = [];
+  let merimeeId: string | null = null;
+  let googleMapsCid: string | null = null;
+
+  const blob = row.external_sameas;
+  if (blob !== null && blob !== undefined && typeof blob === 'object' && !Array.isArray(blob)) {
+    const dict = blob as Record<string, unknown>;
+    for (const key of KNOWN_SAMEAS_KEYS) {
+      const u = safeHttps(dict[key]);
+      if (u !== null) sameAsList.push(u);
+    }
+    const yr = dict['inception_year'];
+    if (typeof yr === 'number' && Number.isFinite(yr) && yr >= 1500 && yr <= 2100) {
+      inceptionYear = Math.trunc(yr);
+    }
+    const archs = dict['architects'];
+    if (Array.isArray(archs)) {
+      for (const a of archs) {
+        const s = takeStringOrNull(a);
+        if (s !== null && architects.length < 6) architects.push(s);
+      }
+    }
+    const heritages = dict['heritage_designations'];
+    if (Array.isArray(heritages)) {
+      for (const h of heritages) {
+        const s = takeStringOrNull(h);
+        if (s !== null && heritageDesignations.length < 4) heritageDesignations.push(s);
+      }
+    }
+    const merimee = takeStringOrNull(dict['merimee_id']);
+    if (merimee !== null) merimeeId = merimee;
+    const cid = takeStringOrNull(dict['google_maps_cid']);
+    if (cid !== null && NUMERIC_ID_REGEX.test(cid)) googleMapsCid = cid;
+  }
+
+  if (tripadvisorUrl !== null) sameAsList.push(tripadvisorUrl);
+  if (commonsGalleryUrl !== null) sameAsList.push(commonsGalleryUrl);
+  if (merimeeId !== null) {
+    sameAsList.push(`https://www.pop.culture.gouv.fr/notice/merimee/${merimeeId}`);
+  }
+  if (googleMapsCid !== null) {
+    sameAsList.push(`https://maps.google.com/?cid=${googleMapsCid}`);
+  }
+
+  // De-dupe (some hotels have official_url == wikipedia_url_fr for chains)
+  const sameAs = [...new Set(sameAsList)];
+
+  return {
+    wikidataId,
+    wikipediaUrlFr,
+    wikipediaUrlEn,
+    officialUrl,
+    emailReservations,
+    commonsCategory,
+    tripadvisorLocationId,
+    bookingComHotelId,
+    expediaPropertyId,
+    hotelsComHotelId,
+    agodaHotelId,
+    commonsGalleryUrl,
+    tripadvisorUrl,
+    sameAs,
+    knowledgeGraph: {
+      inceptionYear,
+      architects,
+      heritageDesignations,
+      merimeeId,
+      googleMapsCid,
+    },
+  };
 }
 
 /**
@@ -1633,7 +1873,14 @@ export async function getHotelBySlug(
         .maybeSingle();
     }
 
-    if (row.error || !row.data) return null;
+    if (row.error || !row.data) {
+      if (process.env['NODE_ENV'] !== 'production' && row.error) {
+        // Surfaces PostgREST errors (missing columns, RLS denials, network
+        // failures) at dev-time. Silent in production to keep logs clean.
+        console.warn('[getHotelBySlug] no row', { slug, locale, error: row.error });
+      }
+      return null;
+    }
 
     const parsed = HotelDetailRowSchema.safeParse(row.data);
     if (!parsed.success) {
@@ -1766,6 +2013,98 @@ const HotelSummaryRowSchema = z.object({
   is_palace: z.boolean(),
   priority: PrioritySchema,
 });
+
+/**
+ * Index-card row used by `/[locale]/hotels` (catalog landing).
+ * Carries the visual + filter signals (`region`, `hero_image`, short
+ * description) that `PublishedHotelSummary` deliberately omits to
+ * keep the LLM corpus compact.
+ */
+export interface PublishedHotelIndexCard {
+  readonly slugFr: string;
+  readonly slugEn: string | null;
+  readonly nameFr: string;
+  readonly nameEn: string | null;
+  readonly city: string;
+  readonly region: string;
+  readonly stars: number;
+  readonly isPalace: boolean;
+  readonly priority: 'P0' | 'P1' | 'P2';
+  readonly heroPublicId: string | null;
+  readonly descriptionFr: string | null;
+  readonly descriptionEn: string | null;
+}
+
+const HotelIndexRowSchema = z.object({
+  slug: z.string(),
+  slug_en: stringOrEmpty,
+  name: z.string(),
+  name_en: stringOrEmpty,
+  city: z.string(),
+  region: z.string(),
+  stars: z.number().int().min(1).max(5),
+  is_palace: z.boolean(),
+  priority: PrioritySchema,
+  hero_image: stringOrEmpty,
+  description_fr: stringOrEmpty,
+  description_en: stringOrEmpty,
+});
+
+/**
+ * Service-role read powering `/[locale]/hotels` and the `/categorie/*`
+ * + `/destination/*` + `/marque/*` taxonomic landings. Ordered by
+ * editorial `priority` then `name` so promoted properties always
+ * surface above the fold.
+ *
+ * Capped at 200 — even the most aggressive scale plan stays under
+ * that bound for the curated 5★/Palace catalogue.
+ */
+export async function listPublishedHotelsForIndex(
+  limit = 200,
+): Promise<readonly PublishedHotelIndexCard[]> {
+  const safeLimit = Math.max(1, Math.min(500, limit));
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from('hotels')
+      .select(
+        'slug, slug_en, name, name_en, city, region, stars, is_palace, priority, hero_image, description_fr, description_en',
+      )
+      .eq('is_published', true)
+      .order('priority', { ascending: true })
+      .order('name', { ascending: true })
+      .limit(safeLimit);
+    if (error || !Array.isArray(data)) return [];
+
+    const out: PublishedHotelIndexCard[] = [];
+    for (const raw of data) {
+      const parsed = HotelIndexRowSchema.safeParse(raw);
+      if (!parsed.success) continue;
+      const row = parsed.data;
+      if (!isValidSlug(row.slug)) continue;
+      out.push({
+        slugFr: row.slug,
+        slugEn:
+          row.slug_en !== null && row.slug_en.length > 0 && isValidSlug(row.slug_en)
+            ? row.slug_en
+            : null,
+        nameFr: row.name,
+        nameEn: row.name_en !== null && row.name_en.length > 0 ? row.name_en : null,
+        city: row.city,
+        region: row.region,
+        stars: row.stars,
+        isPalace: row.is_palace,
+        priority: row.priority,
+        heroPublicId: row.hero_image,
+        descriptionFr: row.description_fr,
+        descriptionEn: row.description_en,
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Service-role catalog read for GEO/LLM surfaces (`llms.txt`,

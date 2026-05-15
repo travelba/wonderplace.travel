@@ -2,11 +2,12 @@ packages:
   - "apps/*"
   - "packages/*"
   - "tests"
+  - "scripts/editorial-pilot"
 
 catalog:
   # Pinned shared dependency versions across the monorepo.
   # Reference with "catalog:" in package.json dependencies blocks.
-  next: 15.1.6
+  next: 15.3.9
   react: 19.0.0
   react-dom: 19.0.0
   typescript: ^5.6.3

@@ -12,6 +12,7 @@ import { HotelAmenities } from '@/components/hotel/hotel-amenities';
 import { HotelAwards } from '@/components/hotel/hotel-awards';
 import { HotelFactSheet } from '@/components/hotel/hotel-fact-sheet';
 import { HotelFaq } from '@/components/hotel/hotel-faq';
+import { HotelFeaturedInRankings } from '@/components/hotel/hotel-featured-in-rankings';
 import { HotelFeaturedReviews } from '@/components/hotel/hotel-featured-reviews';
 import { HotelFavoriteButton } from '@/components/hotel/hotel-favorite-button';
 import { HotelShareButton } from '@/components/hotel/hotel-share-button';
@@ -24,7 +25,9 @@ import { HotelRestaurants } from '@/components/hotel/hotel-restaurants';
 import { HotelSignatureExperiences } from '@/components/hotel/hotel-signature-experiences';
 import { HotelSpa } from '@/components/hotel/hotel-spa';
 import { HotelStory } from '@/components/hotel/hotel-story';
+import { HotelTldr } from '@/components/hotel/hotel-tldr';
 import { HotelVirtualTour } from '@/components/hotel/hotel-virtual-tour';
+import { RelatedHotels } from '@/components/hotel/related-hotels';
 import { PriceComparator } from '@/components/price-comparator';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { Link } from '@/i18n/navigation';
@@ -43,6 +46,7 @@ import {
   readAmenities,
   readAmenitiesByCategory,
   readAwards,
+  readExternalIds,
   hasAnyPolicy,
   readFaq,
   readFaqByCategory,
@@ -66,6 +70,8 @@ import {
   type HotelDetailRow,
   type SupportedLocale,
 } from '@/server/hotels/get-hotel-by-slug';
+import { getRelatedHotels } from '@/server/hotels/get-related-hotels';
+import { getRankingsForHotel } from '@/server/rankings/get-rankings-for-hotel';
 
 /**
  * Rendering mode (Sprint 4.1 refactor + Phase 11.8 follow-up):
@@ -364,6 +370,7 @@ async function renderHotelPage(
   const galleryImages = readGallery(row, locale, name);
   const virtualTour = readVirtualTour(row);
   const miceInfo = readMiceInfo(row, locale);
+  const externalIds = readExternalIds(row);
   const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const heroDescriptor =
     heroPublicId !== null ? { publicId: heroPublicId, alt: galleryImages[0]?.alt ?? name } : null;
@@ -560,6 +567,46 @@ async function renderHotelPage(
           },
         }
       : {}),
+    // Knowledge-graph anchors (Phase 12.1). Pulled from migration 0025
+    // columns + the Wikidata enrichment cron. Surfaces as:
+    //   - additionalType → unambiguous Wikidata QID disambiguation
+    //   - sameAs[]       → 5-25 canonical URLs (Wikipedia, official,
+    //                      TripAdvisor, Commons, social, Mérimée…)
+    //   - subjectOf[]    → Wikipedia article(s) + Commons gallery
+    //                      (Article schema, strong EEAT signal)
+    //   - founder[]      → architects (Schema.org Person nodes)
+    //   - email          → reservation email (booking_mode=email)
+    // Each field is omitted when null so a partially enriched row
+    // emits a clean, lint-free payload.
+    ...(externalIds.wikidataId !== null ? { wikidataId: externalIds.wikidataId } : {}),
+    ...(externalIds.sameAs.length > 0 ? { sameAs: externalIds.sameAs } : {}),
+    ...((): { subjectOf?: { url: string; name?: string; inLanguage?: 'fr' | 'en' }[] } => {
+      const list: { url: string; name?: string; inLanguage?: 'fr' | 'en' }[] = [];
+      if (externalIds.wikipediaUrlFr !== null) {
+        list.push({
+          url: externalIds.wikipediaUrlFr,
+          name: `${name} — Wikipédia`,
+          inLanguage: 'fr',
+        });
+      }
+      if (externalIds.wikipediaUrlEn !== null) {
+        list.push({
+          url: externalIds.wikipediaUrlEn,
+          name: `${name} — Wikipedia`,
+          inLanguage: 'en',
+        });
+      }
+      if (externalIds.commonsGalleryUrl !== null) {
+        list.push({ url: externalIds.commonsGalleryUrl, name: `${name} — Wikimedia Commons` });
+      }
+      return list.length > 0 ? { subjectOf: list } : {};
+    })(),
+    ...(externalIds.emailReservations !== null && row.booking_mode === 'email'
+      ? { email: externalIds.emailReservations }
+      : {}),
+    ...(externalIds.knowledgeGraph.architects.length > 0
+      ? { architects: externalIds.knowledgeGraph.architects }
+      : {}),
     // Aggregate rating priority — Amadeus first, Google second. The
     // Amadeus mapper already returns `null` for hotels with zero reviews
     // (Google rich-results forbid synthesised ratings), so any value we
@@ -635,6 +682,41 @@ async function renderHotelPage(
   ];
   const faqJsonLd = JsonLd.withSchemaOrgContext(JsonLd.faqPageJsonLd(faqPayload));
 
+  // HowTo JSON-LD (skill: structured-data-schema-org §HowTo).
+  // Two recipes: "How to book at X" + "How to cancel at X". Strong
+  // signal for AI voice assistants (Google Assistant, Siri, Alexa)
+  // answering procedural booking queries.
+  const hotelCanonicalUrl = `${origin}${withLocalePrefix(locale, `/hotel/${row.slug}`)}`;
+  const bookingHowToJsonLd = JsonLd.withSchemaOrgContext(
+    JsonLd.bookingHowToJsonLd({
+      hotelName: name,
+      hotelUrl: hotelCanonicalUrl,
+      locale,
+    }),
+  );
+  const cancellationHowToJsonLd = JsonLd.withSchemaOrgContext(
+    JsonLd.cancellationHowToJsonLd({
+      hotelName: name,
+      hotelUrl: hotelCanonicalUrl,
+      locale,
+    }),
+  );
+
+  // Maillage interne (Phase 12.4 / skill seo-technical §Maillage).
+  // Fetched right before render so the bundle is a Server Component
+  // tree leaf — cached implicitly by the route's ISR layer (1 h).
+  // We parallel-fetch the editorial rankings that feature this hotel
+  // (plan rankings-parity-yonder WS2.5 v4 — bloc "Cet hôtel apparaît dans…").
+  const [relatedHotels, featuredInRankings] = await Promise.all([
+    getRelatedHotels({
+      currentSlug: row.slug,
+      city: row.city,
+      region: row.region,
+      name,
+    }),
+    getRankingsForHotel(row.id, { limit: 6 }),
+  ]);
+
   const nonce = (await headers()).get('x-nonce') ?? undefined;
 
   return (
@@ -642,6 +724,8 @@ async function renderHotelPage(
       <JsonLdScript data={hotelJsonLd} nonce={nonce} />
       <JsonLdScript data={breadcrumbJsonLd} nonce={nonce} />
       <JsonLdScript data={faqJsonLd} nonce={nonce} />
+      <JsonLdScript data={bookingHowToJsonLd} nonce={nonce} />
+      <JsonLdScript data={cancellationHowToJsonLd} nonce={nonce} />
 
       <nav aria-label={t('breadcrumb.hotels')} className="text-muted mb-6 text-xs">
         <ol className="flex flex-wrap items-center gap-1.5">
@@ -756,6 +840,20 @@ async function renderHotelPage(
           </p>
         ) : null}
       </header>
+
+      <HotelTldr
+        locale={locale}
+        name={name}
+        city={row.city}
+        region={row.region}
+        isPalace={row.is_palace}
+        totalRooms={inventory.totalRooms}
+        suites={inventory.suites}
+        openedYear={historyDates.openedYear}
+        architects={externalIds.knowledgeGraph.architects}
+        bookingMode={row.booking_mode}
+        dateModified={row.updated_at !== null && row.updated_at !== '' ? row.updated_at : null}
+      />
 
       <HotelGallery
         locale={locale}
@@ -1096,7 +1194,7 @@ async function renderHotelPage(
       {faqGroups.length > 0 ? (
         <HotelFaq locale={locale} groups={faqGroups} />
       ) : (
-        <section aria-labelledby="faq-title" className="mb-12">
+        <section id="faq" aria-labelledby="faq-title" className="mb-12 scroll-mt-24">
           <h2 id="faq-title" className="text-fg mb-3 font-serif text-2xl">
             {t('sections.faq')}
           </h2>
@@ -1105,6 +1203,15 @@ async function renderHotelPage(
       )}
 
       <HotelReassurance locale={locale} />
+
+      <HotelFeaturedInRankings mentions={featuredInRankings} locale={locale} />
+
+      <RelatedHotels
+        locale={locale}
+        bundle={relatedHotels}
+        currentRegion={row.region}
+        currentCity={row.city}
+      />
 
       <footer className="text-muted mt-10 flex flex-col gap-2 text-xs">
         <p>{t('loyaltyHint')}</p>

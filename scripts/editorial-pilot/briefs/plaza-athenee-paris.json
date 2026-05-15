@@ -1,0 +1,276 @@
+{
+  "slug": "plaza-athenee-paris",
+  "name": "Hôtel Plaza Athénée",
+  "operator": "Dorchester Collection",
+  "city": "Paris",
+  "region": "Île-de-France",
+  "country": "FR",
+  "address": "25 avenue Montaigne, 75008 Paris, France",
+  "coordinates": {
+    "lat": 48.8666,
+    "lng": 2.3046,
+    "verified_confidence": "medium",
+    "source": "Approximation centre du 25 av. Montaigne — à recouper avec Google Maps / Apify avant publication"
+  },
+  "classification": {
+    "stars": 5,
+    "atout_france_palace": true,
+    "atout_france_palace_first_distinction_year": 2011,
+    "verified_confidence": "high",
+    "source": "Première vague de distinctions Palace publiée par Atout France en mai 2011 — Plaza Athénée fait partie des 8 premiers Palaces distingués"
+  },
+  "history": {
+    "opening_year": 1913,
+    "founder_or_first_operator": "Famille Bouvier — propriétaires fondateurs au 25 av. Montaigne",
+    "verified_confidence": "high",
+    "key_dates": [
+      {
+        "year": 1913,
+        "event": "Ouverture sur l'avenue Montaigne, conçu comme hôtel résidentiel pour la haute société internationale",
+        "confidence": "high"
+      },
+      {
+        "year": 1916,
+        "event": "Mata Hari y séjourne à plusieurs reprises — détail documenté dans plusieurs biographies",
+        "confidence": "medium"
+      },
+      {
+        "year": 1947,
+        "event": "Christian Dior installe sa maison de couture au 30 avenue Montaigne, juste en face — l'hôtel devient le quartier général officieux de la haute couture parisienne",
+        "confidence": "high"
+      },
+      {
+        "year": 1979,
+        "event": "Acquisition par le groupe Forte Holdings (Lord Forte)",
+        "confidence": "medium"
+      },
+      {
+        "year": 1996,
+        "event": "Rachat par le Sultan de Brunei (Dorchester Collection — Brunei Investment Agency)",
+        "confidence": "high"
+      },
+      {
+        "year": 2014,
+        "event": "Réouverture après 7 mois de fermeture pour rénovation majeure — direction artistique Bruno Moinard, restaurant Alain Ducasse repensé selon la philosophie 'Naturalité' (poisson-légumes-céréales)",
+        "confidence": "high"
+      }
+    ],
+    "cultural_references": [
+      {
+        "type": "literature_cinema",
+        "item": "Sex and the City — Carrie Bradshaw séjourne au Plaza Athénée dans la saison 6 finale (épisodes parisiens, diffusion 2004)",
+        "confidence": "high"
+      },
+      {
+        "type": "fashion_history",
+        "item": "Lieu de quartier général officieux de la haute couture française — proximité immédiate Dior (30 av. Montaigne), Chanel, Saint Laurent rive droite",
+        "confidence": "high"
+      },
+      {
+        "type": "literature",
+        "item": "Mentions récurrentes chez Frédéric Beigbeder, notamment dans 'L'amour dure trois ans' et plusieurs chroniques",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "architecture": {
+    "style": "Belle Époque haussmannienne",
+    "facade_signature": "Façade en pierre de taille avec marquises Art nouveau, géraniums rouges plantés aux balcons d'avril à octobre — devenus signature visuelle iconique du palace",
+    "interior_design_last_major": {
+      "year": 2014,
+      "designer": "Bruno Moinard (Studio Moinard)",
+      "approach": "Modernisation respectueuse — bois clairs, tons gris-perle, mobilier sur-mesure, couleurs sobres en rupture avec le rouge baroque historique"
+    },
+    "verified_confidence": "medium-high",
+    "notes_to_check": "Vérifier nom exact architecte original 1913 — info pas largement documentée publiquement"
+  },
+  "capacity": {
+    "total_keys": 208,
+    "rooms": 154,
+    "suites": 54,
+    "signature_suites": [
+      {
+        "name": "Suite Royale",
+        "size_m2": 450,
+        "feature": "Plus grande suite du palace, vue Tour Eiffel"
+      },
+      {
+        "name": "Suite Eiffel",
+        "size_m2": 88,
+        "feature": "Suite signature avec terrasse face Tour Eiffel"
+      }
+    ],
+    "verified_confidence": "medium",
+    "notes_to_check": "Capacité totale recoupée publiquement à 208 clés, dont 154 chambres et 54 suites — à reverifier sur site officiel Dorchester Collection avant publication"
+  },
+  "dining": [
+    {
+      "name": "Alain Ducasse au Plaza Athénée",
+      "type": "restaurant_signature",
+      "chef": "Alain Ducasse (en partenariat avec Romain Meder puis Jean Imbert)",
+      "current_chef": "Jean Imbert (depuis 2021)",
+      "michelin_stars": 3,
+      "since_stars": 2016,
+      "cuisine": "Cuisine française contemporaine — relecture du patrimoine culinaire français par Jean Imbert depuis 2021, retour aux classiques après la période Naturalité",
+      "verified_confidence": "high",
+      "source": "Guide Michelin France — édition la plus récente disponible"
+    },
+    {
+      "name": "Le Relais Plaza",
+      "type": "brasserie",
+      "style": "Brasserie Art déco classée, ouverte en 1936 — cantine historique de la mode parisienne",
+      "verified_confidence": "high"
+    },
+    {
+      "name": "Bar du Plaza Athénée",
+      "type": "bar",
+      "designer": "Patrick Jouin (rénovation)",
+      "signature": "Bar comptoir en bloc de verre rétroéclairé, mixologie reconnue internationalement",
+      "verified_confidence": "high"
+    },
+    {
+      "name": "La Galerie",
+      "type": "salon",
+      "feature": "Salon de thé et restauration légère — décor signature, fauteuils en velours",
+      "verified_confidence": "medium"
+    }
+  ],
+  "wellness": {
+    "spa_name": "Dior Institut au Plaza Athénée",
+    "spa_partner": "Parfums Christian Dior",
+    "size_m2": 450,
+    "signature": "Premier spa Dior au monde, ouvert au Plaza Athénée — soins exclusifs Dior Prestige",
+    "facilities": ["pool", "hammam", "sauna", "treatment_rooms_8", "fitness_center"],
+    "verified_confidence": "medium-high"
+  },
+  "service": {
+    "languages_spoken": [
+      "français",
+      "anglais",
+      "espagnol",
+      "italien",
+      "portugais",
+      "russe",
+      "mandarin",
+      "japonais",
+      "arabe"
+    ],
+    "concierge": "Les Clefs d'Or (plusieurs concierges médaillés)",
+    "verified_confidence": "medium"
+  },
+  "signature_features": [
+    "Cour intérieure pavée aux géraniums rouges — emblème du palace, photographiée dans le monde entier",
+    "Patinoire éphémère installée chaque hiver dans la cour (depuis 2008)",
+    "Position avenue Montaigne — golden triangle de la mode parisienne",
+    "Vue Tour Eiffel depuis les chambres et suites des étages supérieurs côté nord"
+  ],
+  "nearby_pois": [
+    {
+      "name": "Théâtre des Champs-Élysées",
+      "distance_m": 200,
+      "type": "cultural",
+      "note": "Scène mythique du Sacre du Printemps de Stravinsky (1913) — même année que l'ouverture du Plaza Athénée",
+      "confidence": "high"
+    },
+    {
+      "name": "Avenue des Champs-Élysées",
+      "distance_m": 350,
+      "type": "shopping_avenue",
+      "confidence": "high"
+    },
+    {
+      "name": "Place de l'Alma",
+      "distance_m": 400,
+      "type": "transport_landmark",
+      "note": "Mémorial Princesse Diana à proximité immédiate",
+      "confidence": "high"
+    },
+    {
+      "name": "Pont de l'Alma — Tour Eiffel",
+      "distance_m": 750,
+      "type": "monument",
+      "confidence": "high"
+    },
+    {
+      "name": "Maison Dior — 30 avenue Montaigne",
+      "distance_m": 80,
+      "type": "fashion_landmark",
+      "note": "Boutique historique et musée Dior depuis 2022",
+      "confidence": "high"
+    },
+    {
+      "name": "Petit Palais — Musée des Beaux-Arts de la Ville de Paris",
+      "distance_m": 600,
+      "type": "museum",
+      "confidence": "high"
+    },
+    {
+      "name": "Grand Palais",
+      "distance_m": 700,
+      "type": "museum_event_venue",
+      "confidence": "high"
+    },
+    {
+      "name": "Pont Alexandre III",
+      "distance_m": 850,
+      "type": "monument",
+      "confidence": "high"
+    }
+  ],
+  "iata_insider": {
+    "advisor_name": "Léa",
+    "advisor_role": "conseillère senior Paris ConciergeTravel.fr",
+    "key_observation": "L'orientation des suites Eiffel — la lumière du Trocadéro entre dans les chambres entre 17h et 19h en hiver. Détail rarement mentionné par l'hôtel lui-même.",
+    "best_for": "Voyageurs combinant un agenda haute couture (Fashion Week) ou un rendez-vous Avenue Montaigne avec un séjour de 3-4 nuits",
+    "honest_caveat": "Localisation très centrale mais entrée d'immeuble urbain — l'aventure ne commence vraiment qu'une fois la cour franchie. Pas le palace à choisir pour une 'arrivée scénographique' à la Bristol ou Crillon.",
+    "alternative_recommendation": "Pour un voyageur priorisant la vue plein nord Tour Eiffel toute la journée : Shangri-La Paris (16ᵉ). Pour la sérénité absolue : Bristol (8ᵉ)."
+  },
+  "pricing_indication": {
+    "low_season_classic_room_from_eur": 1400,
+    "high_season_classic_room_from_eur": 2100,
+    "suite_eiffel_from_eur": 4500,
+    "verified_confidence": "low",
+    "note": "Fourchettes indicatives 2024-2025. À recouper avec ARI Amadeus avant publication — le brief ne doit jamais figer un prix précis."
+  },
+  "operational": {
+    "opening_dates": "Ouvert toute l'année",
+    "renovation_pattern": "Cycles de rénovation majeurs ~10-15 ans, prochain attendu fin années 2020",
+    "verified_confidence": "low"
+  },
+  "sources": [
+    {
+      "type": "wikipedia_fr",
+      "url": "https://fr.wikipedia.org/wiki/Hôtel_Plaza_Athénée",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "wikidata",
+      "qid": "Q1196245",
+      "url": "https://www.wikidata.org/wiki/Q1196245",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "official",
+      "url": "https://www.dorchestercollection.com/paris/hotel-plaza-athenee/",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "atout_france_palace_registry",
+      "url": "https://www.atout-france.fr/services/classement-hebergement-touristique",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "michelin_guide",
+      "url": "https://guide.michelin.com/fr/fr/ile-de-france/paris/restaurant/alain-ducasse-au-plaza-athenee",
+      "consulted_at": "2026-05-11"
+    }
+  ],
+  "verification_required_before_publication": [
+    "Coordonnées GPS exactes (lat/lng) via géocodage data.gouv.fr API Adresse",
+    "Date exacte de première distinction Palace Atout France (mai 2011 vraisemblable, à confirmer)",
+    "Nombre exact actuel de chambres et suites — page officielle Dorchester Collection",
+    "Nombre actuel d'étoiles Michelin du restaurant — édition la plus récente",
+    "Nom architecte original 1913 — recherche archive Préfecture / Mairie du 8ᵉ",
+    "Pricing fourchettes — connecter ARI Amadeus en J+0"
+  ]
+}

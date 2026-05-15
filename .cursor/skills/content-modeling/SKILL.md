@@ -184,3 +184,7 @@ Invoke when:
 - CDC v3.0 §3.2 (i18n), §4 (data model), §6.2 (hotel anatomy), §11 (back-office).
 - Excel sheets — Pages Éditoriales, Topic Clusters.
 - `backoffice-cms`, `seo-technical`, `geo-llm-optimization` skills.
+- **`llm-output-robustness`** — when populating content fields via an LLM
+  pipeline (editorial guides, rankings, hotel fiches, AEO blocks).
+- **`typescript-strict-zod-interop`** — when a Zod schema for a content
+  field will be consumed by a React component (front-end rendering).

@@ -71,3 +71,21 @@ plans/
 
 # Local PDF copies (keep tracked references in docs/ if needed)
 *.pdf
+
+# Editorial pilot — local-only artifacts (audit dumps, pipeline outputs, briefs auto)
+scripts/editorial-pilot/_audit/
+scripts/editorial-pilot/output/
+scripts/editorial-pilot/briefs-auto/
+
+# Local debug / scratch dumps (e2e runs, server crash logs, CLI captures, rendered HTML snapshots)
+.e2e-*.txt
+.matrix-*.txt
+.ws0*.txt
+.srv.err
+.catalog-out.txt
+*-rendered.html
+
+# Editorial pilot scratch data + generated showcase pilots (kept out of version control)
+scripts/editorial-pilot/data/
+docs/editorial/pilots-auto/
+docs/editorial/showcase/

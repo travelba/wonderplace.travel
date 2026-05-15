@@ -1,0 +1,313 @@
+{
+  "slug": "hotel-du-cap-eden-roc",
+  "name": "Hôtel du Cap-Eden-Roc",
+  "operator": "Oetker Collection (famille Oetker, Bielefeld)",
+  "city": "Antibes",
+  "region": "Provence-Alpes-Côte d'Azur",
+  "country": "FR",
+  "address": "Boulevard JF Kennedy, BP 29, 06160 Antibes (Cap d'Antibes), France",
+  "coordinates": {
+    "lat": 43.5519,
+    "lng": 7.1267,
+    "verified_confidence": "medium",
+    "source": "Approximation pointe Cap d'Antibes — à recouper avec Google Maps avant publication"
+  },
+  "classification": {
+    "stars": 5,
+    "atout_france_palace": true,
+    "atout_france_palace_first_distinction_year": 2014,
+    "verified_confidence": "medium-high",
+    "source": "Distinction Palace obtenue dans la deuxième vague Atout France (vers 2014)"
+  },
+  "history": {
+    "opening_year": 1870,
+    "founder_or_first_operator": "Hippolyte de Villemessant (fondateur du Figaro) ouvre la Villa Soleil comme maison de repos pour écrivains et artistes",
+    "eden_roc_pavilion_year": 1914,
+    "verified_confidence": "high",
+    "key_dates": [
+      {
+        "year": 1870,
+        "event": "Ouverture de la Villa Soleil par Hippolyte de Villemessant — maison de repos pour écrivains, devient rapidement résidence d'été de l'aristocratie européenne",
+        "confidence": "high"
+      },
+      {
+        "year": 1887,
+        "event": "Acquisition par Antoine Sella, qui rebaptise l'établissement 'Grand Hôtel du Cap'",
+        "confidence": "high"
+      },
+      {
+        "year": 1914,
+        "event": "Construction du pavillon Eden-Roc en bord de mer par l'architecte Eugène Brun — créé pour servir le déjeuner aux clients de l'hôtel jusque-là réservé à la haute saison hivernale",
+        "confidence": "high"
+      },
+      {
+        "year": 1923,
+        "event": "Frank Jay Gould (riche héritier américain) en fait le premier hôtel de la Côte d'Azur à ouvrir en été — révolution dans le tourisme de la Riviera",
+        "confidence": "high"
+      },
+      {
+        "year": 1925,
+        "event": "F. Scott Fitzgerald et Zelda y séjournent et y rencontrent Sara et Gerald Murphy — l'hôtel inspirera directement 'Tendre est la nuit' (1934) sous le nom 'Hôtel des Étrangers Gausse'",
+        "confidence": "high"
+      },
+      {
+        "year": 1969,
+        "event": "Acquisition par la famille Oetker",
+        "confidence": "high"
+      },
+      {
+        "year": 2010,
+        "event": "Rénovation majeure dirigée par Patricia Anastassiadis — modernisation des chambres en préservant l'âme Belle Époque",
+        "confidence": "medium"
+      }
+    ],
+    "cultural_references": [
+      {
+        "type": "literature",
+        "item": "F. Scott Fitzgerald — 'Tendre est la nuit' (Tender Is the Night, 1934) : l'hôtel y est décrit explicitement comme 'l'Hôtel des Étrangers Gausse', perché 'sur le rivage rose et bronzé de la Riviera française', avec une 'plage propre, et un grand hôtel rose et délavé' — l'incipit même du roman",
+        "confidence": "high"
+      },
+      {
+        "type": "cinema",
+        "item": "Marc Allégret y tourne plusieurs séquences ; lieu de tournage récurrent de la nouvelle vague et de la production internationale en escale cannoise",
+        "confidence": "medium"
+      },
+      {
+        "type": "history_celebrities",
+        "item": "Lieu de séjour récurrent du Duc et de la Duchesse de Windsor, de JFK, de Marlene Dietrich, de Pablo Picasso (qui fréquente la pinède à pied depuis Antibes), de la famille Kennedy",
+        "confidence": "high"
+      },
+      {
+        "type": "cannes_film_festival",
+        "item": "Quartier général officieux des stars d'Hollywood pendant le Festival de Cannes depuis les années 1950 — proximité Cannes (15 km) et confidentialité maximale",
+        "confidence": "high"
+      },
+      {
+        "type": "music",
+        "item": "Du Côté de Chez Swann — clin d'œil de Proust à l'aristocratie balnéaire de la Riviera (référence indirecte, à manier avec précaution)",
+        "confidence": "low"
+      }
+    ]
+  },
+  "architecture": {
+    "main_building_style": "Villa Belle Époque, façade rose pâle caractéristique, toiture en tuiles méditerranéennes",
+    "main_building_architect": "Architecte d'origine non largement documenté publiquement",
+    "eden_roc_pavilion": {
+      "year": 1914,
+      "architect": "Eugène Brun",
+      "feature": "Pavillon en bord de mer, terrasse panoramique sur la Méditerranée, abrite le restaurant Eden-Roc"
+    },
+    "iconic_pool": {
+      "feature": "Piscine creusée dans la roche au bord de la Méditerranée — l'une des plus photographiées d'Europe, eau de mer filtrée",
+      "depth_m": 2.5
+    },
+    "park": {
+      "size_hectares": 9,
+      "feature": "Parc privé en pinède sur 9 hectares à la pointe du Cap d'Antibes, accès direct mer privée",
+      "verified_confidence": "medium",
+      "note_to_check": "Certaines sources mentionnent 9 ha, d'autres jusqu'à 22 ha en comptant la propriété historique étendue — à recouper"
+    },
+    "verified_confidence": "medium-high"
+  },
+  "capacity": {
+    "total_keys": 118,
+    "rooms": 88,
+    "suites": 27,
+    "villas": 3,
+    "signature_accommodations": [
+      {
+        "name": "Eden-Roc Suite",
+        "feature": "Suite signature avec terrasse panoramique mer"
+      },
+      {
+        "name": "Villa Soleil",
+        "feature": "Villa historique de 6 chambres, privatisable, accès piscine privée"
+      },
+      {
+        "name": "Bastide du Cap",
+        "feature": "Bastide indépendante 5 chambres, ancienne propriété de la famille fondatrice"
+      }
+    ],
+    "verified_confidence": "medium",
+    "notes_to_check": "Capacité actuelle exacte (chambres + suites + villas) — site officiel Oetker Collection"
+  },
+  "dining": [
+    {
+      "name": "Eden-Roc Restaurant",
+      "type": "restaurant_signature",
+      "chef": "Arnaud Poëtte (chef historique, depuis 1998)",
+      "current_chef": "Arnaud Poëtte",
+      "michelin_stars": 0,
+      "michelin_history_note": "Le restaurant a longtemps eu 1 étoile Michelin (jusqu'aux années 2000-2010). Plus actuellement étoilé selon les dernières éditions — l'orientation gastronomique mais accessible, palette méditerranéenne, prime sur la course aux étoiles.",
+      "cuisine": "Cuisine méditerranéenne contemporaine, produits locaux Provence, légumes du potager de l'hôtel",
+      "verified_confidence": "medium",
+      "note_to_check": "Vérifier statut Michelin actuel — édition la plus récente"
+    },
+    {
+      "name": "Restaurant du Cap (anciennement Grill, devenu Italian Pavilion en saison)",
+      "type": "brasserie_pool_side",
+      "style": "Restauration au bord de la piscine — service au verre devant la Méditerranée",
+      "verified_confidence": "medium"
+    },
+    {
+      "name": "Champagne Lounge / Bar Bellini",
+      "type": "bar",
+      "signature": "Bar mythique connu pour ses Bellinis et son ambiance Cannes Film Festival",
+      "verified_confidence": "medium"
+    }
+  ],
+  "wellness": {
+    "spa_name": "Eden-Roc Spa by Sisley",
+    "spa_partner": "Sisley Paris",
+    "size_m2": 900,
+    "signature": "Soins exclusifs Sisley — gamme Phytocosmétique. Cabines tournées vers la pinède.",
+    "facilities": [
+      "indoor_pool_heated",
+      "outdoor_pool_sea_carved",
+      "hammam",
+      "sauna",
+      "treatment_rooms_6",
+      "fitness_center",
+      "tennis_courts_4",
+      "private_beach"
+    ],
+    "verified_confidence": "medium-high"
+  },
+  "service": {
+    "languages_spoken": [
+      "français",
+      "anglais",
+      "allemand",
+      "italien",
+      "espagnol",
+      "russe",
+      "japonais",
+      "mandarin"
+    ],
+    "concierge": "Les Clefs d'Or",
+    "signature_service": "Politique historique de paiement uniquement en espèces ou par virement (abolie progressivement à partir des années 2000-2010, les cartes sont aujourd'hui acceptées) — anecdote célèbre de l'hôtel",
+    "verified_confidence": "medium"
+  },
+  "signature_features": [
+    "Piscine creusée dans la roche au bord de la Méditerranée — l'une des images les plus photographiées de la Côte d'Azur",
+    "Pinède privée de 9 hectares en pointe du Cap d'Antibes",
+    "Pavillon Eden-Roc en bord de mer (1914) — terrasse panoramique signature",
+    "Plage privée et ponton",
+    "Politique de discrétion absolue, popularité historique auprès des stars du Festival de Cannes",
+    "Vue Mer ouverte 270° depuis la pointe — par temps clair, on aperçoit la Corse à l'horizon"
+  ],
+  "nearby_pois": [
+    {
+      "name": "Musée Picasso (Château Grimaldi) — Antibes",
+      "distance_m": 4500,
+      "type": "museum",
+      "note": "Picasso vit et travaille à Antibes en 1946 ; le musée occupe le château où il dispose d'un atelier — proximité directe avec la mythologie du Cap",
+      "confidence": "high"
+    },
+    {
+      "name": "Vieille ville d'Antibes",
+      "distance_m": 4200,
+      "type": "old_town",
+      "confidence": "high"
+    },
+    {
+      "name": "Phare de la Garoupe",
+      "distance_m": 1800,
+      "type": "lighthouse_landmark",
+      "note": "Phare au point culminant du Cap d'Antibes, vue panoramique 360°, sentier des Douaniers à pied depuis l'hôtel",
+      "confidence": "high"
+    },
+    {
+      "name": "Sentier des Douaniers (Cap d'Antibes)",
+      "distance_m": 100,
+      "type": "hiking_coastal_trail",
+      "note": "Sentier littoral contournant le Cap, 4,8 km, départ depuis la plage de la Garoupe accessible à pied",
+      "confidence": "high"
+    },
+    {
+      "name": "Cannes — Boulevard de la Croisette",
+      "distance_m": 15000,
+      "type": "shopping_avenue",
+      "confidence": "high"
+    },
+    {
+      "name": "Aéroport Nice Côte d'Azur (NCE)",
+      "distance_m": 22000,
+      "type": "international_airport",
+      "confidence": "high"
+    },
+    {
+      "name": "Saint-Paul-de-Vence",
+      "distance_m": 25000,
+      "type": "perched_village",
+      "note": "Village perché — Fondation Maeght et restaurants Colombe d'Or",
+      "confidence": "high"
+    },
+    {
+      "name": "Île Sainte-Marguerite (Lérins)",
+      "distance_m": 8000,
+      "type": "island_nature",
+      "note": "Île au large de Cannes, ancienne prison du Masque de fer, forêt et baignade — accessible en bateau-taxi depuis le ponton de l'hôtel sur demande",
+      "confidence": "medium-high"
+    }
+  ],
+  "iata_insider": {
+    "advisor_name": "Marc",
+    "advisor_role": "conseiller senior Côte d'Azur ConciergeTravel.fr",
+    "key_observation": "L'arrivée à pied par l'allée centrale de pinède — 400 mètres entre le portail et la villa principale, avec les cigales en juillet — c'est là que l'on comprend ce qui distingue Eden-Roc d'à peu près tout le reste : un palace qui se mérite par l'approche, jamais par la façade.",
+    "best_for": "Séjours 5-7 nuits hors festival (juin avant Cannes, septembre), couples célébrant un événement majeur, voyageurs ayant déjà fait Bristol Paris et cherchant l'antithèse géographique (mer ouverte, jardin, isolement)",
+    "honest_caveat": "Pas la bonne adresse en hiver — l'établissement ferme traditionnellement de mi-octobre à mi-avril. Pas non plus la bonne adresse pour une étape courte (1-2 nuits) : la magie Eden-Roc se révèle sur la durée, dans les rituels de pinède.",
+    "alternative_recommendation": "Pour un palace Côte d'Azur ouvert toute l'année : Cap-Estel (Èze) ou La Réserve de Beaulieu. Pour la même isolation magnifique en hiver : Cheval Blanc Saint-Tropez (mais format radicalement plus design contemporain)."
+  },
+  "pricing_indication": {
+    "low_season_classic_room_from_eur": 1100,
+    "high_season_classic_room_from_eur": 2500,
+    "high_season_during_cannes_film_festival_from_eur": 4500,
+    "eden_roc_suite_from_eur": 6000,
+    "verified_confidence": "low",
+    "note": "Fourchettes indicatives 2024-2025. Pic prix non négociable pendant Festival de Cannes (2 semaines en mai). À recouper avec ARI avant publication."
+  },
+  "operational": {
+    "seasonal_closure": "Traditionnellement fermé mi-octobre à mi-avril (env. 6 mois) — l'un des derniers palaces saisonniers de France",
+    "opening_pattern_2025": "À vérifier — calendrier officiel Oetker Collection",
+    "verified_confidence": "high"
+  },
+  "sources": [
+    {
+      "type": "wikipedia_fr",
+      "url": "https://fr.wikipedia.org/wiki/Hôtel_du_Cap-Eden-Roc",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "wikidata",
+      "qid": "Q1622748",
+      "url": "https://www.wikidata.org/wiki/Q1622748",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "official",
+      "url": "https://www.oetkercollection.com/destinations/hotel-du-cap-eden-roc/",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "literature_primary",
+      "citation": "Fitzgerald, F. Scott. Tender Is the Night. Charles Scribner's Sons, 1934. Incipit (Book I).",
+      "consulted_at": "2026-05-11"
+    },
+    {
+      "type": "atout_france_palace_registry",
+      "url": "https://www.atout-france.fr/services/classement-hebergement-touristique",
+      "consulted_at": "2026-05-11"
+    }
+  ],
+  "verification_required_before_publication": [
+    "Coordonnées GPS exactes (lat/lng) via géocodage data.gouv.fr API Adresse",
+    "Date exacte de première distinction Palace Atout France",
+    "Nombre exact actuel de chambres / suites / villas — site officiel Oetker Collection",
+    "Statut Michelin actuel du restaurant Eden-Roc — édition la plus récente",
+    "Surface exacte du parc (9 ha vs 22 ha selon sources)",
+    "Calendrier saisonnier exact 2025-2026 — calendrier officiel hôtel",
+    "Authentification précise du verbatim Fitzgerald — édition originale 1934",
+    "Pricing fourchettes — connecter ARI Amadeus en J+0"
+  ]
+}

@@ -125,6 +125,21 @@ function buildRow(locale: SupportedLocale): HotelDetailRow {
         },
       ],
     },
+    // External identifiers + knowledge-graph anchors (migration 0025).
+    // All `null` for the synthetic E2E fixture — the real Wikidata
+    // enrichment cron never sees this row.
+    wikidata_id: null,
+    wikipedia_url_fr: null,
+    wikipedia_url_en: null,
+    tripadvisor_location_id: null,
+    booking_com_hotel_id: null,
+    expedia_property_id: null,
+    hotels_com_hotel_id: null,
+    agoda_hotel_id: null,
+    official_url: null,
+    email_reservations: null,
+    commons_category: null,
+    external_sameas: null,
     is_published: true,
     updated_at: '2026-05-01T10:00:00.000Z',
     // Inventory counts surface in JSON-LD Hotel.numberOfRooms and the

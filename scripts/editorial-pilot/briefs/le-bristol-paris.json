@@ -1,0 +1,278 @@
+{
+  "slug": "le-bristol-paris",
+  "name": "Le Bristol Paris",
+  "operator": "Oetker Collection (famille Oetker, Bielefeld)",
+  "city": "Paris",
+  "region": "Île-de-France",
+  "country": "FR",
+  "address": "112 rue du Faubourg Saint-Honoré, 75008 Paris, France",
+  "coordinates": {
+    "lat": 48.8718,
+    "lng": 2.3158,
+    "verified_confidence": "medium",
+    "source": "Approximation rue du Faubourg Saint-Honoré (proche Élysée). À recouper avec API Adresse data.gouv.fr."
+  },
+  "classification": {
+    "stars": 5,
+    "atout_france_palace": true,
+    "atout_france_palace_first_distinction_year": 2011,
+    "verified_confidence": "high",
+    "source": "Première vague de distinctions Palace Atout France de mai 2011 — Le Bristol en fait partie."
+  },
+  "history": {
+    "opening_year": 1925,
+    "founder_or_first_operator": "Hippolyte Jammet — ouverture de l'hôtel sous sa forme actuelle, dans l'ancien hôtel particulier du comte Jules de Castellane construit en 1758",
+    "verified_confidence": "high",
+    "key_dates": [
+      {
+        "year": 1758,
+        "event": "Construction de l'hôtel particulier par le comte Jules de Castellane sur la rue du Faubourg Saint-Honoré",
+        "confidence": "high"
+      },
+      {
+        "year": 1925,
+        "event": "Inauguration de l'hôtel sous le nom 'Hôtel Le Bristol' par Hippolyte Jammet, qui rend hommage au 4ᵉ comte de Bristol, voyageur britannique fameux du XVIIIᵉ siècle",
+        "confidence": "high"
+      },
+      {
+        "year": 1944,
+        "event": "Le Bristol sert d'ambassade des États-Unis pendant la Libération de Paris — l'hôtel est l'un des rares établissements parisiens à n'avoir pas été réquisitionné par les troupes allemandes durant l'Occupation",
+        "confidence": "high"
+      },
+      {
+        "year": 1978,
+        "event": "Acquisition par la famille Oetker (Bielefeld) — Le Bristol devient le navire amiral de ce qui deviendra l'Oetker Collection",
+        "confidence": "high"
+      },
+      {
+        "year": 2009,
+        "event": "Extension majeure : l'aile Matignon ajoute 26 chambres et suites, ainsi qu'une piscine couverte au 6ᵉ étage avec vue panoramique sur Paris",
+        "confidence": "high"
+      }
+    ],
+    "cultural_references": [
+      {
+        "type": "cinema",
+        "item": "Midnight in Paris de Woody Allen (2011) — plusieurs scènes tournées dans les salons et le jardin du Bristol",
+        "confidence": "high"
+      },
+      {
+        "type": "literature",
+        "item": "Repaire historique de Joséphine Baker, des sœurs Mitford, du couple Charlie Chaplin et de la Bégum Aga Khan",
+        "confidence": "high"
+      },
+      {
+        "type": "history",
+        "item": "Pied-à-terre traditionnel des chefs d'État en visite à Paris, par sa proximité avec le Palais de l'Élysée (300 m)",
+        "confidence": "high"
+      },
+      {
+        "type": "feline_celebrity",
+        "item": "Fa-Raon, le chat sacré de Birmanie du Bristol, et avant lui Kléopâtre — mascotte officielle du palace présente dans les salons depuis 2010",
+        "confidence": "medium-high"
+      }
+    ]
+  },
+  "architecture": {
+    "style": "Hôtel particulier du XVIIIᵉ siècle revisité, façade néoclassique en pierre de taille",
+    "facade_signature": "Façade discrète sur la rue du Faubourg Saint-Honoré — élégance bourgeoise plutôt que théâtrale, à l'image du quartier",
+    "interior_design_last_major": {
+      "year": 2018,
+      "designer": "Pierre-Yves Rochon (extension Matignon) ; rénovations continues par les équipes Oetker Collection",
+      "approach": "Mobilier d'époque Louis XV / Louis XVI authentique, tissus français Pierre Frey, tableaux de maîtres en collection privée"
+    },
+    "jardin": {
+      "feature": "Jardin intérieur de 1 200 m² — l'un des plus vastes jardins privés d'un palace parisien — clos par les façades de l'hôtel particulier",
+      "verified_confidence": "high"
+    },
+    "rooftop_pool": {
+      "feature": "Piscine couverte du 6ᵉ étage, décor en bois acajou inspiré d'un yacht des années 1920, vue dégagée sur les toits de Paris",
+      "verified_confidence": "high"
+    },
+    "verified_confidence": "high"
+  },
+  "capacity": {
+    "total_keys": 190,
+    "rooms": 102,
+    "suites": 88,
+    "signature_accommodations": [
+      {
+        "name": "Suite Impériale",
+        "size_m2": 320,
+        "feature": "Une des plus grandes suites de Paris, vue sur le jardin intérieur, mobilier d'époque Empire"
+      },
+      {
+        "name": "Suite Penthouse",
+        "size_m2": 270,
+        "feature": "Suite du 6ᵉ étage avec terrasse panoramique de 100 m² sur les toits de Paris"
+      }
+    ],
+    "verified_confidence": "medium-high",
+    "notes_to_check": "Recouper le breakdown chambres/suites avec le site officiel Oetker Collection"
+  },
+  "dining": [
+    {
+      "name": "Épicure",
+      "type": "restaurant_signature",
+      "chef": "Éric Fréchon",
+      "current_chef": "Éric Fréchon (depuis 1999, chef exécutif du Bristol depuis 1996)",
+      "michelin_stars": 3,
+      "since_stars": 2009,
+      "cuisine": "Haute cuisine française classique revisitée — signature : macaroni truffe noire foie gras et céleri",
+      "verified_confidence": "high",
+      "source": "Guide Michelin France — édition la plus récente"
+    },
+    {
+      "name": "114 Faubourg",
+      "type": "brasserie_haut_de_gamme",
+      "chef": "Éric Desbordes",
+      "michelin_stars": 1,
+      "cuisine": "Cuisine de bistronomie haut de gamme — entre brasserie parisienne et table contemporaine",
+      "verified_confidence": "high",
+      "source": "Guide Michelin France"
+    },
+    {
+      "name": "Le Bar du Bristol",
+      "type": "bar",
+      "feature": "Bar lounge avec carte de cocktails signature, programmation musicale jazz live certains soirs",
+      "verified_confidence": "medium"
+    }
+  ],
+  "wellness": {
+    "spa_name": "Spa Le Bristol Paris by La Prairie",
+    "spa_partner": "La Prairie (Suisse)",
+    "size_m2": 1200,
+    "signature": "Soins exclusifs La Prairie ligne Platinum — 8 cabines de soin dont une suite duo",
+    "facilities": ["pool_rooftop_acajou", "hammam", "sauna", "treatment_rooms_8", "fitness_center"],
+    "verified_confidence": "high"
+  },
+  "service": {
+    "languages_spoken": [
+      "français",
+      "anglais",
+      "espagnol",
+      "italien",
+      "russe",
+      "mandarin",
+      "japonais",
+      "arabe",
+      "allemand"
+    ],
+    "concierge": "Les Clefs d'Or — équipe historiquement médaillée, plusieurs chefs-concierges Clés d'Or",
+    "verified_confidence": "medium-high"
+  },
+  "signature_features": [
+    "Jardin intérieur de 1 200 m² — l'un des plus vastes jardins privés en hôtel parisien",
+    "Piscine rooftop au 6ᵉ étage, décor acajou inspiré d'un yacht des années 1920, vue toits de Paris",
+    "Localisation rue du Faubourg Saint-Honoré, à 300 mètres du Palais de l'Élysée",
+    "Fa-Raon, chat sacré de Birmanie, mascotte officielle du palace présente dans les salons",
+    "Tradition d'hôtellerie familiale Oetker Collection, sans groupe coté"
+  ],
+  "nearby_pois": [
+    {
+      "name": "Palais de l'Élysée",
+      "distance_m": 300,
+      "type": "presidential_palace",
+      "note": "Résidence officielle du Président de la République française — visite des Journées du Patrimoine en septembre",
+      "confidence": "high"
+    },
+    {
+      "name": "Madeleine",
+      "distance_m": 600,
+      "type": "church_landmark",
+      "note": "Église Sainte-Marie-Madeleine, modèle architectural d'un temple romain — célèbre pour ses concerts d'orgue",
+      "confidence": "high"
+    },
+    {
+      "name": "Place de la Concorde",
+      "distance_m": 850,
+      "type": "historic_square",
+      "confidence": "high"
+    },
+    {
+      "name": "Musée Jacquemart-André",
+      "distance_m": 700,
+      "type": "museum",
+      "note": "Collection privée d'art italien et flamand dans un hôtel particulier du Boulevard Haussmann",
+      "confidence": "high"
+    },
+    {
+      "name": "Faubourg Saint-Honoré (boutiques de luxe)",
+      "distance_m": 0,
+      "type": "shopping_avenue",
+      "note": "Avenue de toutes les maisons de couture historiques : Hermès (24), Lanvin (22), Saint Laurent, Versace, Goyard",
+      "confidence": "high"
+    },
+    {
+      "name": "Avenue des Champs-Élysées (Rond-Point)",
+      "distance_m": 750,
+      "type": "shopping_avenue",
+      "confidence": "high"
+    },
+    {
+      "name": "Parc Monceau",
+      "distance_m": 1100,
+      "type": "park",
+      "note": "Jardin à l'anglaise du 8ᵉ arrondissement, fréquenté par la haute bourgeoisie",
+      "confidence": "high"
+    }
+  ],
+  "iata_insider": {
+    "advisor_name": "Léa",
+    "advisor_role": "conseillère senior Paris ConciergeTravel.fr",
+    "key_observation": "Pour un séjour avec rendez-vous officiels ou diplomatiques, Le Bristol est plus pertinent que les autres palaces du triangle d'or — proximité Élysée 300 mètres, code vestimentaire des couloirs aligné, équipe de conciergerie historiquement habituée aux cortèges et protocole.",
+    "best_for": "Voyageurs d'affaires haut de gamme, déplacements officiels, séjours culturels nécessitant un quartier moins touristique que Vendôme ou Montaigne, et familles avec enfants (le jardin intérieur permet un usage de respiration rare en plein Paris).",
+    "honest_caveat": "Quartier sobre, presque austère le dimanche — peu d'animation du soir comparé à Saint-Germain ou Marais. Pas le bon choix pour un city break orienté vie nocturne. La façade discrète ne joue pas le signal de luxe attendu par certains : le luxe ici est intérieur.",
+    "alternative_recommendation": "Pour une localisation plus festive et théâtrale : Plaza Athénée (avenue Montaigne) ou Ritz Paris (place Vendôme). Pour le rapport jardin/budget : pas d'équivalent à Paris."
+  },
+  "pricing_indication": {
+    "low_season_classic_room_from_eur": 1500,
+    "high_season_classic_room_from_eur": 2200,
+    "suite_imperiale_from_eur": 12000,
+    "suite_penthouse_from_eur": 25000,
+    "verified_confidence": "low",
+    "note": "Fourchettes indicatives 2024-2025. La Suite Impériale et la Suite Penthouse sont parmi les hébergements les plus chers de Paris."
+  },
+  "operational": {
+    "opening_dates": "Ouvert toute l'année",
+    "renovation_pattern": "Rénovations continues, dernière extension majeure aile Matignon 2009",
+    "verified_confidence": "medium"
+  },
+  "sources": [
+    {
+      "type": "wikipedia_fr",
+      "url": "https://fr.wikipedia.org/wiki/Hôtel_Le_Bristol_Paris",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "wikidata",
+      "qid": "Q1632093",
+      "url": "https://www.wikidata.org/wiki/Q1632093",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "official",
+      "url": "https://www.oetkercollection.com/destinations/le-bristol-paris/",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "michelin_guide",
+      "url": "https://guide.michelin.com/fr/fr/ile-de-france/paris/restaurant/epicure",
+      "consulted_at": "2026-05-12"
+    },
+    {
+      "type": "atout_france_palace_registry",
+      "url": "https://www.atout-france.fr/services/classement-hebergement-touristique",
+      "consulted_at": "2026-05-12"
+    }
+  ],
+  "verification_required_before_publication": [
+    "Coordonnées GPS exactes via API Adresse data.gouv.fr",
+    "Nombre exact chambres / suites breakdown",
+    "Étoiles Michelin actuelles Épicure et 114 Faubourg (édition la plus récente)",
+    "Nom actuel du chat mascotte du Bristol (Fa-Raon vs successeur)",
+    "Surface exacte du jardin intérieur (1 200 m² mentionné, à recouper)",
+    "Distance exacte du Palais de l'Élysée via Haversine",
+    "Pricing ARI Amadeus en J+0"
+  ]
+}

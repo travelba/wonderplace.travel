@@ -117,6 +117,49 @@ export const DEFAULT_AGENT_SKILLS: AgentSkillsDocument = {
         'Filtrer le catalogue par type d’hébergement, équipements, classement étoiles, région.',
     },
     {
+      name: 'list-rankings',
+      description:
+        'Lister tous les classements éditoriaux publiés ("Les meilleurs Palaces de France", "Plus beaux hôtels de Paris", "Palaces avec spa", etc.). Filtrable par axe (type, lieu, thème, occasion). URL hub : /classements ; URL sous-hub : /classements/{axe}/{valeur}.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          axe: {
+            type: 'string',
+            description: 'Axe de filtrage : "type" | "lieu" | "theme" | "occasion".',
+          },
+          valeur: {
+            type: 'string',
+            description:
+              'Valeur de l\'axe (slug kebab-case, ex. "palace", "paris", "spa-bienetre", "lune-de-miel").',
+          },
+          locale: {
+            type: 'string',
+            description: 'Locale demandée — "fr" (par défaut) ou "en".',
+          },
+        },
+      },
+    },
+    {
+      name: 'get-ranking',
+      description:
+        'Récupérer un classement éditorial complet par son slug : intro long-form, sections éditoriales, hôtels classés avec justifications, FAQ canoniques, glossaire, sources externes (EEAT), JSON-LD Article + ItemList. URL canonique : /fr/classement/{slug} ou /en/classement/{slug}.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          slug: {
+            type: 'string',
+            description:
+              'Slug kebab-case du classement (ex. "meilleurs-palaces-france", "palaces-spa-bien-etre").',
+          },
+          locale: {
+            type: 'string',
+            description: 'Locale demandée — "fr" (par défaut) ou "en".',
+          },
+        },
+        required: ['slug'],
+      },
+    },
+    {
       name: 'compare-prices',
       description:
         'Obtenir un comparatif de tarifs non-affilié (Booking, Hotels.com, Expedia, etc.) pour un hôtel et des dates précises. Affichage texte sobre, sans logo ni lien, conforme aux règles légales du comparateur.',
