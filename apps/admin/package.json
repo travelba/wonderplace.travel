@@ -34,7 +34,7 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.18.0",
-    "eslint-config-next": "15.3.9",
+    "eslint-config-next": "16.2.6",
     "typescript": "catalog:"
   }
 }

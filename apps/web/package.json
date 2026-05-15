@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "catalog:",
-    "@next/bundle-analyzer": "15.3.9",
+    "@next/bundle-analyzer": "16.2.6",
     "@playwright/test": "catalog:",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.7",
@@ -60,7 +60,7 @@
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
     "eslint": "^9.18.0",
-    "eslint-config-next": "15.3.9",
+    "eslint-config-next": "16.2.6",
     "msw": "catalog:",
     "postcss": "^8.5.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
