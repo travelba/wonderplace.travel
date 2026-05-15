@@ -273,9 +273,26 @@ export async function generateMetadata({
         ]
       : undefined;
 
+  // EEAT guard: a sheet that has neither a real hero image nor any
+  // long-form editorial section is a "stub" (catalog placeholder for
+  // the rankings matrix — see `scripts/editorial-pilot/src/import/
+  // import-atout-france-5stars.ts`). We let the page render so deep
+  // links from rankings work, but mark it `noindex, follow` so Google
+  // doesn't index thin pages and downgrade the site's overall quality
+  // signal. As soon as the editorial team enriches the fiche (hero +
+  // ≥1 long-description section), the page becomes indexable on the
+  // next ISR revalidation.
+  // `long_description_sections` is typed as `unknown` in the row schema
+  // (it's a JSONB blob with its own runtime parser further down). Narrow
+  // it locally so the TS strict mode is satisfied without an `as` cast.
+  const sectionsRaw = row.long_description_sections;
+  const hasSections = Array.isArray(sectionsRaw) && sectionsRaw.length > 0;
+  const isStub = heroPublicId === null && !hasSections;
+
   return {
     title,
     description: desc,
+    ...(isStub ? { robots: { index: false, follow: true } } : {}),
     alternates: {
       canonical,
       languages: {
