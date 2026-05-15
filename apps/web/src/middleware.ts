@@ -45,7 +45,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   // Run on app routes only — skip static, _next, api/cron (handled separately), well-known.
+  // `sitemaps` (no extension) covers every `sitemaps/*.xml` sub-sitemap;
+  // without it next-intl rewrites them to `/fr/sitemaps/...` which 404s.
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|llms.txt|llms-full.txt|.well-known|manifest.webmanifest|monitoring).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sitemaps|llms.txt|llms-full.txt|.well-known|manifest.webmanifest|monitoring).*)',
   ],
 };

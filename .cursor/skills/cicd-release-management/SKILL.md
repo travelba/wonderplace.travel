@@ -106,6 +106,99 @@ Database environments map to **separate Supabase projects** for `staging` and `p
 - Manual deploys to production from a developer machine.
 - Migrations applied manually without going through `migrate.yml`.
 
+## Vercel deploy gotchas (paid in production, capture for next session)
+
+### Rule 1 — Vercel rejects Next.js builds with known CVEs
+
+Since 2026, Vercel post-build step refuses to ship a deploy if the Next.js
+version is on its CVE blocklist. The error surfaces only as an opaque
+
+```
+Vulnerable version of Next.js detected, please update immediately.
+status   ● Error
+```
+
+after `Build Completed in /vercel/output`. **The build itself succeeds.**
+The blocklist currently rejects Next < `15.2.3` (CVE-2025-29927 — middleware
+auth bypass via `x-middleware-subrequest`) and earlier CVEs on the 14.x and
+13.x lines. Bump to the latest patch on the same minor when this triggers.
+Patch is **not back-ported** to older minors (e.g. 15.1.x stays vulnerable
+even at 15.1.12).
+
+### Rule 2 — `withSentryConfig` crashes silently without `SENTRY_AUTH_TOKEN`
+
+Wrapping the Next.js config with `@sentry/nextjs`'s `withSentryConfig` in
+production builds always triggers the sourcemap upload pipeline — even when
+`authToken` is undefined. The upload step crashes after `Collecting build
+traces ...` with no actionable message; Vercel just marks the deploy as
+ERROR. **Skip the wrapper entirely** when the token is missing instead of
+just stripping the `authToken` option:
+
+```ts
+const sentryAuthToken = process.env['SENTRY_AUTH_TOKEN'];
+const isDev = process.env['NODE_ENV'] !== 'production';
+const shouldWrapSentry =
+  !isDev && sentryAuthToken !== undefined && sentryAuthToken.length > 0;
+
+export default shouldWrapSentry
+  ? withSentryConfig(baseConfig, { ... authToken: sentryAuthToken })
+  : baseConfig;
+```
+
+This is documented in `apps/web/next.config.ts` and matters for Vercel
+preview branches where Sentry creds are intentionally not provisioned.
+
+### Rule 3 — Vercel encrypted env vars come back **empty** via `vercel env pull`
+
+`vercel env pull --environment=preview --git-branch=...` always writes the
+file with empty `=""` values for env vars marked as **Sensitive** /
+encrypted in the dashboard. The names are listed but the values are
+masked. Conclusion:
+
+- **Don't trust** a successful `vercel env pull` as proof the build will get
+  real values. The build pulls them server-side from a different source.
+- If you suspect a Vercel env var is empty (build error like
+  `Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.`), the only way
+  to be sure is to `vercel env rm <NAME> <env> [<branch>] --yes` and
+  re-add via `vercel env add <NAME> <env> <branch> --value "..." --yes`.
+- Branch-scoped overrides (`vercel env add NAME preview <branch>`) take
+  precedence over "all preview branches" entries — useful to fix a single
+  preview without touching production.
+
+### Rule 4 — `vercel env add` requires a Git branch when targeting `preview`
+
+`vercel env add NEXT_PUBLIC_FOO preview --value "..." --yes` returns
+`{ status: "action_required", reason: "git_branch_required" }`. The
+documentation hint says "omit branch for all preview branches", but the
+CLI in fact rejects it — you **must** pass a branch as the third positional
+arg (or use the dashboard for the "all branches" entry).
+
+### Rule 5 — Vercel CLI on PowerShell hangs when piped to `Select-Object`
+
+`vercel env add … 2>&1 | Select-Object -Last 5` looks innocent but
+PowerShell's `Select-Object` waits for stdin EOF. The Vercel CLI prints
+its success message and then keeps the process alive for ~5 minutes
+(probably an HTTP keep-alive on the next-action probe), so the pipe
+never closes. Either:
+
+- Drop the `Select-Object` and accept the full output, **or**
+- Run the command, capture `Output collected before backgrounding` from
+  the tool, and `Stop-Process -Id <pid> -Force` once you see the success
+  marker (`Added Environment Variable …` / `Removed Environment Variable`).
+
+This applies to **every** Vercel CLI subcommand that exits with an open
+stream (`vercel env add`, `vercel env rm`, `vercel pull`, `vercel link`).
+
+### Rule 6 — OAuth-logged Vercel CLI cannot mint API tokens
+
+`vercel tokens add <name>` returns
+`{ "reason": "classic_token_required" }` when the CLI session is OAuth
+(the result of `vercel login`). Creating a personal access token requires
+either (a) a classic token already set in `VERCEL_TOKEN`, or (b) the
+dashboard. Plan accordingly when you need raw REST API access — prefer
+`vercel env add/rm`, `vercel deploy`, and the MCP `user-vercel` tools
+(which use a separate auth flow) over hand-rolled REST calls.
+
 ## References
 
 - CDC v3.0 §13 (phasage), §15 (livrables).
