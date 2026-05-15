@@ -87,6 +87,74 @@ for editorial routes whose underlying data only changes on publish.
 - Leaking secrets to client by reading `process.env.SECRET` inside a client component.
 - Bypassing `next-intl` to hardcode FR strings in JSX.
 
+### Defensive upstream calls in static-prerendered routes
+
+Every `page.tsx` / `route.ts` that runs at build time AND touches an
+upstream service (Supabase, Algolia, Cloudinary admin) **must** wrap the
+call so an outage degrades to an empty render rather than crashing the
+build. Same contract as `generateStaticParams` returning `[]`.
+
+The CI Build job and the first Vercel prerender both run with stub or
+unreachable credentials. Without a try/catch, you get this opaque
+failure that aborts the entire deploy:
+
+```
+Error occurred prerendering page "/llms.txt".
+Error: supabaseUrl is required.
+Export encountered an error on /llms.txt/route, exiting the build.
+```
+
+Pattern (try/catch over `.catch(() => [])` because TypeScript's strict
+inference around `readonly T[]` and Promise overloads gets confused
+otherwise):
+
+```ts
+export const revalidate = 3600;
+
+export default async function ClassementsHubPage(...) {
+  // Defensive: degrade to an empty hub when Supabase is unreachable.
+  let rankings: readonly PublishedRankingCard[];
+  try {
+    rankings = await listPublishedRankings();
+  } catch {
+    rankings = [];
+  }
+  // ...
+}
+```
+
+Applies symmetrically to route handlers (`route.ts`):
+
+```ts
+const [hotels, rankings] = await Promise.all([
+  listPublishedHotelSummaries(50).catch(() => []),
+  listPublishedRankings().catch(() => []),
+]);
+```
+
+The `Promise.all + .catch(() => [])` form is fine when the consuming
+code never re-uses the array in a position that triggers the
+`readonly` inference issue. When it does (typically `Array.reduce<T>`
+or property access on an inferred element), fall back to try/catch.
+
+### Middleware matcher must list every top-level folder you want to bypass
+
+`next-intl`'s middleware matcher uses a negative-lookahead alternation
+to skip non-app routes. Every new top-level folder (`/sitemaps/*.xml`,
+`/api/health`, `/.well-known/*`) must appear in the alternation, otherwise
+the middleware rewrites it to `/fr/<path>` and the request 404s. Single
+files (`sitemap.xml`, `robots.txt`) need their full filename; folders
+need only the folder name without extension:
+
+```ts
+matcher: [
+  '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sitemaps|llms.txt|llms-full.txt|.well-known|manifest.webmanifest|monitoring).*)',
+];
+```
+
+Symptom of a missing entry: route handler exists, build log lists it as
+prerendered (`○ /sitemaps/rankings.xml`), but production returns 404.
+
 ## Example: marketing page with ISR + JSON-LD + AEO
 
 ```tsx

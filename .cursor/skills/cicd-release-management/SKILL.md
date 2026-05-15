@@ -199,6 +199,65 @@ dashboard. Plan accordingly when you need raw REST API access — prefer
 `vercel env add/rm`, `vercel deploy`, and the MCP `user-vercel` tools
 (which use a separate auth flow) over hand-rolled REST calls.
 
+### Rule 7 — GitHub Actions `Build` needs env placeholders, not secrets
+
+Vercel runs the production build with the **real** env vars stored in
+the project, but the GitHub Actions `Build` job does not — and on a fresh
+repo nobody wires Supabase / Cloudinary / Algolia secrets there. With
+`SKIP_ENV_VALIDATION=true` the t3-env Zod check passes, but vendor
+clients still crash at construction time during static prerender:
+
+```
+Error occurred prerendering page "/llms.txt".
+Error: supabaseUrl is required.
+```
+
+The robust fix is **placeholder env vars in the workflow**, not adding
+real secrets — every static route that touches a vendor must already
+`try/catch` its upstream call (see `nextjs-app-router` rule on
+defensive `generateStaticParams`). Pattern:
+
+```yaml
+build:
+  name: Build
+  env:
+    NEXT_PUBLIC_SUPABASE_URL: 'https://placeholder.supabase.co'
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'ci-placeholder-anon-key'
+    SUPABASE_SERVICE_ROLE_KEY: 'ci-placeholder-service-role-key'
+    NEXT_PUBLIC_SITE_URL: 'https://ci.conciergetravel.fr'
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: 'ci-placeholder'
+    NEXT_PUBLIC_ALGOLIA_APP_ID: 'CIPLACEHOLDER'
+    NEXT_PUBLIC_ALGOLIA_SEARCH_KEY: 'ci-placeholder-search-key'
+  steps:
+    - run: pnpm turbo run build
+```
+
+Network calls to the placeholder hosts will fail with DNS / 401 errors,
+but the routes degrade to their static skeleton instead of crashing the
+build — which is the correct prod behaviour during a real outage.
+
+### Rule 8 — Middleware matcher must list `sitemaps` (no extension) explicitly
+
+The `next-intl` middleware matcher pattern excludes top-level files via
+named alternation:
+
+```ts
+matcher: [
+  '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sitemaps|llms.txt|llms-full.txt|.well-known|monitoring).*)',
+];
+```
+
+`sitemap.xml` (the index) excludes only the index file. Sub-sitemaps
+under `/sitemaps/<name>.xml` need a separate `sitemaps` token in the
+alternation — without it, every sub-sitemap (`/sitemaps/hotels.xml`,
+`/sitemaps/rankings.xml`, …) is intercepted by next-intl, rewritten to
+`/fr/sitemaps/<name>.xml`, and 404s because no app-router page matches.
+
+Symptom: route handler exists, build log shows it as static prerendered
+(`○ /sitemaps/rankings.xml`), but production returns 404. Always update
+the matcher when you add a new top-level folder that should bypass i18n
+routing (e.g. `/api/health`, `/sitemaps/`, `/.well-known/`).
+
 ## References
 
 - CDC v3.0 §13 (phasage), §15 (livrables).
