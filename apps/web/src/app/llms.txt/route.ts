@@ -29,9 +29,13 @@ const FALLBACK_SITE_URL = 'https://conciergetravel.fr';
  */
 export async function GET(): Promise<NextResponse> {
   const origin = (env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/$/, '');
+  // Defensive: never let an upstream Supabase outage crash the build
+  // (skill: nextjs-app-router — generateStaticParams / route handlers
+  // must degrade gracefully). The route still ships a valid llms.txt
+  // skeleton without dynamic catalogue when the DB is unreachable.
   const [hotels, rankings] = await Promise.all([
-    listPublishedHotelSummaries(50),
-    listPublishedRankings(),
+    listPublishedHotelSummaries(50).catch(() => []),
+    listPublishedRankings().catch(() => []),
   ]);
 
   const catalogItems: LlmsTxtSectionItem[] = hotels.map((h) => {
