@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { buildSitemapXml, type SitemapEntry } from '@cct/seo';
 
 import { env } from '@/lib/env';
-import { listPublishedHotelSlugs } from '@/server/hotels/get-hotel-by-slug';
+import { listIndexableHotelSlugs } from '@/server/hotels/get-hotel-by-slug';
 
 // ISR — fetches the published catalog at build, then revalidates hourly.
 export const revalidate = 3600;
@@ -24,7 +24,8 @@ export async function GET(): Promise<NextResponse> {
   let entries: SitemapEntry[] = [];
 
   try {
-    const slugs = await listPublishedHotelSlugs();
+    // Indexable only — exclude catalog stubs (noindex on the page).
+    const slugs = await listIndexableHotelSlugs();
     for (const s of slugs) {
       const enSlug = s.slugEn ?? s.slugFr;
       const frUrl = `${origin}/hotel/${s.slugFr}`;

@@ -2003,6 +2003,57 @@ export async function listPublishedHotelSlugs(): Promise<readonly PublishedHotel
   }
 }
 
+/**
+ * Indexable hotel slugs — same shape as `listPublishedHotelSlugs` but
+ * additionally filters out catalog-only "stub" sheets that exist
+ * solely to feed the rankings combinatorial matrix
+ * (`scripts/editorial-pilot/src/import/import-atout-france-5stars.ts`).
+ *
+ * A sheet is considered indexable when **either** a hero image is set
+ * (`hero_image IS NOT NULL`) **or** at least one long-form editorial
+ * section has been authored (`jsonb_array_length(long_description_sections) > 0`).
+ *
+ * Used by the public sitemap (`/sitemaps/hotels.xml`) so Google never
+ * spends crawl budget on stub URLs that we mark `noindex` server-side.
+ * Mirrors the same check applied in
+ * `apps/web/src/app/[locale]/hotel/[slug]/page.tsx` `generateMetadata`.
+ */
+export async function listIndexableHotelSlugs(): Promise<readonly PublishedHotelSlug[]> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from('hotels')
+      .select('slug, slug_en, hero_image, long_description_sections')
+      .eq('is_published', true)
+      .order('priority', { ascending: true })
+      .limit(500);
+    if (error || !Array.isArray(data)) return [];
+    const out: PublishedHotelSlug[] = [];
+    for (const raw of data) {
+      const r = raw as {
+        slug?: unknown;
+        slug_en?: unknown;
+        hero_image?: unknown;
+        long_description_sections?: unknown;
+      };
+      const slug = r.slug;
+      if (typeof slug !== 'string' || !isValidSlug(slug)) continue;
+      const hasHero = typeof r.hero_image === 'string' && r.hero_image.length > 0;
+      const sections = Array.isArray(r.long_description_sections)
+        ? r.long_description_sections
+        : [];
+      if (!hasHero && sections.length === 0) continue;
+      out.push({
+        slugFr: slug,
+        slugEn: typeof r.slug_en === 'string' && isValidSlug(r.slug_en) ? r.slug_en : null,
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 const HotelSummaryRowSchema = z.object({
   slug: z.string(),
   slug_en: stringOrEmpty,
