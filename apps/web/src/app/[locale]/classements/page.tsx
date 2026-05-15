@@ -240,7 +240,12 @@ export default async function RankingsIndexPage({
   const t = T[locale];
   // Defensive: degrade to an empty hub when Supabase is unreachable
   // (CI prerender, transient DB outage). Skill: nextjs-app-router.
-  const rankings = await listPublishedRankings().catch((): PublishedRankingCard[] => []);
+  let rankings: readonly PublishedRankingCard[];
+  try {
+    rankings = await listPublishedRankings();
+  } catch {
+    rankings = [];
+  }
   const origin = siteOrigin();
   const nonce = (await headers()).get('x-nonce') ?? undefined;
 
