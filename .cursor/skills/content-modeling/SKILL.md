@@ -179,6 +179,51 @@ Invoke when:
 - Storing inline image URLs not from Cloudinary.
 - Storing POI distances without units or without `walk_min` when the POI is < 2 km.
 
+## Catalog stub fiches (combinatorial matrix only)
+
+Some product surfaces — e.g. the editorial **rankings combinatorial
+matrix** in `scripts/editorial-pilot/src/rankings/run-rankings-v2-bulk.ts`
+— need a wide hotel catalog to be **eligible** for many seeds
+(`region × theme × type × occasion`). Enriching every fiche before
+expanding the catalog is impractical, but publishing thin fiches kills
+EEAT and pollutes Google's index.
+
+**Pattern**: insert _stub_ hotels (`is_published = TRUE` so they exist
+as routes) but **gate indexability server-side**, not via the publish
+flag. The fiche renders so deep links from rankings resolve, but it is
+hidden from Google.
+
+**The two locks** (must always be paired):
+
+1. **`generateMetadata` returns `robots: { index: false, follow: true }`**
+   when both `hero_image IS NULL` and `long_description_sections` is
+   empty (or not an array). `follow` lets Google traverse the deep links
+   the rankings emit toward the (indexable) parent ranking page.
+   See `apps/web/src/app/[locale]/hotel/[slug]/page.tsx`.
+2. **The public sub-sitemap omits the stubs** — never just relax the
+   `is_published` filter. Use a dedicated query
+   (`listIndexableHotelSlugs()` in `get-hotel-by-slug.ts`) that mirrors
+   the same `(hero_image IS NOT NULL OR long_description_sections IS NOT NULL)`
+   predicate. Otherwise Google wastes crawl budget on pages it will
+   refuse to index.
+
+**Reverse direction**: as soon as the editor adds a hero image **or**
+the first long-form section, both locks lift on the next ISR
+revalidation — no manual flag flip required.
+
+**Bulk-import gotcha** (Atout France CSV pipeline):
+
+- Filter on `TYPOLOGIE = "HÔTEL DE TOURISME"` AND
+  `CLASSEMENT = "5 étoiles"`. Without the typology filter you import
+  campings, résidences de tourisme, villages vacances classified at
+  5★ — they exist in the CSV.
+- Normalise URLs to satisfy `hotels_official_url_ck` (`^https?://`)
+  before insert. The CSV ships bare hostnames like
+  `www.example.com` — prefix with `https://` or NULL out the field.
+- Cap `--per-city` (default 2 in
+  `import-atout-france-5stars.ts`) so a single touristy city does not
+  monopolise the catalog and skew the geographic ranking matrix.
+
 ## References
 
 - CDC v3.0 §3.2 (i18n), §4 (data model), §6.2 (hotel anatomy), §11 (back-office).

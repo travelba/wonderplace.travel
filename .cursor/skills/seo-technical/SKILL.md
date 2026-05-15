@@ -92,6 +92,32 @@ Conventions:
 - Booking tunnel + account → `noindex, nofollow`.
 - Search results page (`/recherche`) → `noindex, follow` (can crawl categorical links, do not index parameterized URLs).
 - Pagination/filter combos → `noindex, follow` with `rel=prev/next` deprecated; we'll rely on canonical to the unparameterized list.
+- **Catalog stub fiches** (hotels published only to feed the rankings
+  combinatorial matrix — see `content-modeling` §"Catalog stub fiches")
+  → `noindex, follow` _server-side in `generateMetadata`_ when both
+  `hero_image IS NULL` and `long_description_sections` is empty. The
+  page renders so deep links resolve, but Google does not index thin
+  pages and the site's overall quality signal is preserved.
+
+### Sub-sitemap exclusion contract
+
+Sub-sitemaps **must mirror the noindex predicate, not the publish
+flag**. A row marked `is_published = TRUE` but `noindex` server-side
+(stub fiches, half-built rooms, archived comparatifs) is a wasted
+crawl-budget URL and will trigger Search Console "Indexed, though
+blocked" warnings.
+
+The pattern in this repo:
+
+- `listPublishedHotelSlugs()` → returns every published slug. Used by
+  `generateStaticParams` so all routes are pre-rendered (404 would be
+  worse than a noindex render).
+- `listIndexableHotelSlugs()` → applies the same predicate as
+  `generateMetadata` (`hero_image OR long_description_sections`). Used
+  by `apps/web/src/app/sitemaps/hotels.xml/route.ts`.
+
+Same split applies to rooms (`listIndexableRoomSlugs` should mirror
+the room-page indexability check: ≥ 5 photos AND ≥ 200 words).
 
 ### Anti-cannibalisation (Excel matrix)
 
